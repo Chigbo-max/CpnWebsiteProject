@@ -1,0 +1,142 @@
+.features {
+  background: #ffff;
+  padding: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.feature_cards {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 2rem;
+  width: 1200px;
+  padding: 4rem;
+}
+
+.imageContainer {
+  width: 400px;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+}
+
+.textContainer {
+  max-width: 500px;
+  min-width: 500px;
+}
+
+.textContainer h5{
+  margin-top: 0;
+}
+
+.textContainer h2{
+  font-size: 2.9rem;
+  font-weight: 900;
+  margin-top: -15px;
+  line-height: 60px;
+  color: #3d231b;
+}
+
+.textContainer h2 span{
+  color: burlywood;
+}
+
+
+.textContainer p {
+  font-size: 1.2rem;
+  text-align: left;
+  margin-top: -15px;
+  margin-bottom: 20px;
+}
+
+.about_button{
+  margin-top: 20px;
+ 
+}
+
+.about_button a{
+  background-color: #3d231b;
+  color: #ffff;
+  font-weight: bold;
+  height: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  text-decoration: none;
+
+}
+
+.imageContainer img{
+  width: 100%;
+  border-radius: 25px;
+}
+
+
+
+.about_button a:hover{
+  border: 2px solid #3d231b;
+  background-color: #ffff;
+  color:#3d231b;
+
+}
+
+span{
+  color: #3d231b;
+}
+
+.threeFeatures{
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 4rem;
+  
+}
+
+.threeFeaturesBox{
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+  color: #3d231b;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding: 3rem;
+  width: 300px;
+  height: 150px;
+  cursor: pointer;
+  transition: 0.3s;
+
+}
+
+.threeFeaturesBox:hover{
+  transition: transform 0.8s ease-in;
+  transform: scale(1);
+  border: 1px solid #3d231b;
+}
+
+.threeFeaturesBox h3{
+  font-size: 2rem;
+}
+.threeFeaturesBox p{
+  font-size: 1.2rem;
+  margin-top: -10px;
+}
+
+.featureIcon {
+  font-size: 24px;
+  color: #F5F5DC;
+  margin-right: 10px;
+  position: absolute;
+  margin-top: -50px; 
+  background-color: #3d231b;
+  border-radius: 50%;
+  height: 8%;
+  width: 6%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: .8rem;
+}
+

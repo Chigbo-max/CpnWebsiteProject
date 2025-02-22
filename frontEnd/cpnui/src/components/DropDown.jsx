@@ -10,8 +10,8 @@ function DropDown() {
   return (
     <div>
         <ul className={dropDown ? style.drop_down_clicked : style.drop_down} onClick={() => setDropDown(!dropDown)}>
-            {dropDownItems.map((item) => {
-                return <li key={item.id}className ={item.cName} >
+            {dropDownItems.map((item, index) => {
+                return <li key={index}className ={item.cName} >
                     <Link to={item.path} onClick={()=> setDropDown(false)} >{item.title}</Link>
                     </li>
 

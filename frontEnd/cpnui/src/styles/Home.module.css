@@ -1,10 +1,11 @@
 
 
 .heroSection {
-  padding: 10rem 4rem 10rem 18rem;
+    padding: 10rem 4rem 10rem 18rem;
     clip-path: ellipse(100% 100% at 40% 0%);
     position: relative;
-    width: 1200px;
+    width: 100%;
+    max-width: 1200px;
     height: 300px;
     overflow: hidden;
     display: flex;
@@ -13,8 +14,30 @@
     color: #fff;
     text-align: center;
     flex-direction: column;
-    font-size: 1.2em;
+    font-size: 1.5em;
+    margin: 0 auto;
   }
+
+  .heroSection p{
+    font-size: 1em;
+    margin-top: -10px;
+    width: 800px;
+  }
+
+  .heroSection h1 {
+    margin-top: 0;
+  }
+
+  .otherHeroSection {
+    padding: 10rem 4rem 10rem 18rem;
+      /* padding: 8rem 4rem 4rem 2rem; */
+      background:#3d231b;
+      color: white;
+      width: 100vw;
+      max-width: 1200px;
+      align-items:center;
+      clip-path: ellipse(100% 100% at 40% 0%);
+    }
 
 
   .hero_image {
@@ -31,8 +54,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100%px;
-    margin-right: 180px;
+    width: 100%;
+    margin-right: 280px;
     padding: 40px;
     border-radius: 20px;
   }

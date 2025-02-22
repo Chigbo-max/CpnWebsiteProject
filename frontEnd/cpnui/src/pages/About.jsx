@@ -2,12 +2,12 @@ import React from 'react'
 import Style from "../styles/Home.module.css"
 
 
-function AboutUs() {
+function About() {
   return (
-    <div className={Style.heroSection}>
+    <div className={Style.otherHeroSection}>
       <h1>About us</h1>
     </div>
   )
 }
 
-export default AboutUs
+export default About

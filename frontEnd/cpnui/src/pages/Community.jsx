@@ -2,13 +2,12 @@ import React from 'react'
 import Style from "../styles/Home.module.css"
 
 
-function ContactUs() {
+function Community() {
   return (
     <div className={Style.otherHeroSection}>
-        <h1>Contact us</h1>
-      
+        <h1>Community</h1>
     </div>
   )
 }
 
-export default ContactUs
+export default Community

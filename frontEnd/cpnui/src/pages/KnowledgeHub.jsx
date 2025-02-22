@@ -1,17 +1,15 @@
 import React from 'react'
 import Style from "../styles/Home.module.css"
 
-function Business() {
+function KnowledgeHub() {
   return (
     <div>
-
-         <div className={Style.heroSection}>
-        
-                  <h1>Business</h1>
+         <div className={Style.otherHeroSection}>
+                  <h1>KnowledgeHub</h1>
                   </div>
       
     </div>
   )
 }
 
-export default Business
+export default KnowledgeHub

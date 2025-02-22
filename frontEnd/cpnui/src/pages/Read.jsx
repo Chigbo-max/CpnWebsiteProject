@@ -1,16 +1,16 @@
 import React from 'react'
 import Style from "../styles/Home.module.css"
 
-function StartUp() {
+function Read() {
   return (
     <div>
-       <div className={Style.heroSection}>
+       <div className={Style.otherHeroSection}>
 
-<h1>Start Up</h1>
+<h1>Read</h1>
 
 </div>
     </div>
   )
 }
 
-export default StartUp
+export default Read

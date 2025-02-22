@@ -5,7 +5,7 @@ function TheTeam() {
     return (
         <div>
 
-            <div className={Style.heroSection}>
+            <div className={Style.otherHeroSection}>
                 <h1>The Team</h1>
             </div>
 

@@ -4,7 +4,7 @@ import Style from "../styles/Home.module.css"
 function NewsLetter() {
     return (
         <div>
-            <div className={Style.heroSection}>
+            <div className={Style.otherHeroSection}>
 
                 <h1>NewsLetter</h1>
             </div>

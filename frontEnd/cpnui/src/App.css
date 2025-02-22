@@ -17,5 +17,6 @@ body::-webkit-scrollbar{
   align-items: center;
   justify-content: center;
   height: auto;
+  overflow-x: hidden;
 }
 

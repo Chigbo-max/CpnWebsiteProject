@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Style from "../styles/Home.module.css"
 import Features from "../components/Features"
+import LatestRelease from "../components/LatestRelease"
+import Courses from "../components/Courses"
+import FreeContent from '../components/FreeContent'
+import NewAndPastEvents from '../components/NewAndPastEvents'
 import Cpn1 from "../assets/cpnevent1.jpg";
 import Cpn2 from "../assets/cpnevent2.jpg"
 import Cpn3 from "../assets/cpnevent3.jpg"
@@ -110,8 +114,21 @@ function Home() {
         </div>
       </section>
       <Features />
+      <LatestRelease/>
+      <Courses/>
+      <FreeContent/>
+      <NewAndPastEvents/>
+      
+
+                            
+   
     </div>
-  )
+
+
+            
+      
+    
+      )
 }
 
-export default Home
+      export default Home

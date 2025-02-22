@@ -24,14 +24,14 @@ export const navBarItems = [
     },
 
     {
-        "title": "About",
-        "path": "/about",
+        "title": "Inside CPN",
+        "path": "/insideCPN",
         "cName": "nav_bar_item" 
     },
 
     {
         "title": "Contact us",
-        "path": "/ContactUs",
+        "path": "/contactUs",
         "cName": "nav_bar_item"
     }
 

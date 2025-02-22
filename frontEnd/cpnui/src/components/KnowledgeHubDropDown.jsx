@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
-import { businessDropDownItems } from "../helpers/BusinessDropDownItems.jsx"
+import { KnowledgeHubDropDownItems } from "../helpers/KnowledgeHubDropDownItems.jsx"
 import { Link } from 'react-router-dom'
 import style from "../styles/DropDown.module.css"
 
-function BusinessDropDown() {
+function KnowledgeHubDropDown() {
 
     const [dropDown, setDropDown] = useState(false);
 
     return (
         <div>
             <ul className={dropDown ? style.drop_down_clicked : style.drop_down} onClick={() => setDropDown(!dropDown)}>
-                {businessDropDownItems.map((item) => {
-                    return <li key={item.id} className={item.cName} >
+                {KnowledgeHubDropDownItems.map((item, index) => {
+                    return <li key= {index} className={item.cName} >
                         <Link to={item.path} onClick={() => setDropDown(false)} >{item.title}</Link>
                     </li>
 
@@ -23,7 +23,7 @@ function BusinessDropDown() {
     )
 }
 
-export default BusinessDropDown
+export default KnowledgeHubDropDown
 
 
 
