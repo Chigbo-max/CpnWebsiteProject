@@ -26,13 +26,24 @@
     padding: 0;
 }
 
+.footerLinks li a{
+    text-decoration: none;
+}
+
+.leftSideFooter a{
+    font-style: none;
+}
+
 .footerLinks li {
     margin-bottom: 10px;
+    font-style: none;
+
 }
 
 .footerLinks h3 {
     font-size: 0.8em;
     color: white;
+
 }
 
 
@@ -40,6 +51,7 @@
 .footerLinks h5 {
     font-size: 0.6em;
     color: #ffff;
+
 }
 
 .footerLinks h5:hover {
@@ -53,6 +65,7 @@
     flex-direction: column;
     align-items: flex-start;
     margin-left: 20px;
+
 }
 
 .contact {
