@@ -10,19 +10,19 @@ export const getAccessToken = async () => {
   try {
     const response = await axios.post(
       "https://accounts.spotify.com/api/token",
-      new URLSearchParams({ grant_type: "client_credentials" }), // Proper URL encoding
+      new URLSearchParams({ grant_type: "client_credentials" }), 
       {
         headers: {
           Authorization: `Basic ${base64Credentials}`,
-          "Content-Type": "application/x-www-form-urlencoded", // ✅ Valid Header Format
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
 
-    console.log("🎉 New Token Fetched:", response.data.access_token);
+    console.log("New Token Fetched:", response.data.access_token);
     return response.data.access_token;
   } catch (error) {
-    console.error("❌ Error Fetching Spotify Token:", error.response?.data || error);
+    console.error("Error Fetching Spotify Token:", error.response?.data || error);
     return null;
   }
 };

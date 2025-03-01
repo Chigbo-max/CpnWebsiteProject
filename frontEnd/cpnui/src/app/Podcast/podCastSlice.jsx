@@ -19,12 +19,11 @@ const fetchNewAccessToken = async () => {
     );
     return response.data.access_token;
   } catch (error) {
-    console.error('❌ Error fetching token:', error);
+    console.error('Error fetching token:', error);
     throw new Error('Failed to get access token');
   }
 };
 
-// Thunk to fetch podcasts with pagination
 export const fetchPodcasts = createAsyncThunk(
   'podcasts/fetchPodcasts',
   async (_, { getState, dispatch, rejectWithValue }) => {
@@ -40,7 +39,7 @@ export const fetchPodcasts = createAsyncThunk(
       const showId = getState().podcasts.showId;
       let episodes = [];
       let offset = 0;
-      let limit = 50; // Max allowed per request
+      let limit = 50; 
 
       while (true) {
         const response = await axios.get(
@@ -73,7 +72,6 @@ export const fetchPodcasts = createAsyncThunk(
   }
 );
 
-// Podcast slice
 const podcastSlice = createSlice({
   name: 'podcasts',
   initialState: {
@@ -82,7 +80,7 @@ const podcastSlice = createSlice({
     selectedTopic: '',
     searchQuery: '',
     accessToken: null,
-    showId: '2vmyOcrq7cFcKBMepGbpZP', // Example show ID
+    showId: '2vmyOcrq7cFcKBMepGbpZP', 
     status: 'idle',
     error: null,
   },
@@ -118,9 +116,7 @@ const podcastSlice = createSlice({
   },
 });
 
-// Export actions
 export const { setSelectedTopic, setSearchQuery, clearFilters, setAccessToken } =
   podcastSlice.actions;
 
-// Export reducer
 export default podcastSlice.reducer;

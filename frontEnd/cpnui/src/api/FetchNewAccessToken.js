@@ -18,7 +18,7 @@ const fetchNewAccessToken = async () => {
     console.log("🎉 New Token Fetched:", response.data.access_token);
     return response.data.access_token;
   } catch (error) {
-    console.error("❌ Error Fetching Spotify Token:", error.response?.data || error);
+    console.error("Error Fetching Spotify Token:", error.response?.data || error);
   }
 };
 
