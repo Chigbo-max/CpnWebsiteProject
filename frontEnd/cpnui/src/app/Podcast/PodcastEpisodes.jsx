@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPodcasts } from "./PodcastSlice";
-import Style from "../../styles/PodcastEpisode.module.css";
+import Style from "./PodcastEpisode.module.css";
 
 const PodcastEpisodes = () => {
   const dispatch = useDispatch();

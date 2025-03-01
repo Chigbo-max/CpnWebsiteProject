@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSearchQuery } from './PodcastSlice';
-import Style from '../../styles/Listen.module.css';
+import Style from '../../pages/Listen/Listen.module.css';
 
 const PodcastSearch = () => {
   const dispatch = useDispatch();

@@ -1,0 +1,10 @@
+.otherHeroSection {
+    padding: 10rem 4rem 10rem 18rem;
+      /* padding: 8rem 4rem 4rem 2rem; */
+      background:#3d231b;
+      color: white;
+      width: 100vw;
+      max-width: 1200px;
+      align-items:center;
+      clip-path: ellipse(100% 100% at 40% 0%);
+    }

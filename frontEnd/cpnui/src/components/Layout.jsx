@@ -1,6 +1,6 @@
-import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
-import Connect from "../components/Connect";
+import NavBar from "../components/NavBar/NavBar";
+import Footer from "../components/Footer/Footer";
+import Connect from "../components/Connect/Connect";
 
 import { Outlet } from "react-router-dom";
 

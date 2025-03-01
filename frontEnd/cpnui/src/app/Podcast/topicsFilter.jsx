@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedTopic, clearFilters } from './podcastSlice';
-import Style from '../../styles/TopicsFilter.module.css';
+import { setSelectedTopic, clearFilters } from './PodcastSlice';
+import Style from './TopicsFilter.module.css';
 
 const TopicsFilter = () => {
   const dispatch = useDispatch();
