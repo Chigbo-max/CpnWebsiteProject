@@ -1,0 +1,73 @@
+
+.episodesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-color: #121212;
+    color: white;
+  }
+  
+  .episodeCard {
+    background: #181818;
+    border-radius: 12px;
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .episodeCard:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .episodeImage {
+    width: 100%;
+    max-width: 180px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  
+  button {
+    background: #deb887ff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  button:hover {
+    background: rgb(235, 162, 67);
+  }
+  
+  .audioPlayer {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .playing {
+    border: 2px solid #deb887ff;
+    box-shadow: 0 0 10px #deb887ff;
+  }
+  
+  .paused {
+    opacity: 0.8;
+  }
+  
+  @media (max-width: 768px) {
+    .episodesContainer {
+      grid-template-columns: 1fr;
+      padding: 10px;
+    }
+  
+    .episodeCard {
+      padding: 10px;
+    }
+  }
+  

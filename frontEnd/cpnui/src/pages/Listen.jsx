@@ -1,57 +1,34 @@
-import Styles from "../styles/Home.module.css"
 import React from 'react';
-import { useSelector} from 'react-redux';
-import Podcast from '../app/Podcast/Podcast';
-import PodcastSearch from '../app/Podcast/podCastSearch';
-import TopicsFilter from '../app/Podcast/topicsFilter';
-import Style from "../styles/Listen.module.css"
+import PodcastSearch from "../app/Podcast/PodcastSearch.jsx";
+import TopicsFilter from '../app/Podcast/TopicsFilter.jsx'
+import PodcastEpisodes from '../app/Podcast/PodcastEpisodes';
+import Styles from '../styles/Home.module.css';
+import Style from '../styles/Listen.module.css';
+import { useSelector } from 'react-redux';
 
 const Listen = () => {
 
-    const { podcasts, searchQuery, selectedTopic } = useSelector(state => state.podcasts);
 
-    const filteredPodcasts = podcasts.filter(podcast => {
-        const matchesSearch = podcast.title.toLowerCase().includes(searchQuery);
-        const matchesTopic = selectedTopic ? podcast.topic.toLowerCase() === selectedTopic : true;
-        return matchesSearch && matchesTopic;
-      });
+  const podcast = useSelector((state) => state.podcast);
 
+  return (
+    <>
+      <div className={Styles.otherHeroSection}>
+        <h1>Subscribe to <span style={{color: '#deb887ff'}}>Christian Professionals Network</span></h1>
+        <h3>Our Podcast Channel</h3>
+        <p>Listen to inspiring discussions of how your peers have embraced their marketplace calling and continue to seek ways to steward their faith and work toward righteousness.</p>
 
-    return (
+      </div>
 
-        <>
-        <div className={Styles.otherHeroSection}>
-                <h1>Listen</h1>         
+      <div className={Style.pageContainer}>
+        <div className={Style.searchContainer}>
+          <PodcastSearch />
+          <TopicsFilter />
         </div>
-        <div className={Style.pageContainer}>
-             
-            <h1>Podcasts</h1>
-            <div className={Style.search_container}>
-            <PodcastSearch />
-            <TopicsFilter />
-            </div>
-
-            {filteredPodcasts.length === 0 ? (
-                    <div className={Style.noPodcasts}>
-                        <h1>😪Oops, it seems we don't have what you're looking for</h1>
-                       
-                    </div>
-                ) : (
-                    <div className={Style.podcastsGrid}>
-                        {filteredPodcasts.map((podcast, index) => (
-                            <Podcast
-                                key={index}
-                                title={podcast.title}
-                                embedUrl={podcast.embedUrl}
-                                topic={podcast.topic}
-                            />
-                ))}
-            </div>
-        )}
-        </div>
-        </>
-    );
+        <PodcastEpisodes />
+      </div>
+    </>
+  );
 };
 
 export default Listen;
-

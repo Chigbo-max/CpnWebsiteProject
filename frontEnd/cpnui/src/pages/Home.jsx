@@ -111,6 +111,7 @@ function Home() {
           >
             {slides[currentIndex].buttonText}
           </motion.a>
+
         </div>
       </section>
       <Features />
@@ -118,6 +119,8 @@ function Home() {
       <Courses/>
       <FreeContent/>
       <NewAndPastEvents/>
+                <iframe style={{borderRadius:"12px"}} src="https://open.spotify.com/embed/show/2vmyOcrq7cFcKBMepGbpZP?utm_source=generator" width="100%" height="352" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
       
 
                             

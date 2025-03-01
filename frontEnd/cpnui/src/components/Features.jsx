@@ -73,7 +73,7 @@ const Features = () => {
           <p>Engage with passionate Christian professionals.</p>
         </div>
       </div>
-      <iframe style={{borderRadius:"12px"}} src="https://open.spotify.com/embed/episode/5l3Qlf25FxAblRXsKtEkQC?utm_source=generator" width="25%" height="300" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>    </section>
+      <iframe style={{borderRadius:"12px"}} src="https://open.spotify.com/embed/episode/5l3Qlf25FxAblRXsKtEkQC?utm_source=generator" width="25%" height="300" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>    </section>
   );
 };
 

@@ -1,135 +1,30 @@
-.topics-filter {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
+.pageContainer {
+  max-width: 1200px;
+  margin: auto;
+  padding: 80px 20px 20px 20px;
+  background: #3d231bff;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
 
-  .search_container{
-    display: flex;
-    justify-items: center;
-    align-items: center;
-  }
-  
-  .topic-btn {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    background: #f5f5f5;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .topic-btn.active {
-    background: #1DB954;
-    color: white;
-    border-color: #1DB954;
-  }
-  
-  .clear-btn {
-    padding: 8px 16px;
-    border: 1px solid #ff4444;
-    border-radius: 20px;
-    background: #fff;
-    color: #ff4444;
-    cursor: pointer;
-  }
-  
-  .search-container {
-    margin-bottom: 20px;
+.pageContainer h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  }
+.searchContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
   
-  .pageContainer {
-  
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    padding: 20px 0px;
-    margin: 0 auto;
-    max-width: 1200px;
-    min-height: 100vh;
-   
+}
 
-
-  }
-  .podcastsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    padding: 0px;
-  }
-
-
-  .filterContainer {
-    display: grid;
-    grid-template-columns: 2fr 1fr auto;
-    gap: 1rem;
-    align-items: center;
-    margin: 2rem 0;
-  }
-  
-  .searchInput {
-    padding: 0.8rem;
-    border: 2px solid #ddd;
-    border-radius: 25px;
-    font-size: 1rem;
-  }
-  
-  .topicDropdown {
-    padding: 0.8rem;
-    border: 2px solid #1DB954;
-    border-radius: 25px;
-    background: white;
-    appearance: none;
-  }
-  
-  .clearButton {
-    padding: 0.8rem 1.5rem;
-    background: #1DB954;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .clearButton:hover {
-    background: #169c46;
-  }
-  
-
-  .noResults {
-    text-align: center;
-    padding: 2rem;
-    background: #f8f9fa;
-    border-radius: 10px;
-    margin: 2rem 0;
-  }
-  
-  @media (max-width: 768px) {
-    .page-container {
-      padding: 10px;
-    }
-    
-    .otherHeroSection {
-      padding: 4rem 1rem;
-    }
-    
-    .otherHeroSection h1 {
-      font-size: 2.5rem;
-    }
-    
-    .podcasts-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  .podcasts-grid > * {
-    transition: transform 0.3s ease;
-  }
-  
-  .podcasts-grid > *:hover {
-    transform: translateY(-5px);
-  }
+.searchBox{
+  border-radius: 5px;
+  width: 200px;
+  height: 35px;
+}

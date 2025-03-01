@@ -1,19 +1,20 @@
-// PodcastSearch.jsx
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { setSearchQuery } from './podCastSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSearchQuery } from './PodcastSlice';
+import Style from '../../styles/Listen.module.css';
 
 const PodcastSearch = () => {
   const dispatch = useDispatch();
+  const searchQuery = useSelector((state) => state.podcasts.searchQuery);
 
   return (
-    <div className="search-container">
-      <input
-        type="text"
-        placeholder="Search by topic..."
-        onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-      />
-    </div>
+    <input
+      type="text"
+      value={searchQuery}
+      onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+      placeholder="Search podcasts..."
+      className={Style.searchBox}
+    />
   );
 };
 
