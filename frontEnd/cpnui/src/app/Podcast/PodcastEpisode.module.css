@@ -1,12 +1,11 @@
 
 .episodesContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns:1fr 1fr 1fr;
     gap: 20px;
     padding: 20px;
     background-color: #121212;
-    color: white;
-  }
+    color: white;}
   
   .episodeCard {
     background: #181818;
@@ -17,6 +16,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    height: 100%;
   }
   
   .episodeCard:hover {
@@ -29,7 +29,16 @@
     max-width: 180px;
     border-radius: 10px;
     margin-bottom: 10px;
+    height: 180px;
+    object-fit: cover;
   }
+
+  .episodeCard h3 {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
   
   button {
     background: #deb887ff;
