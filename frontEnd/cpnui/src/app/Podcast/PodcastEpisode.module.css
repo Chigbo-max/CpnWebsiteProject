@@ -1,22 +1,24 @@
 
 .episodesContainer {
     display: grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 2rem;
     background-color: #121212;
-    color: white;}
+    color: white;
+  }
   
   .episodeCard {
     background: #181818;
     border-radius: 12px;
-    padding: 15px;
+    padding: 5px;
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     height: 100%;
+    margin-bottom: 20px;
   }
   
   .episodeCard:hover {
@@ -38,6 +40,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 10px;
 }
   
   button {
@@ -49,6 +52,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s;
+    margin-bottom: 10px;
   }
   
   button:hover {
@@ -68,6 +72,105 @@
   .paused {
     opacity: 0.8;
   }
+  
+  .loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+  }
+
+.pagination {
+  /* display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem; */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pagination button {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #3d231b;
+  cursor: pointer;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
+.pagination button.activePage {
+  background-color: #3d231b;
+  color: #fff;
+  border-color: #3d231b;
+}
+
+.pagination button:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #ddd;
+}
+
+.pagination button:not(:disabled):hover {
+  background-color: #3d231b;
+  color: #fff;
+  border-color: #3d231b;
+}
+
+.pageSizeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pageSizeContainer label {
+  font-size: 0.9rem;
+  color: #ffff;
+}
+
+.pageSizeContainer select {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #3d231b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.pageSizeContainer select:hover {
+  border-color: #3d231b;
+}
+
+.pageSizeContainer select:focus {
+  outline: none;
+  border-color: #3d231b;
+  box-shadow: 0 0 0 2px rgba(61, 35, 27, 0.2);
+}
+
+.spotifyButton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #121212; 
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.spotifyButton:hover {
+  background-color: burlywood; 
+  transition: background 0.2s;
+}
   
   @media (max-width: 768px) {
     .episodesContainer {

@@ -53,6 +53,7 @@ export const fetchPodcasts = createAsyncThunk(
 
 const initialState = {
   episodes: [],
+  cachedEpisodes: {},
   topics: [],
   selectedTopic: '',
   searchQuery: '',
@@ -60,6 +61,8 @@ const initialState = {
   showId: '2vmyOcrq7cFcKBMepGbpZP', 
   status: 'idle',
   error: null,
+  episodesPerPage: 10,
+  currentPage: 1,
 };
 
 const podcastSlice = createSlice({
@@ -79,6 +82,14 @@ const podcastSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload;
     },
+    setEpisodesPerPage:(state, action) =>{
+      state.episodesPerPage = action.payload;
+      state.currentPage = 1; //reset to first page when size changes
+    },
+    
+    setCurrentPage:(state, action)=>{
+      state.currentPage = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -89,6 +100,7 @@ const podcastSlice = createSlice({
         state.status = 'succeeded';
         state.episodes = action.payload.episodes;
         state.topics = action.payload.topics;
+        state.cachedEpisodes[state.currentPage] = action.payload.episodes;
       })
       .addCase(fetchPodcasts.rejected, (state, action) => {
         state.status = 'failed';
@@ -97,7 +109,7 @@ const podcastSlice = createSlice({
   },
 });
 
-export const { setSelectedTopic, setSearchQuery, clearFilters, setAccessToken } =
+export const { setSelectedTopic, setSearchQuery, clearFilters, setAccessToken, setCurrentPage, setEpisodesPerPage } =
   podcastSlice.actions;
 
 export default podcastSlice.reducer;

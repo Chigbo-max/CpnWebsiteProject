@@ -38,7 +38,7 @@
     width: 100vw;
     max-width: 1200px;
     align-items:center;
-    clip-path: ellipse(100% 100% at 40% 0%);
+    /* clip-path: ellipse(100% 100% at 40% 0%); */
   }
 
   .otherHeroSection h1{
