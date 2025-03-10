@@ -30,7 +30,7 @@
     justify-content: space-around;
     align-items: center;
     list-style: none;
-    gap: 30px;
+    gap: 25px;
     margin: 0 100px 0 90px;
 
 
@@ -89,6 +89,15 @@
 
 
 
+@media (max-width: 768px) {
+    .navbar {
+      height: 50px;
+    }
+    
+    .otherHeroSection {
+      padding-top: calc(50px + 2rem);
+    }
+  }
 
 @media only screen and (max-width:900px) { 
     .followButton{
@@ -104,11 +113,11 @@
 
     .navBar{
         display: flex; 
-      
         justify-content: space-evenly;
         align-content: center;
         align-items: center; 
         padding: 0 2rem;
+    
     } 
 
     

@@ -1,10 +1,171 @@
+
+
 .otherHeroSection {
-    padding: 10rem 4rem 10rem 18rem;
+padding: 6rem 2rem;
       /* padding: 8rem 4rem 4rem 2rem; */
       background:#3d231b;
       color: white;
+      width: 100%;
       width: 100vw;
       max-width: 1200px;
       align-items:center;
-      clip-path: ellipse(100% 100% at 40% 0%);
+      position: relative;
+      border-radius: 15px;
+      text-align: center;
+      margin: 0 auto;
+      left: 50%;
+      padding-top: calc(60px + 4rem); 
+      /* box-sizing: border-box; */
+      transform: translatex(-50%);
+      /* clip-path: ellipse(100% 100% at 40% 0%); */
+    }
+
+  
+  
+
+    .heroHeader{
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .heroHeader h1{
+      font-size: 2.5rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+    }
+
+    .aboutContainer {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      box-sizing: border-box;
+    }
+    
+    /* .heroSection {
+      text-align: center;
+      padding: 4rem 0;
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('your-hero-image.jpg');
+      background-size: cover;
+      color: white;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+    } */
+    
+    .welcomeSection {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .tagline {
+      font-size: 1.2rem;
+      color: #666;
+      margin-top: 1rem;
+    }
+    
+    .contentSection {
+      margin: 3rem 0;
+    }
+    
+    .missionBlock {
+      background: #f8f9fa;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+    
+    .detailsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .detailCard {
+      background: #F5F5DC;;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .detailCard:hover{
+      transform: translateY(-5px);
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+
+    }
+    
+    .platformsSection, .activitiesSection {
+      margin: 3rem 0;
+    }
+    
+    .platformsGrid, .activitiesGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .platformCard, .activityCard {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .platformCard:hover, .activityCard:hover {
+      transform: translateY(-5px);
+    }
+    
+    .contactSection {
+      background: #f8f9fa;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      margin: 3rem 0;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    
+    @media (max-width: 768px) {
+      .aboutContainer {
+        padding: 1rem;
+      }
+
+      .otherHeroSection {
+        padding: 4rem 1.5rem;
+        border-radius: 10px;
+      }
+      
+      .heroHeader h1 {
+        font-size: 2rem;
+      }
+      
+      .heroSection {
+        padding: 2rem 0;
+      }
+      
+      .platformsGrid, .activitiesGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .detailCard, .platformCard, .activityCard {
+        padding: 1rem;
+      }
+
+      .otherHeroSection {
+        padding: 4rem 1rem;
+      }
+      
+      .heroHeader h1 {
+        font-size: 1.75rem;
+      }
     }

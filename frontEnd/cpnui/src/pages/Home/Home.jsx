@@ -51,7 +51,7 @@ function Home() {
 
 
   return (
-    <div>
+    <div className = {Style.homeContainer}>
       <section className={Style.heroSection}
         >
         <AnimatePresence mode="sync">

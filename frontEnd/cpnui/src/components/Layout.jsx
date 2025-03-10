@@ -10,7 +10,7 @@ function Layout() {
     return (
         <div>
             <NavBar />
-            <main >
+            <main>
                 <Outlet />
             </main>
             <Connect/>
