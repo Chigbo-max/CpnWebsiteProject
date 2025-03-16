@@ -1,26 +1,31 @@
-import React from 'react';
+import React from "react";
 import Style from "./about.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpotify, faInstagram, faWhatsapp} from "@fortawesome/free-brands-svg-icons";
-// import { faInstagram, faWhatsapp, faClubhouse } from 'react-icons/fa';
-
-import icon from '../../assets/clubhouse.svg';
+import { faSpotify, faInstagram, faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import icon from "../../assets/clubhouse.svg";
+import bgImage from "../../assets/cpnevent1.jpg"
 
 function About() {
   return (
     <div className={Style.aboutContainer}>
-      <div className={Style.otherHeroSection}>
-      <header className={Style.heroHeader}>
-          <h1>About Christian Professionals Network</h1>
+      <div className={Style.otherHeroSection}
+      style={{
+        background: `linear-gradient(rgba(61, 35, 27, 0.85), rgba(61, 35, 27, 0.85)), url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}>
+        <header className={Style.heroHeader}>
+          <h1>About <span>Christian Professionals Network</span></h1>
         </header>
-   
-    </div>
-  
+      </div>
 
       <section className={Style.contentSection}>
         <div className={Style.missionBlock}>
           <h2>Our Mission</h2>
-          <p>Christian Professionals Network (CPN) is a platform to mentor and raise excellent, ethical professionals who will take over their industries and workplaces for The Kingdom, using practical Bible-based principles to rise to positions of influence and power.</p>
+          <p>
+            Christian Professionals Network (CPN) is a platform to mentor and raise excellent, ethical professionals who will take over their industries and workplaces for The Kingdom, using practical Bible-based principles to rise to positions of influence and power.
+          </p>
         </div>
 
         <div className={Style.detailsGrid}>
@@ -43,17 +48,20 @@ function About() {
         <h2>Our Platforms</h2>
         <div className={Style.platformsGrid}>
           <a href="https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP" target="_blank" rel="noopener noreferrer" className={Style.platformCard}>
-          <FontAwesomeIcon icon={faSpotify} style={{ color: "#3d231b", fontSize: "40px" }} />
+            <FontAwesomeIcon icon={faSpotify} className={Style.icon} />
+            <p>Listen to our podcast on Spotify</p>
           </a>
           <a href="https://www.clubhouse.com/house/christian-professionals-network" target="_blank" rel="noopener noreferrer" className={Style.platformCard}>
-          {/* < FontAwesomeIcon icon={faClubhouse} className="w-8 h-8" /> */}
-        <img src={icon} style={{width: 40}} alt="" />
+            <img src={icon} className={Style.clubhouseIcon} alt="Clubhouse Icon" />
+            <p>Join our Clubhouse room</p>
           </a>
           <a href="https://www.instagram.com/christianprofessionalsnetwork/" target="_blank" rel="noopener noreferrer" className={Style.platformCard}>
-          <FontAwesomeIcon icon={faInstagram} style={{ color: "#3d231b", fontSize: "40px" }} />
+            <FontAwesomeIcon icon={faInstagram} className={Style.icon} />
+            <p>Follow us on Instagram</p>
           </a>
           <a href="https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ" target="_blank" rel="noopener noreferrer" className={Style.platformCard}>
-          <FontAwesomeIcon icon={faWhatsapp} style={{ color: "#3d231b", fontSize: "40px" }}  />
+            <FontAwesomeIcon icon={faWhatsapp} className={Style.icon} />
+            <p>Join our WhatsApp group</p>
           </a>
         </div>
       </section>
@@ -76,18 +84,48 @@ function About() {
         </div>
       </section>
 
-      <section className={Style.contactSection}>
-        <h2>Connect With Us</h2>
-        <div className={Style.contactContent}>
-          <p>Have questions? Reach out to:</p>
-          <p>Hadassah: <a href="tel:+2347033288115">+234 703 328 8115</a></p>
-          <p>Email: <a href="mailto:cprofessionalsnetwork@gmail.com">cprofessionalsnetwork@gmail.com</a></p>
+      <section className={Style.testimonialsSection}>
+        <h2>We look forward to sharing in your success story!</h2>
+        <div className={Style.testimonialsGrid}>
+          <div className={Style.testimonialCard}>
+            <p>"I have a clearer knowledge of how to stand for Christ at work and everyday life, with my career as a platform."</p>
+            <h4>- Ezinne Umozurike. USA</h4>
+          </div>
+          <div className={Style.testimonialCard}>
+            <p>"CPN has taught me how to thrive in my career, by applying bible based principles. The podcasts are always relatable and timely."</p>
+            <h4>- Chika Bob-Agomoh. LAGOS</h4>
+          </div>
+          <div className={Style.testimonialCard}>
+            <p>"It's been amazing. The gift of access to fellow Christians walking same path as been encouraging. "</p>
+            <h4>- Femi Oke IBADAN.</h4>
+          </div>
         </div>
       </section>
 
-      <footer className={Style.footer}>
-        <p>We look forward to sharing in your success story! 🙌</p>
-      </footer>
+      <section className={Style.contactSection}>
+        <h2>Connect With Us</h2>
+        <div className={Style.contactContent}>
+          <p><strong>Call or WhatsApp:</strong> <a href="tel:+2347033288115">+234 703 328 8115</a></p>
+          <p><strong>Email:</strong> <a href="mailto:cprofessionalsnetwork@gmail.com">cprofessionalsnetwork@gmail.com</a></p>
+          <p>💬 <strong>Follow us on social media:</strong> Stay updated with our latest programs!</p>
+          <div className={Style.followUs}>
+          <a href="https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP" target="_blank" rel="noopener noreferrer" className={Style.followUs}>
+            <FontAwesomeIcon icon={faSpotify} className={Style.followUsIcon} />
+          </a>
+          <a href="https://www.clubhouse.com/house/christian-professionals-network" target="_blank" rel="noopener noreferrer" className={Style.followUs}>
+            <img src={icon} className={Style.clubhouseIcon2} alt="Clubhouse Icon" />
+          </a>
+          <a href="https://www.instagram.com/christianprofessionalsnetwork/" target="_blank" rel="noopener noreferrer" className={Style.followUs}>
+            <FontAwesomeIcon icon={faInstagram} className={Style.followUsIcon} />
+          </a>
+          <a href="https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ" target="_blank" rel="noopener noreferrer" className={Style.followUs}>
+            <FontAwesomeIcon icon={faWhatsapp} className={Style.followUsIcon} />
+          </a>
+        </div>
+        </div>
+      </section>
+
+      
     </div>
   );
 }

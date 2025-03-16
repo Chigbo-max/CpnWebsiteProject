@@ -28,26 +28,26 @@ const PodcastEpisodes = () => {
   const startIndex = (currentPage - 1) * episodesPerPage;
   const endIndex = startIndex + episodesPerPage;
 
-  const filteredEpisodes = (cachedEpisodes[currentPage] || episodes).filter((ep) => {
+  const filteredEpisodes = (cachedEpisodes[currentPage] || episodes).filter((episode) => {
 
     const matchesTopic =
       !selectedTopic ||
-      (ep.name && ep.name.toLowerCase() === selectedTopic.toLowerCase());
+      (episode.name && episode.name.toLowerCase() === selectedTopic.toLowerCase());
 
     const matchesSearch =
-      !searchQuery || ep.name.toLowerCase().includes(searchQuery.toLowerCase());
+      !searchQuery || episode.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesTopic && matchesSearch;
   });
 
-  const totalEpisodes = episodes.filter((ep) => {
+  const totalEpisodes = episodes.filter((episode) => {
 
     const matchesTopic =
       !selectedTopic ||
-      (ep.name && ep.name.toLowerCase() === selectedTopic.toLowerCase());
+      (episode.name && episode.name.toLowerCase() === selectedTopic.toLowerCase());
 
     const matchesSearch =
-      !searchQuery || ep.name.toLowerCase().includes(searchQuery.toLowerCase());
+      !searchQuery || episode.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesTopic && matchesSearch;
   }).length;
@@ -67,7 +67,7 @@ const PodcastEpisodes = () => {
 
   if (status === "loading") return (
     <div className={Style.loadingContainer}>
-      <ClipLoader color="#ffff" size={50} />
+      <ClipLoader color="#ffff" size={100} />
       <p>Loading episodes...</p>
     </div>
   );
@@ -88,40 +88,40 @@ const PodcastEpisodes = () => {
       {filteredEpisodes.length === 0 ? (
         <p>No episodes found</p>
       ) : (
-        filteredEpisodes.slice(startIndex, endIndex).map((ep) => (
+        filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
           <div
-            key={ep.id}
-            className={`${Style.episodeCard} ${playingId === ep.id ? Style.playing : Style.paused
+            key={episode.id}
+            className={`${Style.episodeCard} ${playingId === episode.id ? Style.playing : Style.paused
               }`}
           >
-            <h3>{ep.name}</h3>
-            <p>{ep.description}</p>
+            <h3>{episode.name}</h3>
+            <p>{episode.description}</p>
 
-            {ep.images?.length > 0 && (
+            {episode.images?.length > 0 && (
               <img
-                src={ep.images[0].url}
-                alt={ep.name}
+                src={episode.images[0].url}
+                alt={episode.name}
                 className={Style.episodeImage}
               />
             )}
 
-            {ep.audio_preview_url ? (
-              <button onClick={() => handlePlayPause(ep.id)}>
-                {playingId === ep.id ? "⏸ Pause" : "▶ Play"}
+            {episode.audio_preview_url ? (
+              <button onClick={() => handlePlayPause(episode.id)}>
+                {playingId === episode.id ? "⏸ Pause" : "▶ Play"}
               </button>
             ) : (
               <p>No preview available.</p>
             )}
 
-            {ep.audio_preview_url && playingId === ep.id && (
+            {episode.audio_preview_url && playingId === episode.id && (
               <audio autoPlay controls className={Style.audioPlayer}>
-                <source src={ep.audio_preview_url} type="audio/mpeg" />
+                <source src={episode.audio_preview_url} type="audio/mpeg" />
               </audio>
             )}
 
-{ep.external_urls?.spotify && (
+{episode.external_urls?.spotify && (
     <a
-      href={ep.external_urls.spotify}
+      href={episode.external_urls.spotify}
       target="_blank"
       rel="noopener noreferrer"
       className={Style.spotifyButton}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import { navBarItems } from '../../helpers/NavBarItems.jsx'
 import { Link } from "react-router-dom"
 import Logo from "../../assets/ChristianProfessionalsNetwork.png"
@@ -10,6 +10,7 @@ import { IndeterminateCheckBoxRounded } from '@mui/icons-material'
 import CommunityDropDown from '../DropDown/CommunityDropDown/CommunityDropDown.jsx'
 import { useDispatch, useSelector } from 'react-redux';
 import { setDropDown, setKnowledgeHubDropDown, setCommunityDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
+import Switch from "../Switch.jsx"
 
 
 function NavBar() {
@@ -23,7 +24,10 @@ function NavBar() {
 
     function toggleBar() {
         dispatch(setOpenLink(!openLink));
+
     };
+
+  
 
     return (
 
@@ -34,6 +38,7 @@ function NavBar() {
                 </div>
                 <div >
                     <ul className={`${style.navBarOptions} ${openLink ? style.open : ''}`}>
+
                         {navBarItems.map((item, index) => {
 
                             if (item.title === "Inside CPN") {
@@ -87,8 +92,9 @@ function NavBar() {
                 <div className={style.followButton}>
                     <Link to="/" > <button>Follow us</button></Link>
                 </div>
-                <div onClick={toggleBar} className={style.hiddenButton}>
-                    <button><LiaBarsSolid /></button>
+                <div className={style.hiddenButton}>
+                    {/* <button><LiaBarsSolid /></button> */}
+                    <Switch onClick={toggleBar} />
                 </div>
             </div>
         </nav>

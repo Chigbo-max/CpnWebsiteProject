@@ -31,3 +31,13 @@ body::-webkit-scrollbar-thumb:hover {
   align-items: center;
   overflow: hidden; 
 }
+
+:root {
+  --primary-bg: white;
+  --primary-text: #3d231b;
+  --secondary-text: #555;
+  --input-bg: #f8f8f8;
+  --button-bg: #3d231b;
+  --button-hover: #5a3225;
+  --border-color: #ccc;
+}

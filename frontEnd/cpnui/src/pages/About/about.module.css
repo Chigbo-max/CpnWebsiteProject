@@ -28,10 +28,15 @@ padding: 6rem 2rem;
       margin: 0 auto;
     }
 
+    .heroHeader h1 span{
+      color: #ffff;
+    }
+
     .heroHeader h1{
       font-size: 2.5rem;
   line-height: 1.2;
   margin-bottom: 1rem;
+  color: burlywood;
     }
 
     .aboutContainer {
@@ -69,10 +74,20 @@ padding: 6rem 2rem;
     }
     
     .missionBlock {
-      background: #f8f9fa;
+      background: #3d231b;
       padding: 2rem;
       border-radius: 10px;
       margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .missionBlock p{
+      color: #fff;
+      line-height: 1.5;
+    }
+
+    .missionBlock h2{
+      color: burlywood;
     }
     
     .detailsGrid {
@@ -83,10 +98,16 @@ padding: 6rem 2rem;
     }
     
     .detailCard {
-      background: #F5F5DC;;
+      background: #3d231b;
+      color: burlywood;
       padding: 1.5rem;
       border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .detailCard p{
+      color: #fff;
+      line-height: 1.5;
     }
 
     .detailCard:hover{
@@ -104,15 +125,39 @@ padding: 6rem 2rem;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.5rem;
       margin-top: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .platformsGrid p{
+      font-size: 1rem;
+      font-weight: 500;
     }
     
-    .platformCard, .activityCard {
-      background: white;
+    .activityCard {
+      background: #3d231b;
+      color: #ffff;
       padding: 1.5rem;
       border-radius: 10px;
       text-align: center;
       transition: transform 0.3s ease;
       cursor: pointer;
+    }
+
+    .activityCard h3{
+      color: burlywood;
+    }
+
+    .platformCard{
+
+      background: #ffff;
+      color: #3d231b;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #3d231b;
+      text-align: center;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+
     }
     
     .platformCard:hover, .activityCard:hover {
@@ -132,6 +177,106 @@ padding: 6rem 2rem;
       padding: 2rem;
       color: #666;
     }
+
+    .testimonialsSection {
+      background: #f8f9fa;
+      padding: 3rem;
+      text-align: center;
+      border-radius: 10px;
+      margin: 3rem 0;
+    }
+    
+    .testimonialsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .testimonialCard {
+      background: #3d231b;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .testimonialCard h4 {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: burlywood;
+    }
+    
+    .contactSection {
+      background: #3d231b;
+      color: white;
+      padding: 2.5rem;
+      text-align: center;
+      border-radius: 10px;
+    }
+    
+    .contactContent p {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .contactContent a {
+      color: burlywood;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    
+    .contactContent a:hover {
+      text-decoration: underline;
+    }
+    
+    .icon {
+      font-size: 40px;
+      color: #3d231b;
+    }
+
+    .clubhouseIcon2{
+      width: 40px;
+      margin: 20px;
+    }
+
+    .followUsIcon{
+      font-size: 40px;
+      color: burlywood;
+      margin: 20px;
+    }
+
+    .followUsIcon:hover, .clubhouseIcon2:hover{
+      transform: translateY(-5px);
+    }
+    
+    .clubhouseIcon {
+      width: 40px;
+    }
+
+   
+    
+    @media (max-width: 768px) {
+      .testimonialsGrid {
+        grid-template-columns: 1fr;
+      }
+    
+      .contactSection {
+        padding: 2rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .testimonialCard {
+        padding: 1rem;
+      }
+    
+      .contactContent p {
+        font-size: 1rem;
+      }
+    }
+    
     
     @media (max-width: 768px) {
       .aboutContainer {

@@ -1,10 +1,9 @@
 
-
 .homeContainer{
-  max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      position: relative;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
 
 }
 
@@ -13,10 +12,10 @@
   /* clip-path: ellipse(100% 100% at 40% 0%); */
     position: relative;
     width: 100%;
-    /* max-width: 1200px; */
     height: auto;
+    max-width: 1200px;
     min-height: 400px;
-        overflow: hidden;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,6 +25,7 @@
     font-size: 1.5em;
     margin: -2rem auto 2rem;
     border-radius: 15px;
+    background:#3d231b;
   }
 
   .heroSection p{
@@ -42,11 +42,11 @@
     padding: 10rem 4rem 10rem 18rem;
       /* padding: 8rem 4rem 4rem 2rem; */
       background:#3d231b;
-      color: white;
+      color:#3d231b;
       width: 100vw;
       max-width: 1200px;
       align-items:center;
-      clip-path: ellipse(100% 100% at 40% 0%);
+      /* clip-path: ellipse(100% 100% at 40% 0%); */
     }
 
 
