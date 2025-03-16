@@ -5,8 +5,12 @@ import podcast from "../../assets/cpnPodcast.png";
 import SoundWave from "../../assets/soundWave.png";
 import read from "../../assets/cpnRead.png";
 import bgImage from "../../assets/listen.jpeg";
+import {useNavigate} from "react-router-dom"
 
 function KnowledgeHub() {
+
+  const navigate = useNavigate();
+  
   return (
     <div className={Style.knowledgeContainer}>
       <div

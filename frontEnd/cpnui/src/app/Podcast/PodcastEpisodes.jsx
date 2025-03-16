@@ -2,16 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPodcasts, setEpisodesPerPage, setCurrentPage } from "./PodcastSlice";
 import Style from "./PodcastEpisode.module.css";
-import { ClipLoader } from 'react-spinners';
+import { ClipLoader } from "react-spinners";
 
 const PodcastEpisodes = () => {
   const dispatch = useDispatch();
-  const { episodes, searchQuery, cachedEpisodes, selectedTopic, status, error, episodesPerPage, currentPage } = useSelector(
-    (state) => state.podcasts
-  );
-
+  const {
+    episodes,
+    searchQuery,
+    cachedEpisodes,
+    selectedTopic,
+    status,
+    error,
+    episodesPerPage,
+    currentPage,
+  } = useSelector((state) => state.podcasts);
 
   const [playingId, setPlayingId] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchPodcasts());
+  }, [dispatch, currentPage, episodesPerPage]);
 
   const handlePageSizeChange = (e) => {
     dispatch(setEpisodesPerPage(Number(e.target.value)));
@@ -21,60 +31,39 @@ const PodcastEpisodes = () => {
     dispatch(setCurrentPage(page));
   };
 
-  useEffect(() => {
-    dispatch(fetchPodcasts());
-  }, [dispatch, currentPage, episodesPerPage]);
-
   const startIndex = (currentPage - 1) * episodesPerPage;
   const endIndex = startIndex + episodesPerPage;
 
   const filteredEpisodes = (cachedEpisodes[currentPage] || episodes).filter((episode) => {
+    const episodeName = episode.name?.toLowerCase() || "";
 
+    // Search query filtering: Ensure partial matches work correctly
+    const matchesSearch = searchQuery.length < 2 || episodeName.includes(searchQuery.toLowerCase());
+
+    // Topic filtering (if selected)
     const matchesTopic =
-      !selectedTopic ||
-      (episode.name && episode.name.toLowerCase() === selectedTopic.toLowerCase());
+      !selectedTopic || episodeName.includes(selectedTopic.toLowerCase());
 
-    const matchesSearch =
-      !searchQuery || episode.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesTopic && matchesSearch;
+    return matchesSearch && matchesTopic;
   });
 
-  const totalEpisodes = episodes.filter((episode) => {
-
-    const matchesTopic =
-      !selectedTopic ||
-      (episode.name && episode.name.toLowerCase() === selectedTopic.toLowerCase());
-
-    const matchesSearch =
-      !searchQuery || episode.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesTopic && matchesSearch;
-  }).length;
-
-  const totalPages = Math.ceil(totalEpisodes / episodesPerPage)
-
+  const totalEpisodes = filteredEpisodes.length;
+  const totalPages = Math.ceil(totalEpisodes / episodesPerPage);
 
   const handlePlayPause = (epId) => {
-    if (playingId === epId) {
-      setPlayingId(null);
-    } else {
-      setPlayingId(epId);
-    }
+    setPlayingId(playingId === epId ? null : epId);
   };
 
-
-
-  if (status === "loading") return (
-    <div className={Style.loadingContainer}>
-      <ClipLoader color="#ffff" size={100} />
-      <p>Loading episodes...</p>
-    </div>
-  );
+  if (status === "loading")
+    return (
+      <div className={Style.loadingContainer}>
+        <ClipLoader color="#ffff" size={100} />
+        <p>Loading episodes...</p>
+      </div>
+    );
   if (status === "failed") return <p>Error: {error}</p>;
 
   return (
-
     <div className={Style.episodesContainer}>
       <div className={Style.pageSizeContainer}>
         <label>Episodes per page:</label>
@@ -91,8 +80,9 @@ const PodcastEpisodes = () => {
         filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
           <div
             key={episode.id}
-            className={`${Style.episodeCard} ${playingId === episode.id ? Style.playing : Style.paused
-              }`}
+            className={`${Style.episodeCard} ${
+              playingId === episode.id ? Style.playing : Style.paused
+            }`}
           >
             <h3>{episode.name}</h3>
             <p>{episode.description}</p>
@@ -119,39 +109,39 @@ const PodcastEpisodes = () => {
               </audio>
             )}
 
-{episode.external_urls?.spotify && (
-    <a
-      href={episode.external_urls.spotify}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={Style.spotifyButton}
-    >
-      Listen on Spotify
-    </a>
-  )}
+            {episode.external_urls?.spotify && (
+              <a
+                href={episode.external_urls.spotify}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={Style.spotifyButton}
+              >
+                Listen on Spotify
+              </a>
+            )}
           </div>
         ))
-
       )}
 
       <div className={Style.pagination}>
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        {
-          Array.from({ length: totalPages }, (_, index) => (
-            <button key={index + 1} onClick={() => handlePageChange(index + 1)}
-              className={currentPage === index + 1 ? Style.activePage : ""}> {index + 1}
-
-            </button>
-          ))}
-        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={currentPage === index + 1 ? Style.activePage : ""}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+          Next
+        </button>
       </div>
     </div>
   );
-
-
-
-
 };
 
 export default PodcastEpisodes;
