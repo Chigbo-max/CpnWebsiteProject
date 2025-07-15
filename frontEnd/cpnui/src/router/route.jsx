@@ -7,6 +7,8 @@ import Listen from "../pages/Listen/Listen";
 import Culture from "../pages/Culture/Culture";
 import NewsLetter from '../pages/NewsLetter/NewsLetter';
 import Blog from "../pages/Blog/Blog"
+import BlogPost from "../pages/Blog/BlogPost"
+import AdminDashboard from "../pages/Admin/AdminDashboard"
 import TheTeam from "../pages/Team/TheTeam";
 import About from "../pages/About/About"
 import ContactUs from "../pages/ContactUs/ContactUs"
@@ -20,6 +22,7 @@ const BrowserRouter = createBrowserRouter(
         { path: "/", element: <Home /> },
         { path: "/community", element: <Community /> },
         { path: "/blog", element: <Blog /> },
+        { path: "/blog/:slug", element: <BlogPost /> },
         { path: "/read", element: <Blog /> },
         { path: "/knowledgeHub", element: <KnowledgeHub /> },
         { path: "/knowledgeHub/listen", element: <Listen /> },
@@ -31,7 +34,8 @@ const BrowserRouter = createBrowserRouter(
         { path: "/insideCPN/theTeam", element: <TheTeam /> },
         { path: "/insideCPN/about", element: <About /> },
         { path: "/InsideCPN/blog", element: <Blog /> },
-        { path: "/contactUs", element: <ContactUs /> }
+        { path: "/contactUs", element: <ContactUs /> },
+        { path: "/admin", element: <AdminDashboard /> }
         ]
     }]
 )
