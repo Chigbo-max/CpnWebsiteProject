@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
+const db = require('../config/database').default;
 
 // Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
