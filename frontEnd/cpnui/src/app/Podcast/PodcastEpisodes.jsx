@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPodcasts, setEpisodesPerPage, setCurrentPage } from "./PodcastSlice";
-import Style from "./PodcastEpisode.module.css";
 import { ClipLoader } from "react-spinners";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
 const PodcastEpisodes = () => {
   const dispatch = useDispatch();
@@ -36,14 +38,8 @@ const PodcastEpisodes = () => {
 
   const filteredEpisodes = (cachedEpisodes[currentPage] || episodes).filter((episode) => {
     const episodeName = episode.name?.toLowerCase() || "";
-
-    // Search query filtering: Ensure partial matches work correctly
     const matchesSearch = searchQuery.length < 2 || episodeName.includes(searchQuery.toLowerCase());
-
-    // Topic filtering (if selected)
-    const matchesTopic =
-      !selectedTopic || episodeName.includes(selectedTopic.toLowerCase());
-
+    const matchesTopic = !selectedTopic || episodeName.includes(selectedTopic.toLowerCase());
     return matchesSearch && matchesTopic;
   });
 
@@ -56,87 +52,113 @@ const PodcastEpisodes = () => {
 
   if (status === "loading")
     return (
-      <div className={Style.loadingContainer}>
-        <ClipLoader color="#ffff" size={100} />
-        <p>Loading episodes...</p>
+      <div className="flex flex-col items-center justify-center py-12">
+        <ClipLoader color="#fbbf24" size={100} />
+        <p className="text-lg text-gray-700 mt-4">Loading episodes...</p>
       </div>
     );
-  if (status === "failed") return <p>Error: {error}</p>;
+  if (status === "failed") return <p className="text-red-600">Error: {error}</p>;
 
   return (
-    <div className={Style.episodesContainer}>
-      <div className={Style.pageSizeContainer}>
-        <label>Episodes per page:</label>
-        <select value={episodesPerPage} onChange={handlePageSizeChange}>
-          <option value={10}>10</option>
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center gap-4 mb-4">
+        <label className="text-gray-200 font-semibold">Episodes per page:</label>
+        <select 
+          value={episodesPerPage} 
+          onChange={handlePageSizeChange}
+          className="rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 text-gray-900 bg-white shadow-sm"
+        >
+          <option value={12}>12</option>
+          <option value={16}>16</option>
           <option value={20}>20</option>
-          <option value={50}>50</option>
         </select>
       </div>
 
       {filteredEpisodes.length === 0 ? (
-        <p>No episodes found</p>
+        <p className="text-gray-300">No episodes found</p>
       ) : (
-        filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
-          <div
-            key={episode.id}
-            className={`${Style.episodeCard} ${
-              playingId === episode.id ? Style.playing : Style.paused
-            }`}
-          >
-            <h3>{episode.name}</h3>
-            <p>{episode.description}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
+            <div
+              key={episode.id}
+              className={`rounded-xl shadow-lg text-white p-4 flex flex-col gap-3 border-2 border-gray-700 hover:shadow-xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
+              style={{backgroundColor: '#111826ff'}}
+            >
+              {episode.images?.length > 0 && (
+                <img
+                  src={episode.images[0].url}
+                  alt={episode.name}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                />
+              )}
 
-            {episode.images?.length > 0 && (
-              <img
-                src={episode.images[0].url}
-                alt={episode.name}
-                className={Style.episodeImage}
-              />
-            )}
+              <div className="flex-1">
+                <h3 className="text-lg font-bold mb-2 line-clamp-2 text-white">{episode.name}</h3>
+                <p className="text-sm text-gray-300 mb-3 line-clamp-3">{episode.description}</p>
+              </div>
 
-            {episode.audio_preview_url ? (
-              <button onClick={() => handlePlayPause(episode.id)}>
-                {playingId === episode.id ? "⏸ Pause" : "▶ Play"}
-              </button>
-            ) : (
-              <p>No preview available.</p>
-            )}
+              <div className="flex flex-col gap-2">
+                {episode.audio_preview_url ? (
+                  <button 
+                    onClick={() => handlePlayPause(episode.id)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 text-sm shadow-md hover:shadow-lg"
+                    style={{backgroundColor: '#111826ff'}}
+                  >
+                    <FontAwesomeIcon 
+                      icon={playingId === episode.id ? faPause : faPlay} 
+                      className="text-sm" 
+                    />
+                    {playingId === episode.id ? "Pause" : "Play"}
+                  </button>
+                ) : (
+                  <p className="text-gray-400 text-sm">No preview available.</p>
+                )}
 
-            {episode.audio_preview_url && playingId === episode.id && (
-              <audio autoPlay controls className={Style.audioPlayer}>
-                <source src={episode.audio_preview_url} type="audio/mpeg" />
-              </audio>
-            )}
+                {episode.external_urls?.spotify && (
+                  <a
+                    href={episode.external_urls.spotify}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-all duration-300 text-sm shadow-md hover:shadow-lg"
+                  >
+                    <FontAwesomeIcon icon={faSpotify} className="text-sm" />
+                    Spotify
+                  </a>
+                )}
+              </div>
 
-            {episode.external_urls?.spotify && (
-              <a
-                href={episode.external_urls.spotify}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={Style.spotifyButton}
-              >
-                Listen on Spotify
-              </a>
-            )}
-          </div>
-        ))
+              {episode.audio_preview_url && playingId === episode.id && (
+                <audio autoPlay controls className="w-full mt-2">
+                  <source src={episode.audio_preview_url} type="audio/mpeg" />
+                </audio>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
-      <div className={Style.pagination}>
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+      <div className="flex flex-wrap gap-2 justify-center items-center mt-8">
+        <button 
+          onClick={() => handlePageChange(currentPage - 1)} 
+          disabled={currentPage === 1}
+          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
+        >
           Previous
         </button>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
-            className={currentPage === index + 1 ? Style.activePage : ""}
+            className={`px-3 py-2 rounded-md font-semibold border-2 ${currentPage === index + 1 ? 'bg-amber-400 text-gray-900 border-amber-400' : 'bg-white text-gray-900 border-gray-300 hover:bg-amber-100'} transition-colors`}
           >
             {index + 1}
           </button>
         ))}
-        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+        <button 
+          onClick={() => handlePageChange(currentPage + 1)} 
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
+        >
           Next
         </button>
       </div>
