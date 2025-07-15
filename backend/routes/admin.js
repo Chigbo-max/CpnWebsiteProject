@@ -93,7 +93,7 @@ router.post('/newsletter', auth, async (req, res) => {
     const subscribers = await db.query('SELECT email, name FROM subscribers');
     
     // Configure email transporter
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,

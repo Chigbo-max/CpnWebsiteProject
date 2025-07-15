@@ -14,10 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-const db = require('./config/database');
-
+const db = require('./config/database').default;
+const pool = db.default || db;
 // Test database connection
-db.query('SELECT NOW()', (err, res) => {
+pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('Database connection error:', err);
   } else {

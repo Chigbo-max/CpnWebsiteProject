@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import ServerDown from '../Error/ServerDown';
 
 function Blog() {
     const [blogPosts, setBlogPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [serverDown, setServerDown] = useState(false);
 
     useEffect(() => {
         fetchBlogPosts();
@@ -21,7 +23,11 @@ function Blog() {
             const data = await response.json();
             setBlogPosts(data);
         } catch (err) {
-            setError(err.message);
+            if (err.message === 'Failed to fetch' || err.message === 'NetworkError when attempting to fetch resource.') {
+                setServerDown(true);
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -35,6 +41,10 @@ function Blog() {
             day: 'numeric'
         });
     };
+
+    if (serverDown) {
+        return <ServerDown />;
+    }
 
     if (loading) {
         return (

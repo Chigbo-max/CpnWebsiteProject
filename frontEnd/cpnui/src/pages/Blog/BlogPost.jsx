@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowLeft, faShare } from '@fortawesome/free-solid-svg-icons';
+import ServerDown from '../Error/ServerDown';
 
 function BlogPost() {
     const { slug } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [serverDown, setServerDown] = useState(false);
 
     useEffect(() => {
         fetchBlogPost();
@@ -22,7 +24,11 @@ function BlogPost() {
             const data = await response.json();
             setPost(data);
         } catch (err) {
-            setError(err.message);
+            if (err.message === 'Failed to fetch' || err.message === 'NetworkError when attempting to fetch resource.') {
+                setServerDown(true);
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -48,6 +54,10 @@ function BlogPost() {
             alert('Link copied to clipboard!');
         }
     };
+
+    if (serverDown) {
+        return <ServerDown />;
+    }
 
     if (loading) {
         return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faUsers, faFileAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'sonner';
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('blog');
@@ -81,12 +82,12 @@ function AdminDashboard() {
       if (response.ok) {
         setNewPost({ title: '', content: '', excerpt: '', slug: '' });
         fetchData();
-        alert('Blog post created successfully!');
+        toast.success('Blog post created successfully!');
       } else {
-        alert('Failed to create blog post');
+        toast.error('Failed to create blog post');
       }
     } catch (error) {
-      alert('Error creating blog post');
+      toast.error('Error creating blog post');
     }
   };
 
@@ -104,12 +105,12 @@ function AdminDashboard() {
 
       if (response.ok) {
         setNewsletter({ subject: '', content: '' });
-        alert('Newsletter sent successfully!');
+        toast.success('Newsletter sent successfully!');
       } else {
-        alert('Failed to send newsletter');
+        toast.error('Failed to send newsletter');
       }
     } catch (error) {
-      alert('Error sending newsletter');
+      toast.error('Error sending newsletter');
     }
   };
 

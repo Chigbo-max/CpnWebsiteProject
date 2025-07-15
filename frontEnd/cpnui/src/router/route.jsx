@@ -13,6 +13,7 @@ import TheTeam from "../pages/Team/TheTeam";
 import About from "../pages/About/About"
 import ContactUs from "../pages/ContactUs/ContactUs"
 import Layout from "../components/Layout";
+import NotFound from "../pages/Error/NotFound";
 
 const BrowserRouter = createBrowserRouter(
     [{
@@ -35,7 +36,8 @@ const BrowserRouter = createBrowserRouter(
         { path: "/insideCPN/about", element: <About /> },
         { path: "/InsideCPN/blog", element: <Blog /> },
         { path: "/contactUs", element: <ContactUs /> },
-        { path: "/admin", element: <AdminDashboard /> }
+        { path: "/admin", element: <AdminDashboard /> },
+        { path: "*", element: <NotFound /> }
         ]
     }]
 )
