@@ -11,6 +11,7 @@ import BlogList from './BlogList';
 import ContactInquiries from './ContactInquiries';
 import AdminManagement from './AdminManagement';
 import { useAdminAuth } from '../../app/AdminAuthContext';
+import { Link } from 'react-router-dom';
 
 function AdminDashboard() {
   const { token, admin, login, logout } = useAdminAuth();

@@ -14,8 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-const db = require('./config/database').default;
-const pool = db.default || db;
+const pool = require('./config/database');
 // Test database connection
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
@@ -31,6 +30,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/blog', require('./routes/blog'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/subscribers', require('./routes/subscribers'));
+app.use('/api/events', require('./routes/events'));
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

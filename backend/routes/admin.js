@@ -7,12 +7,7 @@ const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const upload = multer();
-const cloudinary = require('cloudinary').v2;
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const { uploadImage } = require('../services/CloudinaryService');
 
 // Import services
 const BlogService = require('../services/BlogService');
@@ -45,33 +40,18 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     const { title, content, excerpt, tags, status, slug } = req.body;
     let featured_image = null;
     if (req.file) {
-      // Upload image to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload_stream(
-        { folder: 'cpn_blog' },
-        (error, result) => {
-          if (error) return next(error);
-          featured_image = result.secure_url;
-        }
-      );
-      // Use a Promise to wait for upload_stream to finish
-      await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: 'cpn_blog' },
-          (error, result) => {
-            if (error) return reject(error);
-            featured_image = result.secure_url;
-            resolve();
-          }
-        );
-        stream.end(req.file.buffer);
-      });
+      // Convert buffer to base64 data URL
+      const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      featured_image = await uploadImage(base64, 'blog-images');
     }
     if (!title || !content || !slug) {
       return res.status(400).json({ message: 'Title, content, and slug are required' });
     }
     const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image });
     res.status(201).json({ message: 'Blog post created successfully', post });
-  } catch (error) { next(error); }
+  } catch (err) {
+    next(err);
+  }
 });
 router.put('/blog/:id', auth, async (req, res, next) => {
   try {
@@ -207,6 +187,22 @@ router.post('/admins/:id/reset-password', auth, requireSuperAdmin, async (req, r
     });
     res.json({ message: 'Password reset and emailed to admin' });
   } catch (error) { next(error); }
+});
+
+// Admin profile image upload (example, adjust as needed)
+router.post('/profile/image', auth, upload.single('image'), async (req, res, next) => {
+  try {
+    let profile_image = null;
+    if (req.file) {
+      const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      profile_image = await uploadImage(base64, 'admin-profiles');
+    }
+    // Save profile_image URL to admin profile in DB
+    // ... existing code ...
+    res.json({ profile_image });
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router; 

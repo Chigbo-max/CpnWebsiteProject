@@ -14,6 +14,11 @@ import About from "../pages/About/About"
 import ContactUs from "../pages/ContactUs/ContactUs"
 import Layout from "../components/Layout";
 import NotFound from "../pages/Error/NotFound";
+import EventCreate from "../pages/Admin/EventCreate";
+import EventDetail from "../pages/Events/EventDetail";
+import EventRegistrations from "../pages/Admin/EventRegistrations";
+import AdminEvents from '../pages/Admin/Events';
+import EventEdit from '../pages/Admin/EventEdit';
 
 const BrowserRouter = createBrowserRouter(
     [{
@@ -37,6 +42,11 @@ const BrowserRouter = createBrowserRouter(
         { path: "/InsideCPN/blog", element: <Blog /> },
         { path: "/contactUs", element: <ContactUs /> },
         { path: "/admin", element: <AdminDashboard /> },
+        { path: "/admin/events/create", element: <EventCreate /> },
+        { path: "/admin/events/registrations", element: <EventRegistrations /> },
+        { path: "/admin/events", element: <AdminEvents /> },
+        { path: "/admin/events/edit/:event_id", element: <EventEdit /> },
+        { path: "/events/:event_id", element: <EventDetail /> },
         { path: "*", element: <NotFound /> }
         ]
     }]
