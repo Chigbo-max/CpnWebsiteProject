@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 const NewsLetter = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [formData, setFormData] = useState({
     name: '',
     email: ''
@@ -145,7 +145,7 @@ const NewsLetter = () => {
             : "bg-gray-900 hover:bg-amber-600 text-white"
         }`}
       >
-        Switch to {theme === "light" ? "Dark" : "Light"} Mode
+        Switch to {theme === "dark" ? "Light" : "Dark"} Mode
       </button>
     </div>
   );

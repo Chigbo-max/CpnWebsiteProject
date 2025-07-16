@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const EventDetail = () => {
   const { event_id } = useParams();
@@ -53,7 +54,7 @@ const EventDetail = () => {
     }
   };
 
-  if (loading) return <div className="w-full text-center py-16 text-gray-500">Loading event...</div>;
+      if (loading) return <LoadingSpinner message="Loading event..." />;
   if (!event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
   return (

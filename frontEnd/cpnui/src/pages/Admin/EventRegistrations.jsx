@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import SimpleSpinner from '../../components/SimpleSpinner';
 
 const EventRegistrations = () => {
   const [events, setEvents] = useState([]);
@@ -129,7 +130,7 @@ const EventRegistrations = () => {
         </button>
       </div>
       {loading ? (
-        <div className="w-full text-center py-8 text-gray-500">Loading registrations...</div>
+        <SimpleSpinner message="Loading registrations..." />
       ) : registrations.length === 0 ? (
         <div className="w-full text-center py-8 text-gray-400">No registrations found.</div>
       ) : (

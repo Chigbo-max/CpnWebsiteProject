@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import SimpleSpinner from '../../components/SimpleSpinner';
 
 const ContactInquiries = ({ token }) => {
   const [inquiries, setInquiries] = useState([]);
@@ -111,7 +112,7 @@ const ContactInquiries = ({ token }) => {
         </div>
       </div>
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+        <SimpleSpinner message="Loading inquiries..." />
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : paginated.length === 0 ? (

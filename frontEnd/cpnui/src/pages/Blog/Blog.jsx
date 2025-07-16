@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { motion } from "framer-motion";
 import ServerDown from '../Error/ServerDown';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { FaRegNewspaper } from 'react-icons/fa';
 
 function Blog() {
@@ -50,46 +51,11 @@ function Blog() {
     }
 
     if (loading) {
-        return (
-            <div className="w-full">
-                <div className="relative w-full min-h-[400px] sm:min-h-[500px] flex items-center justify-center text-center overflow-hidden">
-                    <div
-                        className="absolute inset-0 w-full h-full"
-                        style={{
-                            background: `linear-gradient(rgba(17, 24, 38, 0.9), rgba(17, 24, 38, 0.9)), url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2028&q=80')`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            backgroundRepeat: "no-repeat",
-                        }}
-                    />
-                    <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
-                        <p className="text-white mt-4 text-lg">Loading blog posts...</p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Loading blog posts..." />;
     }
 
     if (error) {
-        return (
-            <div className="w-full">
-                <div className="relative w-full min-h-[400px] sm:min-h-[500px] flex items-center justify-center text-center overflow-hidden">
-                    <div
-                        className="absolute inset-0 w-full h-full"
-                        style={{
-                            background: `linear-gradient(rgba(17, 24, 38, 0.9), rgba(17, 24, 38, 0.9)), url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2028&q=80')`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            backgroundRepeat: "no-repeat",
-                        }}
-                    />
-                    <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
-                        <div className="text-red-400 text-lg">Error: {error}</div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message={`Error: ${error}`} />;
     }
 
     return (

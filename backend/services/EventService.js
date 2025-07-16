@@ -2,10 +2,14 @@ const db = require('../config/database');
 const crypto = require('crypto');
 
 function generateEventId(title) {
-  // Slugify title and append random 4-digit number
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `${slug}-${rand}`;
+  // Get initials from title (first letter of each word)
+  const words = title.trim().split(/\s+/);
+  const initials = words.map(word => word.charAt(0).toUpperCase()).join('');
+  
+  // Generate 3 random digits
+  const rand = Math.floor(100 + Math.random() * 900);
+  
+  return `${initials}${rand}`;
 }
 
 function generateRegistrationCode() {

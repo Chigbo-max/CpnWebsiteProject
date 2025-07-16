@@ -6,6 +6,7 @@ import store from './app/store.jsx'
 import React from 'react';
 import ServerDown from './pages/Error/ServerDown';
 import NoInternet from './pages/Error/NoInternet';
+import ErrorBoundary from './pages/Error/ErrorBoundary';
 import { Toaster } from 'sonner';
 import { AdminAuthProvider } from './app/AdminAuthContext';
 
@@ -53,12 +54,14 @@ function App() {
   if (hasServerError) return <ServerDown />;
 
   return (
-    <Provider store={store}>
-      <AdminAuthProvider>
-        <Toaster position="top-center" richColors />
-        <RouterProvider router={router} />
-      </AdminAuthProvider>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <AdminAuthProvider>
+          <Toaster position="top-center" richColors />
+          <RouterProvider router={router} />
+        </AdminAuthProvider>
+      </Provider>
+    </ErrorBoundary>
   );
 }
 

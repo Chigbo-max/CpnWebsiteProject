@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
+import SimpleSpinner from '../../components/SimpleSpinner';
 
 // Remove demoSubscribers and related code
 
@@ -150,7 +151,7 @@ const Subscribers = () => {
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
       {loading && (
-        <div className="w-full text-center py-8 text-gray-500">Loading subscribers...</div>
+        <SimpleSpinner message="Loading subscribers..." />
       )}
       {!loading && (
         <>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
+import SimpleSpinner from '../../components/SimpleSpinner';
 
 function Events() {
   const [events, setEvents] = useState([]);
@@ -117,10 +118,7 @@ function Events() {
           <section className="mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-gray-900 text-center">Upcoming Events</h2>
             {loading ? (
-              <div className="w-full text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
-                <p className="text-gray-600 mt-4">Loading events...</p>
-              </div>
+              <SimpleSpinner message="Loading events..." />
             ) : paginatedUpcoming.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">

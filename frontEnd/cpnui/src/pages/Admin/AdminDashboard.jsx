@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faUsers, faFileAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'sonner';
+import SimpleSpinner from '../../components/SimpleSpinner';
 import AdminLayout from './AdminLayout';
 import Profile from './Profile';
 import Subscribers from './Subscribers';
@@ -107,12 +108,12 @@ function AdminDashboard() {
           <Profile admin={admin} onUpdate={handleProfileUpdate} showChangePassword={showChangePassword} setShowChangePassword={setShowChangePassword} />
         )}
         {activeSection === 'subscribers' && (
-          <Suspense fallback={<div>Loading Subscribers...</div>}>
+          <Suspense fallback={<SimpleSpinner message="Loading Subscribers..." />}>
             <Subscribers token={token} />
           </Suspense>
         )}
         {activeSection === 'newsletter' && (
-          <Suspense fallback={<div>Loading Newsletter...</div>}>
+          <Suspense fallback={<SimpleSpinner message="Loading Newsletter..." />}>
             <Newsletter token={token} />
           </Suspense>
         )}

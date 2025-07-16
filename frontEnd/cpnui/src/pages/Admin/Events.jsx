@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../app/AdminAuthContext';
+import SimpleSpinner from '../../components/SimpleSpinner';
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
@@ -92,7 +93,7 @@ const AdminEvents = () => {
         </Link>
       </div>
       {loading ? (
-        <div className="w-full text-center py-8 text-gray-500">Loading events...</div>
+        <SimpleSpinner message="Loading events..." />
       ) : paginated.length === 0 ? (
         <div className="w-full text-center py-8 text-gray-400">No events found.</div>
       ) : (
