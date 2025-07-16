@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import ServerDown from '../Error/ServerDown';
-import SimpleSpinner from '../../components/SimpleSpinner';
 import { FaRegNewspaper } from 'react-icons/fa';
 
 function Blog() {
@@ -50,7 +49,13 @@ function Blog() {
     }
 
     if (loading) {
-        return <SimpleSpinner message="Loading blog posts..." />;
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+                <div className="relative w-full rounded-2xl text-center mb-12 flex items-center justify-center min-h-[300px] sm:min-h-[400px] overflow-hidden bg-gray-900 text-white px-8 py-16">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+                </div>
+            </div>
+        );
     }
 
     if (error) {

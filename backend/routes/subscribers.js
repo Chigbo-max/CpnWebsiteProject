@@ -36,4 +36,56 @@ router.delete('/:email', async (req, res) => {
   }
 });
 
+// Add a new subscriber
+router.post('/', async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    // Check if already exists
+    const existing = await db.query('SELECT * FROM subscribers WHERE email = $1', [email]);
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ message: 'Email already subscribed' });
+    }
+    const result = await db.query(
+      'INSERT INTO subscribers (email, name) VALUES ($1, $2) RETURNING *',
+      [email, name]
+    );
+    res.status(201).json({ message: 'Subscriber added', subscriber: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding subscriber:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Edit an existing subscriber
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
+    if (!name && !email) {
+      return res.status(400).json({ message: 'Name or email required to update' });
+    }
+    // If updating email, check for duplicate
+    if (email) {
+      const existing = await db.query('SELECT * FROM subscribers WHERE email = $1 AND id != $2', [email, id]);
+      if (existing.rows.length > 0) {
+        return res.status(400).json({ message: 'Email already subscribed by another user' });
+      }
+    }
+    const result = await db.query(
+      'UPDATE subscribers SET name = COALESCE($1, name), email = COALESCE($2, email) WHERE id = $3 RETURNING *',
+      [name, email, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Subscriber not found' });
+    }
+    res.json({ message: 'Subscriber updated', subscriber: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating subscriber:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router; 

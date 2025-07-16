@@ -11,9 +11,8 @@ class BlogService {
             <td align="center">
               <table width="650" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(80,120,200,0.10); margin: 40px 0; border: 1.5px solid #e0e7ef;">
                 <tr>
-                  <td style="background: #f59e42; border-radius: 18px 18px 0 0; padding: 36px 0; text-align: center;">
-                    <img src='http://localhost:5173/src/assets/cpnBanner.png' alt='CPN Logo' style='height:48px; margin-bottom:8px;' />
-                    <h1 style="color: #fff; font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; font-size: 2.2rem; margin: 0; letter-spacing: 1px;">Christian Professionals Network</h1>
+                  <td style="background: #f59e42;  border-radius: 18px 18px 0 0; padding: 2px 0; text-align: center;">
+                    <img src='http://localhost:5173/src/assets/ChristianProfessionalsNetwork.png' alt='CPN Logo' style='height:250px; margin-bottom:0px;' />
                   </td>
                 </tr>
                 <tr>

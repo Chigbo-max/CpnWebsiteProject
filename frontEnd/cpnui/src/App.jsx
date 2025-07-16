@@ -8,18 +8,11 @@ import ServerDown from './pages/Error/ServerDown';
 import NoInternet from './pages/Error/NoInternet';
 import { Toaster } from 'sonner';
 import { AdminAuthProvider } from './app/AdminAuthContext';
-import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
+  // Remove token logic from here; use context instead
   const [hasServerError, setHasServerError] = React.useState(false);
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
-  const [isAppLoading, setIsAppLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    // Simulate async startup (e.g., auth check, config fetch)
-    const timer = setTimeout(() => setIsAppLoading(false), 1200); // 1.2s splash
-    return () => clearTimeout(timer);
-  }, []);
 
   React.useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -32,9 +25,29 @@ function App() {
     };
   }, []);
 
-  if (isAppLoading) {
-    return <LoadingSpinner message="Christian Professionals Network is starting..." />;
-  }
+  // Global fetch error handler
+  React.useEffect(() => {
+    const origFetch = window.fetch;
+    window.fetch = async (...args) => {
+      try {
+        const response = await origFetch(...args);
+        if (!response.ok && response.status >= 500) {
+          setHasServerError(true);
+        }
+        return response;
+      } catch (err) {
+        if (!navigator.onLine) {
+          setIsOnline(false);
+        } else {
+          setHasServerError(true);
+        }
+        throw err;
+      }
+    };
+    return () => {
+      window.fetch = origFetch;
+    };
+  }, []);
 
   if (!isOnline) return <NoInternet />;
   if (hasServerError) return <ServerDown />;
@@ -42,8 +55,8 @@ function App() {
   return (
     <Provider store={store}>
       <AdminAuthProvider>
-        <RouterProvider router={router} />
         <Toaster position="top-center" richColors />
+        <RouterProvider router={router} />
       </AdminAuthProvider>
     </Provider>
   );

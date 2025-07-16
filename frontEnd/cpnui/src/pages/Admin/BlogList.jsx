@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import SimpleSpinner from '../../components/SimpleSpinner';
 
 const BlogList = ({ token, onRefresh }) => {
   const [posts, setPosts] = useState([]);
@@ -94,7 +93,7 @@ const BlogList = ({ token, onRefresh }) => {
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Blog Posts</h2>
       {loading ? (
-        <SimpleSpinner message="Loading blog posts..." />
+        <div className="text-center py-8 text-gray-500">Loading...</div>
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : posts.length === 0 ? (

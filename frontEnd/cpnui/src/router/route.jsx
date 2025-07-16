@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, useNavigation } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Community from "../pages/Community/Community";
 import KnowledgeHub from "../pages/knowledgeHub/KnowledgeHub";
@@ -14,8 +14,6 @@ import About from "../pages/About/About"
 import ContactUs from "../pages/ContactUs/ContactUs"
 import Layout from "../components/Layout";
 import NotFound from "../pages/Error/NotFound";
-import LoadingSpinner from '../components/LoadingSpinner';
-import React from 'react';
 
 const BrowserRouter = createBrowserRouter(
     [{
@@ -35,21 +33,13 @@ const BrowserRouter = createBrowserRouter(
         { path: "/insideCPN/culture", element: <Culture /> },
         { path: "/insideCPN/newsLetter", element: <NewsLetter /> },
         { path: "/insideCPN/theTeam", element: <TheTeam /> },
-        { path: "/about", element: <About /> },
-        { path: "/contact", element: <ContactUs /> },
+        { path: "/insideCPN/about", element: <About /> },
+        { path: "/InsideCPN/blog", element: <Blog /> },
+        { path: "/contactUs", element: <ContactUs /> },
         { path: "/admin", element: <AdminDashboard /> },
-        { path: "*", element: <NotFound /> },
+        { path: "*", element: <NotFound /> }
         ]
     }]
-);
+)
 
-// Global route transition spinner wrapper
-export function RouterWithSpinner() {
-  const navigation = useNavigation();
-  return <>
-    <RouterProvider router={BrowserRouter} />
-    {navigation.state === 'loading' && <LoadingSpinner overlay message="Loading page..." />}
-  </>;
-}
-
-export default BrowserRouter;
+export default BrowserRouter

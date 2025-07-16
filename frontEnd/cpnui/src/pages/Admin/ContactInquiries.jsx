@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import SimpleSpinner from '../../components/SimpleSpinner';
 
 const ContactInquiries = ({ token }) => {
   const [inquiries, setInquiries] = useState([]);
@@ -8,8 +7,6 @@ const ContactInquiries = ({ token }) => {
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [response, setResponse] = useState('');
-  const [responding, setResponding] = useState(false);
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -65,35 +62,11 @@ const ContactInquiries = ({ token }) => {
     }
   };
 
-  const handleRespond = async () => {
-    if (!response.trim()) return toast.error('Response cannot be empty');
-    setResponding(true);
-    try {
-      const res = await fetch(`http://localhost:5000/api/admin/inquiries/${selected.id || selected._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ admin_response: response })
-      });
-      if (!res.ok) throw new Error('Failed to send response');
-      toast.success('Response sent and marked as responded');
-      setModalOpen(false);
-      setResponse('');
-      fetchInquiries();
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setResponding(false);
-    }
-  };
-
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Inquiries</h2>
       {loading ? (
-        <SimpleSpinner message="Loading inquiries..." />
+        <div className="text-center py-8 text-gray-500">Loading...</div>
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : inquiries.length === 0 ? (
@@ -163,7 +136,7 @@ const ContactInquiries = ({ token }) => {
           <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative animate-fadeIn">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-              onClick={() => { setModalOpen(false); setResponse(''); }}
+              onClick={() => setModalOpen(false)}
               aria-label="Close"
             >
               &times;
@@ -173,23 +146,6 @@ const ContactInquiries = ({ token }) => {
             <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Date:</span> {selected.created_at ? new Date(selected.created_at).toLocaleString() : '-'}</p>
             <div className="mt-4">
               <p className="text-gray-900 whitespace-pre-line">{selected.message}</p>
-            </div>
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Respond to Inquiry</label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
-                rows={4}
-                value={response}
-                onChange={e => setResponse(e.target.value)}
-                placeholder="Type your response here..."
-              />
-              <button
-                className={`mt-2 px-4 py-2 rounded bg-amber-500 text-white font-semibold hover:bg-amber-600 ${responding ? 'opacity-60 cursor-not-allowed' : ''}`}
-                onClick={handleRespond}
-                disabled={responding}
-              >
-                {responding ? 'Sending...' : 'Send Response'}
-              </button>
             </div>
             <div className="flex gap-2 mt-6">
               {selected.status !== 'read' && (

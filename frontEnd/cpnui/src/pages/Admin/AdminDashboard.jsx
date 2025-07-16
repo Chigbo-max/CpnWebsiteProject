@@ -11,7 +11,6 @@ import BlogList from './BlogList';
 import ContactInquiries from './ContactInquiries';
 import AdminManagement from './AdminManagement';
 import { useAdminAuth } from '../../app/AdminAuthContext';
-import SimpleSpinner from '../../components/SimpleSpinner';
 
 function AdminDashboard() {
   const { token, admin, login, logout } = useAdminAuth();
@@ -104,16 +103,12 @@ function AdminDashboard() {
           <Profile admin={admin} onUpdate={handleProfileUpdate} showChangePassword={showChangePassword} setShowChangePassword={setShowChangePassword} />
         )}
         {activeSection === 'subscribers' && (
-          <Suspense fallback={
-            <SimpleSpinner message="Loading subscribers..." />
-          }>
+          <Suspense fallback={<div>Loading Subscribers...</div>}>
             <Subscribers token={token} />
           </Suspense>
         )}
         {activeSection === 'newsletter' && (
-          <Suspense fallback={
-            <SimpleSpinner message="Loading newsletter..." />
-          }>
+          <Suspense fallback={<div>Loading Newsletter...</div>}>
             <Newsletter token={token} />
           </Suspense>
         )}
