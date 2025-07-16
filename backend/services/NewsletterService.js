@@ -1,0 +1,56 @@
+class NewsletterService {
+  constructor(db, mailer) {
+    this.db = db;
+    this.mailer = mailer;
+  }
+
+  async sendNewsletter(subject, content) {
+    if (!subject || !content) throw new Error('Subject and content are required');
+    const subscribers = await this.db.query('SELECT email, name FROM subscribers');
+    const emailPromises = subscribers.rows.map(subscriber => {
+      return this.mailer.sendMail({
+        from: process.env.EMAIL_USER,
+        to: subscriber.email,
+        subject,
+        html: `
+          <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; padding: 0; margin: 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background: #f8fafc; padding: 0; margin: 0;">
+              <tr>
+                <td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin: 32px 0;">
+                    <tr>
+                      <td style="background: #111826ff; border-radius: 10px 10px 0 0; padding: 32px 0; text-align: center;">
+                        <h1 style="color: #fff; font-size: 2rem; margin: 0; letter-spacing: 1px;">Christian Professionals Network</h1>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 32px 40px 0 40px;">
+                        <p style="font-size: 1.1rem; color: #222; margin-bottom: 24px;">Dear <b>${subscriber.name || 'Valued Subscriber'}</b>,</p>
+                        <div style="font-size: 1.1rem; color: #333; line-height: 1.7; margin-bottom: 32px;">
+                          ${content}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 40px 32px 40px;">
+                        <p style="font-size: 1rem; color: #444; margin-bottom: 0;">Best regards,</p>
+                        <p style="font-size: 1rem; color: #444; margin-top: 4px; font-weight: bold;">Christian Professionals Network Team</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0 16px 0;" />
+                        <p style="font-size: 0.95rem; color: #888; text-align: center; margin: 0;">You are receiving this email because you subscribed to Christian Professionals Network updates.</p>
+                        <p style="font-size: 0.95rem; color: #888; text-align: center; margin: 0;">&copy; ${new Date().getFullYear()} Christian Professionals Network</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </div>
+        `
+      });
+    });
+    await Promise.all(emailPromises);
+    return subscribers.rows.length;
+  }
+}
+
+module.exports = NewsletterService; 

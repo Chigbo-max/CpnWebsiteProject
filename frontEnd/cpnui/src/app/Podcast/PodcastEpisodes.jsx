@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPodcasts, setEpisodesPerPage, setCurrentPage } from "./PodcastSlice";
-import { ClipLoader } from "react-spinners";
+import SimpleSpinner from "../../components/SimpleSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
@@ -51,12 +51,7 @@ const PodcastEpisodes = () => {
   };
 
   if (status === "loading")
-    return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <ClipLoader color="#fbbf24" size={100} />
-        <p className="text-lg text-gray-700 mt-4">Loading episodes...</p>
-      </div>
-    );
+    return <SimpleSpinner message="Loading episodes..." />;
   if (status === "failed") return <p className="text-red-600">Error: {error}</p>;
 
   return (

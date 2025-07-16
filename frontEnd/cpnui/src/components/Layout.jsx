@@ -1,22 +1,27 @@
+import React from 'react';
 import NavBar from "../components/NavBar/NavBar";
 import Footer from "../components/Footer/Footer";
 import Connect from "../components/Connect/Connect";
+import { Outlet, useNavigation, useLocation } from "react-router-dom";
+import LoadingSpinner from './LoadingSpinner';
 
-import { Outlet } from "react-router-dom";
-
-
-
-function Layout() {
+const Layout = () => {
+    const navigation = useNavigation();
+    const location = useLocation();
+    const isAdminRoute = location.pathname.startsWith('/admin');
     return (
         <div>
-            <NavBar />
+            {!isAdminRoute && <NavBar />}
+            {navigation.state === 'loading' && (
+                <LoadingSpinner overlay message="Loading page..." />
+            )}
             <main>
                 <Outlet />
             </main>
-            <Connect/>
-            <Footer />
+            {!isAdminRoute && <Connect />}
+            {!isAdminRoute && <Footer />}
         </div>
     )
 }
 
-export default Layout
+export default Layout;

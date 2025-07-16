@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin',
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     excerpt TEXT,
+    tags TEXT,
     author_id INTEGER REFERENCES admins(id),
     featured_image VARCHAR(255),
     slug VARCHAR(255) UNIQUE NOT NULL,
@@ -45,7 +47,7 @@ CREATE TABLE IF NOT EXISTS contact_inquiries (
 
 -- Insert default admin
 INSERT INTO admins (username, email, password_hash) 
-VALUES ('admin', 'admin@cpn.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
+VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
 ON CONFLICT (username) DO NOTHING;
 
 -- Insert dummy blog posts

@@ -8,7 +8,7 @@ const ServerDown = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-4 py-16">
     <FontAwesomeIcon icon={faServer} className="text-amber-500 text-6xl mb-6 animate-pulse" />
     <h1 className="text-3xl sm:text-4xl font-black mb-4">Server Unavailable</h1>
-    <h2 className="text-xl font-bold mb-2">Oops! Our backend is currently unreachable.</h2>
+    <h2 className="text-xl font-bold mb-2">Oops! Our server is currently unreachable.</h2>
     <p className="text-gray-300 mb-8 text-center max-w-md">
       Please check your internet connection or try again later. If the problem persists, contact support.
     </p>

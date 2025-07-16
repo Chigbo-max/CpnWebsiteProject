@@ -1,15 +1,17 @@
-const { Pool } = require('pg');
+// const { Pool } = require('pg');
+import { pool } from './config/database';
 const fs = require('fs');
 const path = require('path');
 
+
 // Database configuration
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'cpn_db',
-  password: process.env.DB_PASSWORD || 'postgres',
-  port: process.env.DB_PORT || 5432,
-});
+// const pool = new Pool({
+//   user: process.env.DB_USER,
+//   host: process.env.DB_HOST,
+//   database: process.env.DB_NAME,
+//   password: process.env.DB_PASSWORD,
+//   port: process.env.DB_PORT,
+// });
 
 async function setupDatabase() {
   try {
@@ -24,9 +26,9 @@ async function setupDatabase() {
     
     console.log('Database setup completed successfully!');
     console.log('Default admin credentials:');
-    console.log('Username: admin');
+    console.log('Username: Uju');
     console.log('Password: password');
-    console.log('Email: admin@cpn.com');
+    console.log('Email: chizzyaac@gmail.com');
     
   } catch (error) {
     console.error('Database setup failed:', error);

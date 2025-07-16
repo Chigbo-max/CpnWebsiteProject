@@ -61,10 +61,10 @@ function LatestRelease() {
                                 <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
                                 <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                                 <span className="text-xs font-medium">LIVE</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+            </div>
+                </div>
+            </div>
             </div>
         </div>
     )
