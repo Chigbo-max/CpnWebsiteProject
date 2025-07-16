@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-const db = require('../config/database').default;
+const db = require('../config/database');
 
 // Admin login
 router.post('/login', async (req, res) => {

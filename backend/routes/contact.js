@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database').default;
+const db = require('../config/database');
 
 // Submit contact form
 router.post('/submit', async (req, res) => {
