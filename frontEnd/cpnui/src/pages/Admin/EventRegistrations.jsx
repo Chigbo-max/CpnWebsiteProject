@@ -8,6 +8,8 @@ const EventRegistrations = () => {
   const [loading, setLoading] = useState(false);
   const [csvLoading, setCsvLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 10;
 
   useEffect(() => {
     // Fetch all events for dropdown
@@ -72,6 +74,24 @@ const EventRegistrations = () => {
     ev.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  const filtered = React.useMemo(() => {
+    let data = registrations;
+    if (search) {
+      data = data.filter(reg =>
+        (reg.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (reg.email || '').toLowerCase().includes(search.toLowerCase()) ||
+        (reg.phone || '').toLowerCase().includes(search.toLowerCase()) ||
+        (reg.registration_code || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    return data;
+  }, [search, registrations]);
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = React.useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return filtered.slice(start, start + PER_PAGE);
+  }, [filtered, page]);
+
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8">
       <h2 className="text-3xl font-bold mb-8 text-gray-900">Event Registrations</h2>
@@ -125,7 +145,7 @@ const EventRegistrations = () => {
               </tr>
             </thead>
             <tbody>
-              {registrations.map((reg, idx) => (
+              {paginated.map((reg, idx) => (
                 <tr key={idx} className="border-t border-gray-100 hover:bg-gray-50">
                   <td className="p-3 font-medium text-gray-900">{reg.name}</td>
                   <td className="p-3 text-gray-700">{reg.email}</td>
@@ -134,8 +154,20 @@ const EventRegistrations = () => {
                   <td className="p-3 text-gray-700">{new Date(reg.registered_at).toLocaleString()}</td>
                 </tr>
               ))}
+              {paginated.length === 0 && (
+                <tr><td colSpan={5} className="p-6 text-center text-gray-400">No registrations found.</td></tr>
+              )}
             </tbody>
           </table>
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-4">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Prev</button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
+          ))}
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Next</button>
         </div>
       )}
     </div>

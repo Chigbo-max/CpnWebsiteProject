@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const db = require('../config/database').default;
+const db = require('../config/database');
 const dotenv = require('dotenv');
 
 const nodemailer = require('nodemailer');

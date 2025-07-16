@@ -10,6 +10,9 @@ import BlogCreate from './BlogCreate';
 import BlogList from './BlogList';
 import ContactInquiries from './ContactInquiries';
 import AdminManagement from './AdminManagement';
+import AdminEvents from './Events';
+import EventCreate from './EventCreate';
+import EventRegistrations from './EventRegistrations';
 import { useAdminAuth } from '../../app/AdminAuthContext';
 import { Link } from 'react-router-dom';
 
@@ -124,6 +127,15 @@ function AdminDashboard() {
         )}
         {activeSection === 'admin-management' && (
           <AdminManagement token={token} currentAdmin={admin} />
+        )}
+        {activeSection === 'events' && (
+          <AdminEvents />
+        )}
+        {activeSection === 'create-event' && (
+          <EventCreate />
+        )}
+        {activeSection === 'event-registrations' && (
+          <EventRegistrations />
         )}
       </div>
     </AdminLayout>

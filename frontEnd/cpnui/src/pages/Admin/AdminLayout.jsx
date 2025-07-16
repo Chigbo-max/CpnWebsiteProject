@@ -11,10 +11,9 @@ const sidebarLinks = [
   { id: 'blog-list', label: 'Blog Posts', icon: faFileAlt },
   { id: 'inquiries', label: 'Contact Inquiries', icon: faEnvelope },
   { id: 'admin-management', label: 'Admin Management', icon: faCog },
-  // Add event CRUD link
-  { id: 'events', label: 'Events', icon: faCalendarAlt, path: '/admin/events' },
-  { id: 'create-event', label: 'Create Event', icon: faPlus, path: '/admin/events/create' },
-  { id: 'event-registrations', label: 'Event Registrations', icon: faFileAlt, path: '/admin/events/registrations' },
+  { id: 'events', label: 'Events', icon: faCalendarAlt },
+  { id: 'create-event', label: 'Create Event', icon: faPlus },
+  { id: 'event-registrations', label: 'Event Registrations', icon: faFileAlt },
 ];
 
 const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowChangePassword, children }) => {
@@ -51,28 +50,16 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
           <p className="text-xs text-gray-400 truncate max-w-[90%] text-center">{admin?.email}</p>
         </div>
         <nav className="flex-1 mt-6">
-          {sidebarLinks.map(link =>
-            link.path ? (
-              <Link
-                key={link.id}
-                to={link.path}
-                className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${window.location.pathname === link.path ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
-                {link.label}
-              </Link>
-            ) : (
-              <button
-                key={link.id}
-                onClick={() => { setActiveSection(link.id); setSidebarOpen(false); }}
-                className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
-              >
-                <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
-                {link.label}
-              </button>
-            )
-          )}
+          {sidebarLinks.map(link => (
+            <button
+              key={link.id}
+              onClick={() => { setActiveSection(link.id); setSidebarOpen(false); }}
+              className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
+            >
+              <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
+              {link.label}
+            </button>
+          ))}
         </nav>
       </aside>
 

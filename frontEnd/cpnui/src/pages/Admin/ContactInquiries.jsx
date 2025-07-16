@@ -7,6 +7,10 @@ const ContactInquiries = ({ token }) => {
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 10;
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -62,14 +66,55 @@ const ContactInquiries = ({ token }) => {
     }
   };
 
+  const filtered = React.useMemo(() => {
+    let data = inquiries;
+    if (search) {
+      data = data.filter(inq =>
+        (inq.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (inq.email || '').toLowerCase().includes(search.toLowerCase()) ||
+        (inq.message || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    if (statusFilter) {
+      data = data.filter(inq => (inq.status || 'unread') === statusFilter);
+    }
+    return data;
+  }, [search, statusFilter, inquiries]);
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = React.useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return filtered.slice(start, start + PER_PAGE);
+  }, [filtered, page]);
+
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Inquiries</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex gap-2 w-full sm:w-auto">
+          <input
+            type="text"
+            placeholder="Search by name, email, or message..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+          <select
+            value={statusFilter}
+            onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
+            className="px-2 py-2 rounded-lg border border-gray-300"
+          >
+            <option value="">All Statuses</option>
+            <option value="unread">Unread</option>
+            <option value="read">Read</option>
+            <option value="responded">Responded</option>
+          </select>
+        </div>
+      </div>
       {loading ? (
         <div className="text-center py-8 text-gray-500">Loading...</div>
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
-      ) : inquiries.length === 0 ? (
+      ) : paginated.length === 0 ? (
         <div className="text-center py-8 text-gray-500">No inquiries found.</div>
       ) : (
         <div className="overflow-x-auto">
@@ -85,7 +130,7 @@ const ContactInquiries = ({ token }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {inquiries.map(inq => (
+              {paginated.map(inq => (
                 <tr key={inq.id || inq._id}>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{inq.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-blue-700">{inq.email}</td>
@@ -128,6 +173,15 @@ const ContactInquiries = ({ token }) => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-4">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Prev</button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
+          ))}
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Next</button>
         </div>
       )}
       {/* Modal for viewing full inquiry */}

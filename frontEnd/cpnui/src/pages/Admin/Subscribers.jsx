@@ -15,6 +15,9 @@ const Subscribers = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIds, setDeleteIds] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [domainFilter, setDomainFilter] = useState('');
+  const PER_PAGE = 10;
 
   // Fetch subscribers from backend
   const fetchSubscribers = async () => {
@@ -38,18 +41,30 @@ const Subscribers = () => {
 
   // Filtered subscribers
   const filtered = useMemo(() => {
-    if (!search) return subscribers;
-    return subscribers.filter(s =>
-      (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (s.email || '').toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search, subscribers]);
+    let data = subscribers;
+    if (search) {
+      data = data.filter(s =>
+        (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (s.email || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    if (domainFilter) {
+      data = data.filter(s => (s.email || '').endsWith(domainFilter));
+    }
+    return data;
+  }, [search, domainFilter, subscribers]);
+
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = useMemo(() => {
+    const start = (page - 1) * PER_PAGE;
+    return filtered.slice(start, start + PER_PAGE);
+  }, [filtered, page]);
 
   // Bulk select
-  const allSelected = selected.length === filtered.length && filtered.length > 0;
+  const allSelected = selected.length === paginated.length && paginated.length > 0;
   const toggleSelectAll = () => {
     if (allSelected) setSelected([]);
-    else setSelected(filtered.map(s => s.id));
+    else setSelected(paginated.map(s => s.id));
   };
   const toggleSelect = (id) => {
     setSelected(sel => sel.includes(id) ? sel.filter(i => i !== id) : [...sel, id]);
@@ -147,11 +162,21 @@ const Subscribers = () => {
               type="text"
               placeholder="Search by name or email..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
             <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
+          <select
+            value={domainFilter}
+            onChange={e => { setDomainFilter(e.target.value); setPage(1); }}
+            className="px-2 py-2 rounded-lg border border-gray-300"
+          >
+            <option value="">All Domains</option>
+            {[...new Set(subscribers.map(s => (s.email || '').split('@')[1]).filter(Boolean))].map(domain => (
+              <option key={domain} value={domain}>@{domain}</option>
+            ))}
+          </select>
           <button
             onClick={openAddModal}
             className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-amber-700 transition-colors"
@@ -187,7 +212,7 @@ const Subscribers = () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(sub => (
+            {paginated.map(sub => (
               <tr key={sub.id} className="border-t border-gray-100 hover:bg-gray-50">
                 <td className="p-3"><input type="checkbox" checked={selected.includes(sub.id)} onChange={() => toggleSelect(sub.id)} /></td>
                 <td className="p-3 font-medium text-gray-900">{sub.name}</td>
@@ -198,7 +223,7 @@ const Subscribers = () => {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
+            {paginated.length === 0 && (
               <tr><td colSpan={4} className="p-6 text-center text-gray-400">No subscribers found.</td></tr>
             )}
           </tbody>
@@ -207,7 +232,7 @@ const Subscribers = () => {
 
       {/* Cards (mobile) */}
       <div className="md:hidden flex flex-col gap-4">
-        {filtered.map(sub => (
+        {paginated.map(sub => (
           <div key={sub.id} className="bg-gray-50 rounded-lg shadow p-4 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <input type="checkbox" checked={selected.includes(sub.id)} onChange={() => toggleSelect(sub.id)} />
@@ -220,8 +245,18 @@ const Subscribers = () => {
             </div>
           </div>
         ))}
-        {filtered.length === 0 && (
+        {paginated.length === 0 && (
           <div className="p-6 text-center text-gray-400">No subscribers found.</div>
+        )}
+        {/* Pagination controls (mobile) */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Prev</button>
+            {[...Array(totalPages)].map((_, i) => (
+              <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
+            ))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Next</button>
+          </div>
         )}
         {selected.length > 0 && (
           <button
