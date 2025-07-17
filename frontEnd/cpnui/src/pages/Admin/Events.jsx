@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { useAdminAuth } from '../../app/AdminAuthContext';
+import { useAdminAuth } from '../../app/useAdminAuth';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
 const AdminEvents = () => {
@@ -22,7 +22,7 @@ const AdminEvents = () => {
       const res = await fetch('/api/events');
       if (!res.ok) throw new Error('Failed to fetch events');
       setEvents(await res.json());
-    } catch (err) {
+    } catch {
       toast.error('Error fetching events');
     } finally {
       setLoading(false);
@@ -43,12 +43,12 @@ const AdminEvents = () => {
       if (!res.ok) throw new Error('Failed to delete event');
       toast.success('Event deleted');
       setEvents(events.filter(ev => ev.event_id !== event_id));
-    } catch (err) {
+    } catch {
       toast.error('Error deleting event');
     }
   };
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     let data = events;
     if (search) {
       data = data.filter(ev =>
@@ -62,7 +62,7 @@ const AdminEvents = () => {
     return data;
   }, [search, typeFilter, events]);
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = React.useMemo(() => {
+  const paginated = useMemo(() => {
     const start = (page - 1) * PER_PAGE;
     return filtered.slice(start, start + PER_PAGE);
   }, [filtered, page]);

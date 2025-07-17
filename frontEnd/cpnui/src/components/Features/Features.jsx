@@ -2,8 +2,6 @@ import {Link} from "react-router-dom"
 import banner from "../../assets/cpnBanner.png"
 
 const Features = () => {
-  const navigate = useNavigate();
-
   return (
     <section className="bg-white py-12 sm:py-16 lg:py-20 flex justify-center items-center flex-col">
       <div className="flex flex-col lg:flex-row items-center justify-evenly gap-8 lg:gap-12 w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">

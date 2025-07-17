@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
@@ -30,7 +31,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
 
   useEffect(() => {
     fetchAdmins();
-  }, []);
+  }, [fetchAdmins]);
 
   const handleDelete = async (id) => {
     setConfirmModal({ open: true, type: 'delete', admin: admins.find(a => (a.id || a._id) === id) });
@@ -264,6 +265,13 @@ const AdminManagement = ({ token, currentAdmin }) => {
       )}
     </div>
   );
+};
+
+AdminManagement.propTypes = {
+  token: PropTypes.string.isRequired,
+  currentAdmin: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }).isRequired
 };
 
 export default AdminManagement; 

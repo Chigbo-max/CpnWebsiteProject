@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faUser, faArrowLeft, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import ServerDown from '../Error/ServerDown';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
@@ -32,27 +32,6 @@ function BlogPost() {
             }
         } finally {
             setLoading(false);
-        }
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
-    const sharePost = () => {
-        if (navigator.share) {
-            navigator.share({
-                title: post.title,
-                url: window.location.href
-            });
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert('Link copied to clipboard!');
         }
     };
 

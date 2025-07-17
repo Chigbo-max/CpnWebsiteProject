@@ -1,6 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEnvelope, faUsers, faFileAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import AdminLayout from './AdminLayout';
@@ -14,8 +12,7 @@ import AdminManagement from './AdminManagement';
 import AdminEvents from './Events';
 import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
-import { useAdminAuth } from '../../app/AdminAuthContext';
-import { Link } from 'react-router-dom';
+import { useAdminAuth } from '../../app/useAdminAuth';
 
 function AdminDashboard() {
   const { token, admin, login, logout } = useAdminAuth();
@@ -53,7 +50,7 @@ function AdminDashboard() {
     setIsLoggedIn(false);
   };
 
-  const handleProfileUpdate = (updated) => {
+  const handleProfileUpdate = () => {
     // TODO: Send update to backend
   };
 

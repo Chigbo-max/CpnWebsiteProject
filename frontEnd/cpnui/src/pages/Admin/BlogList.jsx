@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
@@ -29,7 +30,7 @@ const BlogList = ({ token, onRefresh }) => {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this blog post?')) return;
@@ -253,6 +254,11 @@ const BlogList = ({ token, onRefresh }) => {
       )}
     </div>
   );
+};
+
+BlogList.propTypes = {
+  token: PropTypes.string.isRequired,
+  onRefresh: PropTypes.func
 };
 
 export default BlogList; 

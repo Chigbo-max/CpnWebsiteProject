@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import Features from "../../components/Features/Features"
-import LatestRelease from "../../components/LatestRelease/LatestRelease"
-import Courses from "../../components/Courses/Courses"
-import FreeContent from '../../components/FreeContent/FreeContent'
-import NewAndPastEvents from '../../components/NewAndPastEvents/NewAndPastEvents'
-import Cpn1 from "../../assets/cpnevent1.jpg";
-import Cpn2 from "../../assets/cpnevent2.jpg"
-import Cpn3 from "../../assets/cpnevent3.jpg"
-import { motion, AnimatePresence } from 'framer-motion'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify, faWhatsapp, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { motion } from 'framer-motion';
+import NavBar from '../../components/NavBar/NavBar';
+import Footer from '../../components/Footer/Footer';
+import Features from '../../components/Features/Features';
+import Connect from '../../components/Connect/Connect';
+import FreeContent from '../../components/FreeContent/FreeContent';
+import LatestRelease from '../../components/LatestRelease/LatestRelease';
+import NewAndPastEvents from '../../components/NewAndPastEvents/NewAndPastEvents';
+import Courses from '../../components/Courses/Courses';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { faUsers, faBookOpen, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
-import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand, faInstagram as faInstagramBrand } from "@fortawesome/free-brands-svg-icons";
-import { Link } from 'react-router-dom'
+import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@fortawesome/free-brands-svg-icons";
 
 const slides = [
   {

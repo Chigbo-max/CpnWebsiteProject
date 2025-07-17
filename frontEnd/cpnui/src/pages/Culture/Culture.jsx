@@ -1,5 +1,3 @@
-import React from 'react'
-
 function Culture() {
   return (
     <div className="relative w-full rounded-2xl text-center mb-12 flex items-center justify-center min-h-[300px] sm:min-h-[400px] overflow-hidden bg-gray-900 text-white px-8 py-16">

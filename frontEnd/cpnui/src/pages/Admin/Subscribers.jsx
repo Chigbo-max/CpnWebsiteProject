@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -29,7 +29,7 @@ const Subscribers = () => {
       const data = await res.json();
       // The backend returns id, name, email, subscribed_at
       setSubscribers(data);
-    } catch (err) {
+    } catch {
       toast.error('Error fetching subscribers');
     } finally {
       setLoading(false);
@@ -117,8 +117,8 @@ const Subscribers = () => {
     }
     setShowModal(false);
       await fetchSubscribers();
-    } catch (err) {
-      toast.error(err.message || 'Error saving subscriber');
+    } catch {
+      toast.error('Error saving subscriber');
     }
   };
 
@@ -141,7 +141,7 @@ const Subscribers = () => {
       toast.success(deleteIds.length > 1 ? 'Subscribers deleted' : 'Subscriber deleted');
     setSelected(sel => sel.filter(id => !deleteIds.includes(id)));
       await fetchSubscribers(); // Refresh list after delete
-    } catch (err) {
+    } catch {
       toast.error('Error deleting subscriber(s)');
     } finally {
     setShowDeleteModal(false);

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 
 const BlogCreate = ({ token, onSuccess }) => {
@@ -80,10 +81,9 @@ const BlogCreate = ({ token, onSuccess }) => {
         toast.success(publish ? 'Blog post published!' : 'Blog post saved as draft!');
         if (onSuccess) onSuccess();
       } else {
-        const err = await response.json();
-        toast.error(err.message || 'Failed to create blog post');
+        toast.error('Failed to create blog post');
       }
-    } catch (error) {
+    } catch {
       toast.error('Error creating blog post');
     } finally {
       setSubmitting(false);
@@ -209,6 +209,11 @@ const BlogCreate = ({ token, onSuccess }) => {
       </form>
     </div>
   );
+};
+
+BlogCreate.propTypes = {
+  token: PropTypes.string.isRequired,
+  onSuccess: PropTypes.func
 };
 
 export default BlogCreate; 

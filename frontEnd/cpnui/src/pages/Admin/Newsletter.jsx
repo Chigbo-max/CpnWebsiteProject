@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
-import { RichTextEditorComponent } from '@syncfusion/ej2-react-richtexteditor';
 import '@syncfusion/ej2-base/styles/material.css';
 import '@syncfusion/ej2-react-richtexteditor/styles/material.css';
 
@@ -9,7 +9,6 @@ const Newsletter = ({ token }) => {
   const [content, setContent] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [sending, setSending] = useState(false);
-  const rteRef = useRef(null);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -99,6 +98,10 @@ const Newsletter = ({ token }) => {
       )}
     </div>
   );
+};
+
+Newsletter.propTypes = {
+  token: PropTypes.string.isRequired
 };
 
 export default Newsletter; 

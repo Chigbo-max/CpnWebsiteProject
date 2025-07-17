@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const AdminAuthContext = createContext();
+export const AdminAuthContext = createContext();
 
 export const AdminAuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('adminToken'));
@@ -47,6 +47,4 @@ export const AdminAuthProvider = ({ children }) => {
 
 AdminAuthProvider.propTypes = {
   children: PropTypes.node.isRequired
-};
-
-export const useAdminAuth = () => useContext(AdminAuthContext); 
+}; 

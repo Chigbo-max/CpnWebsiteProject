@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useAdminAuth } from '../../app/AdminAuthContext';
+import { useAdminAuth } from '../../app/useAdminAuth';
 
 const initialState = {
   title: '',
@@ -33,7 +33,7 @@ const EventEdit = () => {
         const data = await res.json();
         setForm({ ...data, image: null, image_url: data.image_url || '' });
         setImagePreview(data.image_url || null);
-      } catch (err) {
+      } catch {
         toast.error('Error fetching event');
       } finally {
         setLoading(false);

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 
 const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword }) => {
@@ -45,7 +46,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       } else {
         toast.error('Failed to update profile');
       }
-    } catch (err) {
+    } catch {
       toast.error('Error updating profile');
     } finally {
       setForm(f => ({ ...f, saving: false }));
@@ -72,7 +73,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       } else {
         toast.error('Failed to change password');
       }
-    } catch (err) {
+    } catch {
       toast.error('Error changing password');
     } finally {
       setChanging(false);
@@ -184,6 +185,17 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       )}
     </div>
   );
+};
+
+Profile.propTypes = {
+  admin: PropTypes.shape({
+    username: PropTypes.string,
+    email: PropTypes.string,
+    profilePic: PropTypes.string
+  }).isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  showChangePassword: PropTypes.bool.isRequired,
+  setShowChangePassword: PropTypes.func.isRequired
 };
 
 export default Profile; 

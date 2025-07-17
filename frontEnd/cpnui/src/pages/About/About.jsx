@@ -4,7 +4,7 @@ import { faSpotify, faInstagram, faWhatsapp } from "@fortawesome/free-brands-svg
 import icon from "../../assets/clubhouse.svg";
 import bgImage from "../../assets/cpnevent1.jpg";
 import { motion } from 'framer-motion';
-import { FaBullseye, FaEye, FaHandshake, FaLeaf, FaUsers, FaHandsHelping, FaBalanceScale, FaHeart, FaUserTie, FaPhoneAlt, FaEnvelope, FaChurch, FaRegCheckCircle } from 'react-icons/fa';
+import { FaBullseye, FaEye, FaHandshake, FaLeaf, FaUsers, FaHandsHelping, FaBalanceScale, FaUserTie, FaChurch, FaRegCheckCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const team = [

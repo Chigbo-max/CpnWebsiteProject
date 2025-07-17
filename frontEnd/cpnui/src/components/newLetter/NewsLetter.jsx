@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -43,10 +43,9 @@ const NewsLetter = () => {
         setSubmitStatus('success');
         setFormData({ name: '', email: '' });
       } else {
-        const errorData = await response.json();
         setSubmitStatus('error');
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
     } finally {
       setLoading(false);
@@ -133,7 +132,7 @@ const NewsLetter = () => {
         <p className={`text-xs sm:text-sm text-center ${
           theme === "dark" ? "text-gray-400" : "text-gray-500"
         }`}>
-          No spam guaranteed, So please don't send any spam mail.
+          No spam guaranteed, So please don&apos;t send any spam mail.
         </p>
       </form>
 

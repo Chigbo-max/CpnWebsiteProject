@@ -20,7 +20,7 @@ function Events() {
         const res = await fetch('/api/events');
         if (!res.ok) throw new Error('Failed to fetch events');
         setEvents(await res.json());
-      } catch (err) {
+      } catch {
         // Optionally show a toast
       } finally {
         setLoading(false);

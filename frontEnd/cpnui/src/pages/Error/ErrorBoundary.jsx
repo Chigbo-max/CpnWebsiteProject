@@ -1,19 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
     this.setState({
-      error: error,
       errorInfo: errorInfo
     });
     
@@ -34,7 +34,7 @@ class ErrorBoundary extends React.Component {
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h1>
               <p className="text-gray-600 mb-6">
-                We're sorry, but something unexpected happened. Please try refreshing the page or go back to the homepage.
+                We&apos;re sorry, but something unexpected happened. Please try refreshing the page or go back to the homepage.
               </p>
             </div>
             
@@ -54,16 +54,12 @@ class ErrorBoundary extends React.Component {
               </button>
             </div>
             
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {typeof window !== 'undefined' && window.location.hostname === 'localhost' && this.state.errorInfo && (
               <details className="mt-6 text-left">
                 <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
                   Error Details (Development)
                 </summary>
                 <div className="mt-2 p-4 bg-gray-100 rounded text-xs font-mono text-gray-800 overflow-auto">
-                  <div className="mb-2">
-                    <strong>Error:</strong>
-                    <pre className="whitespace-pre-wrap">{this.state.error.toString()}</pre>
-                  </div>
                   {this.state.errorInfo && (
                     <div>
                       <strong>Component Stack:</strong>
@@ -81,5 +77,9 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+ErrorBoundary.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 export default ErrorBoundary; 

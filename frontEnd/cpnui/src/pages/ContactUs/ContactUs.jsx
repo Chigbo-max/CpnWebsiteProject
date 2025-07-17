@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import NewsLetter from "../../components/newLetter/NewsLetter";
 import bgImage from "../../assets/contact.jpeg"
 import { motion } from "framer-motion"; 
@@ -40,10 +40,9 @@ const Contact = () => {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', message: '' });
       } else {
-        const errorData = await response.json();
         setSubmitStatus('error');
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../app/AdminAuthContext';
+import { useAdminAuth } from '../../app/useAdminAuth';
 
 const initialState = {
   title: '',

@@ -1,15 +1,10 @@
-import React from 'react';
-import PodcastSearch from '../../app/Podcast/podCastSearch.jsx';
-import TopicsFilter from '../../app/Podcast/topicsFilter.jsx'
-import PodcastEpisodes from '../../app/Podcast/PodcastEpisodes.jsx';
-import { useSelector } from 'react-redux';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpotify } from "@fortawesome/free-brands-svg-icons";
-import { useNavigate } from 'react-router-dom';
-import { motion } from "framer-motion"; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify, faHeadphones, faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { motion } from 'framer-motion';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ServerDown from '../Error/ServerDown';
 
-const Listen = () => {
-  const navigate = useNavigate();
+function Listen() {
   const podcast = useSelector((state) => state.podcast);
 
   return (

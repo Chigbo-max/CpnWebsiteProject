@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion"; 
 import SoundWave from "../../assets/soundWave.png";
 import bgImage from "../../assets/listen.jpeg";

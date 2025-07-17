@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar, faMapMarkerAlt, faVideo, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import ServerDown from '../Error/ServerDown';
 
 const EventDetail = () => {
   const { event_id } = useParams();

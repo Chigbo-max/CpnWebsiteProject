@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faSignOutAlt, faUser, faUsers, faEnvelope, faFileAlt, faNewspaper, faCog, faPlus, faChevronDown, faKey, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { faBars, faTimes, faUser, faSignOutAlt, faCog, faUsers, faEnvelope, faFileAlt, faCalendarAlt, faPlus, faList } from '@fortawesome/free-solid-svg-icons';
 
 const sidebarLinks = [
   { id: 'profile', label: 'Profile', icon: faUser },
   { id: 'subscribers', label: 'Subscribers', icon: faUsers },
-  { id: 'newsletter', label: 'Newsletter', icon: faNewspaper },
+  { id: 'newsletter', label: 'Newsletter', icon: faList },
   { id: 'blog-create', label: 'Create Blog Post', icon: faPlus },
   { id: 'blog-list', label: 'Blog Posts', icon: faFileAlt },
   { id: 'inquiries', label: 'Contact Inquiries', icon: faEnvelope },
@@ -87,7 +87,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
                 className="w-10 h-10 rounded-full object-cover border-2 border-amber-500"
               />
               <span className="font-semibold text-gray-900 hidden sm:block">{admin?.username || 'Admin'}</span>
-              <FontAwesomeIcon icon={faChevronDown} className="text-gray-500" />
+              <FontAwesomeIcon icon={faTimes} className="text-gray-500" />
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
@@ -102,7 +102,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
                   className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   onClick={() => { onShowChangePassword(); setDropdownOpen(false); }}
                 >
-                  <FontAwesomeIcon icon={faKey} className="mr-2" />
+                  <FontAwesomeIcon icon={faTimes} className="mr-2" />
                   Change Password
                 </button>
                 <button
@@ -120,6 +120,19 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
       </div>
     </div>
   );
+};
+
+AdminLayout.propTypes = {
+  admin: PropTypes.shape({
+    username: PropTypes.string,
+    email: PropTypes.string,
+    profilePic: PropTypes.string
+  }).isRequired,
+  onLogout: PropTypes.func.isRequired,
+  activeSection: PropTypes.string.isRequired,
+  setActiveSection: PropTypes.func.isRequired,
+  onShowChangePassword: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default AdminLayout; 

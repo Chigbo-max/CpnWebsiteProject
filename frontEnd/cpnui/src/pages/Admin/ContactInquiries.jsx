@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
@@ -32,7 +33,7 @@ const ContactInquiries = ({ token }) => {
 
   useEffect(() => {
     fetchInquiries();
-  }, []);
+  }, [fetchInquiries]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this inquiry?')) return;
@@ -67,7 +68,7 @@ const ContactInquiries = ({ token }) => {
     }
   };
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     let data = inquiries;
     if (search) {
       data = data.filter(inq =>
@@ -82,7 +83,7 @@ const ContactInquiries = ({ token }) => {
     return data;
   }, [search, statusFilter, inquiries]);
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = React.useMemo(() => {
+  const paginated = useMemo(() => {
     const start = (page - 1) * PER_PAGE;
     return filtered.slice(start, start + PER_PAGE);
   }, [filtered, page]);
@@ -225,6 +226,10 @@ const ContactInquiries = ({ token }) => {
       )}
     </div>
   );
+};
+
+ContactInquiries.propTypes = {
+  token: PropTypes.string.isRequired
 };
 
 export default ContactInquiries; 
