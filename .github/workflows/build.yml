@@ -1,5 +1,3 @@
-git add .github/workflows/build.yml
-
 name: Cpn CI
 
 on:
@@ -17,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: postgres:14
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -40,7 +38,6 @@ jobs:
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-    
 
     steps:
       - name: Checkout code
@@ -58,18 +55,10 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-          cd frontend
-          cd cpnui
+          cd frontend/cpnui
           npm ci
 
       - name: Run ESLint
-        run: npm run ESlint
-
-
-  # deploy:
-  #   name: Deploy to Production
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Deploy to Render
-  #       run: echo "Deploy step goes here"
+        run: |
+          cd frontend/cpnui
+          npm run eslint
