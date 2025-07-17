@@ -55,10 +55,10 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-          cd frontend/cpnui
+          cd frontEnd/cpnui
           npm ci
 
       - name: Run ESLint
         run: |
-          cd frontend/cpnui
+          cd frontEnd/cpnui
           npm run eslint
