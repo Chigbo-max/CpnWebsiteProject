@@ -1,19 +1,16 @@
-import React,{useEffect} from 'react'
 import { navBarItems } from '../../helpers/NavBarItems.jsx'
 import { Link } from "react-router-dom"
 import Logo from "../../assets/ChristianProfessionalsNetwork.png"
 import DropDown from "../DropDown/DropDown.jsx"
 import KnowledgeHubDropDown from "../../pages/knowledgeHub/KnowledgeHubDropDown.jsx"
-import { LiaAngleDownSolid, LiaBarsSolid } from "react-icons/lia";
-import { IndeterminateCheckBoxRounded } from '@mui/icons-material'
-import CommunityDropDown from '../DropDown/CommunityDropDown/CommunityDropDown.jsx'
+import { LiaAngleDownSolid } from "react-icons/lia";
 import { useDispatch, useSelector } from 'react-redux';
-import { setDropDown, setKnowledgeHubDropDown, setCommunityDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
+import { setDropDown, setKnowledgeHubDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
 import Switch from "../Switch.jsx"
 
 function NavBar() {
     const dispatch = useDispatch();
-    const { dropDown, knowledgeHubDropDown, communityDropDown, openLink } = useSelector((state) => state.navBar);
+    const { dropDown, knowledgeHubDropDown, openLink } = useSelector((state) => state.navBar);
 
     function toggleBar() {
         dispatch(setOpenLink(!openLink));

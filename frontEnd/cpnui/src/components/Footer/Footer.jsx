@@ -1,7 +1,6 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquareXTwitter, faFacebook, faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { faPhone, faEnvelope, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons';
 import FooterLogo from "../../assets/ChristianProfessionalsNetwork.png";
 import { Link } from "react-router-dom";
 

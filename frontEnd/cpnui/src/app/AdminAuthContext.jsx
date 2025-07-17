@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const AdminAuthContext = createContext();
 
@@ -42,6 +43,10 @@ export const AdminAuthProvider = ({ children }) => {
       {children}
     </AdminAuthContext.Provider>
   );
+};
+
+AdminAuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export const useAdminAuth = () => useContext(AdminAuthContext); 

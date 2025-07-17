@@ -1,5 +1,5 @@
 
-import React from 'react';
+import PropTypes from 'prop-types';
 import cpnBanner from '../assets/ChristianProfessionalsNetwork.png';
 
 const LoadingSpinner = ({ message = "Loading...", overlay = false }) => {
@@ -46,6 +46,11 @@ const LoadingSpinner = ({ message = "Loading...", overlay = false }) => {
       </div>
     </div>
   );
+};
+
+LoadingSpinner.propTypes = {
+  message: PropTypes.string,
+  overlay: PropTypes.bool
 };
 
 export default LoadingSpinner; 

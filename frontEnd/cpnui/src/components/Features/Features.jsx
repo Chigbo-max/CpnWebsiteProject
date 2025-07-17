@@ -1,9 +1,5 @@
-import React from "react";
 import {Link} from "react-router-dom"
 import banner from "../../assets/cpnBanner.png"
-import { useNavigate } from "react-router-dom";
-import { FaUsers, FaBook, FaCalendarAlt } from "react-icons/fa";
-import {motion} from "framer-motion";
 
 const Features = () => {
   const navigate = useNavigate();

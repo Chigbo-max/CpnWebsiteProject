@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 function Podcast({ title, embedUrl, topic }) {
     return (
       <div className="podcast-card">
@@ -19,4 +21,10 @@ function Podcast({ title, embedUrl, topic }) {
     );
   }
   
+  Podcast.propTypes = {
+    title: PropTypes.string.isRequired,
+    embedUrl: PropTypes.string.isRequired,
+    topic: PropTypes.string.isRequired
+  };
+
   export default Podcast;

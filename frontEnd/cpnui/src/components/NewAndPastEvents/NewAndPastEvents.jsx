@@ -1,5 +1,3 @@
-import React from 'react'
-
 function NewAndPastEvents() {
     return (
         <div className="w-full">

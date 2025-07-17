@@ -1,4 +1,3 @@
-import React from 'react'
 import {dropDownItems} from "./DropDownItems"
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'

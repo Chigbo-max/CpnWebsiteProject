@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 
 const ErrorDisplay = ({ error, onRetry, className = '' }) => {
   if (!error) return null;
@@ -33,6 +33,18 @@ const ErrorDisplay = ({ error, onRetry, className = '' }) => {
       </div>
     </div>
   );
+};
+
+ErrorDisplay.propTypes = {
+  error: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      title: PropTypes.string,
+      message: PropTypes.string
+    })
+  ]),
+  onRetry: PropTypes.func,
+  className: PropTypes.string
 };
 
 export default ErrorDisplay; 

@@ -1,4 +1,3 @@
-import React from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookOpen, faHeadphones } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from 'react-router-dom'
@@ -9,7 +8,7 @@ function LatestRelease() {
         <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 -mt-24 lg:-mt-32 bg-gradient-to-br from-gray-50 to-amber-50">
             <div className="flex flex-col justify-center items-center w-full gap-4 sm:gap-6 lg:gap-8">
                 <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16">
-                    <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">WHAT'S NEW</p>
+                    <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">WHAT&apos;S NEW</p>
                     <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center">
                         Discover our <span className="text-amber-600">Latest Release</span>
                     </h3>
