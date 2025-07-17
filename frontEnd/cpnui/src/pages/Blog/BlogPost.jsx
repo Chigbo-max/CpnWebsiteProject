@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -12,11 +12,7 @@ function BlogPost() {
     const [error, setError] = useState(null);
     const [serverDown, setServerDown] = useState(false);
 
-    useEffect(() => {
-        fetchBlogPost();
-    }, [slug]);
-
-    const fetchBlogPost = async () => {
+    const fetchBlogPost = useCallback(async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/blog/${slug}`);
             if (!response.ok) {
@@ -33,7 +29,11 @@ function BlogPost() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [slug]);
+
+    useEffect(() => {
+        fetchBlogPost();
+    }, [fetchBlogPost]);
 
     if (serverDown) {
         return <ServerDown />;

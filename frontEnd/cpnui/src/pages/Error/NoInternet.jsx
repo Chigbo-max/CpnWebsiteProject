@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWifi, faRedo } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
 
 function NoInternet() {
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
@@ -12,7 +12,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmModal, setConfirmModal] = useState({ open: false, type: '', admin: null });
 
-  const fetchAdmins = async () => {
+  const fetchAdmins = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -27,7 +27,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchAdmins();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
@@ -11,7 +11,7 @@ const BlogList = ({ token, onRefresh }) => {
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -26,7 +26,7 @@ const BlogList = ({ token, onRefresh }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchPosts();

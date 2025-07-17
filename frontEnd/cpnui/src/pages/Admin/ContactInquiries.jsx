@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
@@ -14,7 +14,7 @@ const ContactInquiries = ({ token }) => {
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
 
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -29,7 +29,7 @@ const ContactInquiries = ({ token }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchInquiries();

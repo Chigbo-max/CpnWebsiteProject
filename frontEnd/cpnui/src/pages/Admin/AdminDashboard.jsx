@@ -40,7 +40,7 @@ function AdminDashboard() {
       } else {
         toast.error('Login failed');
       }
-    } catch (error) {
+    } catch {
       toast.error('Login error');
     }
   };
