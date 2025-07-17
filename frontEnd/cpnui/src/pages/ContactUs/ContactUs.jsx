@@ -95,7 +95,7 @@ const Contact = () => {
                 {submitStatus === 'success' && (
                   <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
                     <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-3" />
-                    <span className="text-green-800">Message sent successfully! We'll get back to you soon.</span>
+                    <span className="text-green-800">Message sent successfully! We&apos;ll get back to you soon.</span>
                   </div>
                 )}
                 

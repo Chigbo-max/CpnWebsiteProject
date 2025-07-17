@@ -7,6 +7,11 @@ import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@for
 import Cpn1 from "../../assets/cpnevent1.jpg";
 import Cpn2 from "../../assets/cpnevent2.jpg";
 import Cpn3 from "../../assets/cpnevent3.jpg";
+import Features from "../../components/Features/Features";
+import LatestRelease from "../../components/LatestRelease/LatestRelease";
+import Courses from "../../components/Courses/Courses";
+import FreeContent from "../../components/FreeContent/FreeContent";
+import NewAndPastEvents from "../../components/NewAndPastEvents/NewAndPastEvents";
 
 const slides = [
   {

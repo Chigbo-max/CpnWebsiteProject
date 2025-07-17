@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { motion } from 'framer-motion';
@@ -7,7 +6,6 @@ import TopicsFilter from '../../app/Podcast/topicsFilter.jsx';
 import PodcastEpisodes from '../../app/Podcast/PodcastEpisodes.jsx';
 
 function Listen() {
-  const podcast = useSelector((state) => state.podcast);
 
   return (
     <div className="w-full">
