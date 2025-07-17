@@ -1,3 +1,5 @@
+git add .github/workflows/build.yml
+
 name: Cpn CI
 
 on:
@@ -10,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: 🛠 Build & Test
+    name: Build & Test
     runs-on: ubuntu-latest
 
     services:
@@ -49,9 +51,16 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
 
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          cd cpnui
+          npm ci
 
       - name: Run ESLint
         run: npm run ESlint
