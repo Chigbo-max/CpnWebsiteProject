@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedTopic, clearFilters } from './PodcastSlice';
+import { setSelectedTopic, clearFilters } from './podCastSlice';
 
 const TopicsFilter = () => {
   const dispatch = useDispatch();

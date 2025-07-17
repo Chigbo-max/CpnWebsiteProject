@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import { useAdminAuth } from '../../app/useAdminAuth';
 
 const EventRegistrations = () => {
+  const { token } = useAdminAuth();
   const [events, setEvents] = useState([]);
   const [eventId, setEventId] = useState('');
   const [registrations, setRegistrations] = useState([]);
@@ -30,7 +32,11 @@ const EventRegistrations = () => {
     if (!eventId) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/registrations`);
+      const res = await fetch(`/api/events/${eventId}/registrations`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
         console.log(res)
 
       if (!res.ok) throw new Error('Failed to fetch registrations');
@@ -47,7 +53,11 @@ const EventRegistrations = () => {
   const handleDownloadCSV = async () => {
     setCsvLoading(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/registrations/csv`);
+      const res = await fetch(`/api/events/${eventId}/registrations/csv`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) throw new Error('Failed to download CSV');
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);

@@ -8,7 +8,7 @@ import ServerDown from './pages/Error/ServerDown';
 import NoInternet from './pages/Error/NoInternet';
 import ErrorBoundary from './pages/Error/ErrorBoundary';
 import { Toaster } from 'sonner';
-import { AdminAuthProvider } from './app/AdminAuthContext';
+import { AdminAuthProvider } from './app/AdminAuthContextProvider';
 
 function App() {
   // Remove token logic from here; use context instead

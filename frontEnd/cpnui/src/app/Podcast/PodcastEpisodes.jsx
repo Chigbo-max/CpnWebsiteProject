@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPodcasts, setEpisodesPerPage, setCurrentPage } from "./PodcastSlice";
+import { fetchPodcasts, setEpisodesPerPage, setCurrentPage } from "./podCastSlice";
 import SimpleSpinner from "../../components/SimpleSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";

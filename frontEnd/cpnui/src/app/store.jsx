@@ -1,6 +1,6 @@
 import {configureStore} from '@reduxjs/toolkit';
 import navBarReducer from './navBar/navBarSlice';
-import podcastReducer from './Podcast/PodcastSlice'
+import podcastReducer from './Podcast/podCastSlice'
 
 const store = configureStore({
     reducer: {

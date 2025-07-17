@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { setSearchQuery } from './PodcastSlice';
+import { setSearchQuery } from './podCastSlice';
 
 const PodcastSearch = () => {
   const dispatch = useDispatch();
