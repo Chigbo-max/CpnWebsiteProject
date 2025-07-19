@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import ServerDown from '../Error/ServerDown';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import ReactMarkdown from 'react-markdown';
+import { EditorState, convertFromRaw } from 'draft-js';
 
 function BlogPost() {
     const { slug } = useParams();
@@ -81,9 +83,15 @@ function BlogPost() {
                     </Link>
                 </div>
 
-                {/* Render backend HTML template */}
+                {/* Render backend HTML template or markdown */}
                 <div className="bg-transparent rounded-lg shadow-xl overflow-hidden">
-                    {post.html ? (
+                    {post.content_type === 'markdown' ? (
+                        <div className="prose prose-lg max-w-none bg-white p-6 rounded-xl">
+                            <ReactMarkdown>{post.content}</ReactMarkdown>
+                        </div>
+                    ) : post.content_type === 'richtext' ? (
+                        <div className="prose prose-lg max-w-none bg-white p-6 rounded-xl" dangerouslySetInnerHTML={{ __html: draftRawToHtml(post.content) }} />
+                    ) : post.html ? (
                         <div dangerouslySetInnerHTML={{ __html: post.html }} />
                     ) : (
                         <div className="text-red-400">No blog template available.</div>
@@ -95,3 +103,19 @@ function BlogPost() {
 }
 
 export default BlogPost; 
+
+// Helper to convert Draft.js raw content to HTML
+function draftRawToHtml(raw) {
+    try {
+        const contentState = convertFromRaw(typeof raw === 'string' ? JSON.parse(raw) : raw);
+        // For simplicity, use built-in Draft.js convertToRaw and map blocks to HTML
+        // For production, use draft-js-export-html or similar
+        let html = '';
+        contentState.getBlocksAsArray().forEach(block => {
+            html += `<p>${block.getText()}</p>`;
+        });
+        return html;
+    } catch (e) {
+        return '<p>Could not render rich text content.</p>';
+    }
+} 

@@ -4,6 +4,7 @@ const EventService = require('../services/EventService');
 const { uploadImage } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
 const authMiddleware = require('../middleware/auth');
+const redisClient = require('../config/redisClient');
 
 console.log('Loaded events routes');
 
@@ -14,7 +15,6 @@ router.post('/', authMiddleware, async (req, res) => {
     if (req.body.image) {
       image_url = await uploadImage(req.body.image);
       console.log('Image uploaded:', image_url);
-
     }
     const event = await EventService.createEvent({
       ...req.body,
@@ -22,7 +22,8 @@ router.post('/', authMiddleware, async (req, res) => {
       created_by: req.admin.id
     });
     console.log('Event created:', event);
-
+    // Invalidate events list cache
+    await redisClient.del('events:list');
     res.status(201).json(event);
   } catch (err) {
     console.error('Error creating event:', err); // <-- Add this line
@@ -32,14 +33,22 @@ router.post('/', authMiddleware, async (req, res) => {
 
 // GET /api/events
 router.get('/', async (req, res) => {
+  const cacheKey = 'events:list';
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   const events = await EventService.getEvents();
+  await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
   res.json(events);
 });
 
 // GET /api/events/:event_id
 router.get('/:event_id', async (req, res) => {
+  const cacheKey = `events:${req.params.event_id}`;
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   const event = await EventService.getEventById(req.params.event_id);
   if (!event) return res.status(404).json({ message: 'Event not found' });
+  await redisClient.setEx(cacheKey, 300, JSON.stringify(event));
   res.json(event);
 });
 
@@ -77,6 +86,8 @@ router.post('/:event_id/register', async (req, res) => {
         <p>Event Date: ${new Date(event.start_time).toLocaleString()} - ${new Date(event.end_time).toLocaleString()}</p>
         <p>${locationInfo}</p>`
     });
+    // Invalidate registrations cache for this event
+    await redisClient.del(`event_registrations:${req.params.event_id}`);
     res.status(201).json({ ...reg, event });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -85,13 +96,25 @@ router.post('/:event_id/register', async (req, res) => {
 
 // GET /api/events/:event_id/registrations (admin only)
 router.get('/:event_id/registrations', authMiddleware, async (req, res) => {
+  const cacheKey = `event_registrations:${req.params.event_id}`;
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   const regs = await EventService.getRegistrationsForEvent(req.params.event_id);
+  await redisClient.setEx(cacheKey, 300, JSON.stringify(regs));
   res.json(regs);
 });
 
 // GET /api/events/:event_id/registrations/csv (admin only)
 router.get('/:event_id/registrations/csv', authMiddleware, async (req, res) => {
+  const cacheKey = `event_registrations_csv:${req.params.event_id}`;
+  const cached = await redisClient.get(cacheKey);
+  if (cached) {
+    res.header('Content-Type', 'text/csv');
+    res.attachment('registrations.csv');
+    return res.send(cached);
+  }
   const csv = await EventService.getRegistrationsCSV(req.params.event_id);
+  await redisClient.setEx(cacheKey, 300, csv);
   res.header('Content-Type', 'text/csv');
   res.attachment('registrations.csv');
   res.send(csv);
@@ -109,6 +132,9 @@ router.put('/:event_id', authMiddleware, async (req, res) => {
       ...(image_url && { image_url })
     });
     if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
+    // Invalidate caches for this event and event list
+    await redisClient.del(`events:${req.params.event_id}`);
+    await redisClient.del('events:list');
     res.json(updatedEvent);
   } catch (err) {
     console.error('Error updating event:', err);
@@ -121,6 +147,11 @@ router.delete('/:event_id', authMiddleware, async (req, res) => {
   try {
     const deleted = await EventService.deleteEvent(req.params.event_id);
     if (!deleted) return res.status(404).json({ message: 'Event not found' });
+    // Invalidate caches for this event, event list, and registrations
+    await redisClient.del(`events:${req.params.event_id}`);
+    await redisClient.del('events:list');
+    await redisClient.del(`event_registrations:${req.params.event_id}`);
+    await redisClient.del(`event_registrations_csv:${req.params.event_id}`);
     res.json({ message: 'Event deleted' });
   } catch (err) {
     console.error('Error deleting event:', err);

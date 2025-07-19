@@ -2,6 +2,10 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import MdEditor from 'react-markdown-editor-lite';
+import 'react-markdown-editor-lite/lib/index.css';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ContactInquiries = ({ token }) => {
   const [inquiries, setInquiries] = useState([]);
@@ -13,6 +17,10 @@ const ContactInquiries = ({ token }) => {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
+  const [respondModalOpen, setRespondModalOpen] = useState(false);
+  const [responseContent, setResponseContent] = useState('');
+  const [responseSending, setResponseSending] = useState(false);
+  const [previewResponse, setPreviewResponse] = useState(false);
 
   const fetchInquiries = useCallback(async () => {
     setLoading(true);
@@ -87,6 +95,95 @@ const ContactInquiries = ({ token }) => {
     const start = (page - 1) * PER_PAGE;
     return filtered.slice(start, start + PER_PAGE);
   }, [filtered, page]);
+
+  const handleMdImageUpload = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result;
+          const res = await fetch("/api/admin/blog/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ image: base64 })
+          });
+          const data = await res.json();
+          if (data.url && !data.url.includes('placeholder-event.png')) resolve(data.url);
+          else reject(new Error("Image upload failed. Please try again."));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+  const underlineCommand = {
+    name: 'underline',
+    icon: <u>U</u>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
+      }
+    }
+  };
+  const colorCommand = {
+    name: 'color',
+    icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<span style=\"color:red\">${selected || 'color'}</span>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 22, end: selection.start + 27 });
+      }
+    }
+  };
+  const tableCommand = {
+    name: 'table',
+    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
+    execute: (editor) => {
+      const table = `| Head | Head |\n| --- | --- |\n| Data | Data |\n| Data | Data |\n| Data | Data |\n`;
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const after = value.substring(selection.end);
+      editor.setText(before + table + after);
+      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
+    }
+  };
+  const handleSendResponse = async () => {
+    if (!selected || !responseContent) return;
+    setResponseSending(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/inquiries/${selected.id || selected._id}/respond`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ admin_response: responseContent })
+      });
+      if (!res.ok) throw new Error('Failed to send response');
+      toast.success('Response sent via email!');
+      setRespondModalOpen(false);
+      setResponseContent('');
+      fetchInquiries();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setResponseSending(false);
+    }
+  };
 
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-5xl mx-auto">
@@ -220,7 +317,67 @@ const ContactInquiries = ({ token }) => {
                   Mark as Responded
                 </button>
               )}
+              <button
+                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 text-xs font-semibold"
+                onClick={() => { setRespondModalOpen(true); setResponseContent(''); }}
+              >
+                Respond
+              </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Respond Modal */}
+      {respondModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative animate-fadeIn">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              onClick={() => setRespondModalOpen(false)}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4">Respond to {selected?.name}</h2>
+            <MdEditor
+              value={responseContent}
+              style={{ height: '250px' }}
+              renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+              onChange={({ text }) => setResponseContent(text)}
+              onImageUpload={handleMdImageUpload}
+              view={{ menu: true, md: true, html: true }}
+              commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+            />
+            <div className="flex gap-4 mt-4">
+              <button
+                type="button"
+                className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold"
+                onClick={() => setRespondModalOpen(false)}
+                disabled={responseSending}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 font-semibold"
+                onClick={handleSendResponse}
+                disabled={responseSending}
+              >
+                {responseSending ? 'Sending...' : 'Send Response'}
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 font-semibold"
+                onClick={() => setPreviewResponse(p => !p)}
+              >
+                {previewResponse ? 'Hide Preview' : 'Preview'}
+              </button>
+            </div>
+            {previewResponse && (
+              <div className="prose prose-amber max-w-none mt-4 p-4 border rounded bg-gray-50">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{responseContent}</ReactMarkdown>
+              </div>
+            )}
           </div>
         </div>
       )}

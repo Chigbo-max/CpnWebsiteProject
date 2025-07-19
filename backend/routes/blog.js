@@ -3,14 +3,19 @@ const router = express.Router();
 const db = require('../config/database');
 const BlogService = require('../services/BlogService');
 const blogService = new BlogService(db);
+const redisClient = require('../config/redisClient');
 
 // Get all blog posts
 router.get('/', async (req, res) => {
+  const cacheKey = 'blog:posts';
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   try {
     const result = await db.query(
-      'SELECT id, title, excerpt, slug,featured_image, status, created_at FROM blog_posts WHERE status = $1 ORDER BY created_at DESC',
+      'SELECT id, title, excerpt, slug, featured_image, status, created_at, content_type FROM blog_posts WHERE status = $1 ORDER BY created_at DESC',
       ['published']
     );
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(result.rows));
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
@@ -20,6 +25,9 @@ router.get('/', async (req, res) => {
 
 // Get single blog post by slug
 router.get('/:slug', async (req, res) => {
+  const cacheKey = `blog:post:${req.params.slug}`;
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   try {
     const { slug } = req.params;
     const result = await db.query(
@@ -41,7 +49,9 @@ router.get('/:slug', async (req, res) => {
       content: post.content,
       featuredImage: post.featured_image
     });
-    res.json({ ...post, html });
+    const response = { ...post, html, content_type: post.content_type };
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
+    res.json(response);
   } catch (error) {
     console.error('Error fetching blog post:', error);
     res.status(500).json({ message: 'Server error' });

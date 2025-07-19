@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const redisClient = require('../config/redisClient');
 
 // Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
+  const cacheKey = 'subscribers:list';
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
   try {
     const result = await db.query(
       'SELECT id, email, name, subscribed_at FROM subscribers ORDER BY subscribed_at DESC'
     );
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(result.rows));
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching subscribers:', error);
@@ -28,7 +33,7 @@ router.delete('/:email', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
-
+    await redisClient.del('subscribers:list');
     res.json({ message: 'Successfully unsubscribed' });
   } catch (error) {
     console.error('Error unsubscribing:', error);
@@ -52,6 +57,7 @@ router.post('/', async (req, res) => {
       'INSERT INTO subscribers (email, name) VALUES ($1, $2) RETURNING *',
       [email, name]
     );
+    await redisClient.del('subscribers:list');
     res.status(201).json({ message: 'Subscriber added', subscriber: result.rows[0] });
   } catch (error) {
     console.error('Error adding subscriber:', error);
@@ -81,6 +87,7 @@ router.put('/:id', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
+    await redisClient.del('subscribers:list');
     res.json({ message: 'Subscriber updated', subscriber: result.rows[0] });
   } catch (error) {
     console.error('Error updating subscriber:', error);

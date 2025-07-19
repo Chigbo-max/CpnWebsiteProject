@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
-import '@syncfusion/ej2-base/styles/material.css';
-import '@syncfusion/ej2-react-richtexteditor/styles/material.css';
+import MdEditor from 'react-markdown-editor-lite';
+import 'react-markdown-editor-lite/lib/index.css';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const Newsletter = ({ token }) => {
   const [subject, setSubject] = useState('');
@@ -37,6 +39,72 @@ const Newsletter = ({ token }) => {
     }
   };
 
+  const handleMdImageUpload = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result;
+          const res = await fetch("/api/admin/blog/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ image: base64 })
+          });
+          const data = await res.json();
+          if (data.url && !data.url.includes('placeholder-event.png')) resolve(data.url);
+          else reject(new Error("Image upload failed. Please try again."));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+  const underlineCommand = {
+    name: 'underline',
+    icon: <u>U</u>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
+      }
+    }
+  };
+  const colorCommand = {
+    name: 'color',
+    icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<span style="color:red">${selected || 'color'}</span>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 22, end: selection.start + 27 });
+      }
+    }
+  };
+  const tableCommand = {
+    name: 'table',
+    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
+    execute: (editor) => {
+      const table = `| Head | Head |\n| --- | --- |\n| Data | Data |\n| Data | Data |\n| Data | Data |\n`;
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const after = value.substring(selection.end);
+      editor.setText(before + table + after);
+      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Newsletter</h2>
@@ -53,12 +121,14 @@ const Newsletter = ({ token }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-          <textarea
+          <MdEditor
             value={content}
-            onChange={e => setContent(e.target.value)}
-            rows={10}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y"
-            required
+            style={{ height: '400px' }}
+            renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+            onChange={({ text }) => setContent(text)}
+            onImageUpload={handleMdImageUpload}
+            view={{ menu: true, md: true, html: true }}
+            commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
         {/* Button group using Tailwind */}
@@ -92,7 +162,9 @@ const Newsletter = ({ token }) => {
               &times;
             </button>
             <h2 className="text-xl font-bold mb-4">{subject}</h2>
-            <div className="prose prose-amber max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="prose prose-amber max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
+            </div>
           </div>
         </div>
       )}

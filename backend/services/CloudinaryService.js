@@ -1,6 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
-const { createCanvas } = require('canvas');
+// const { createCanvas } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,28 +15,32 @@ cloudinary.config({
  * @returns {string} The local file path of the generated image.
  */
 function generateFallbackImage() {
-  const width = 600;
-  const height = 400;
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
+  // Temporarily disabled canvas functionality
+  // const width = 600;
+  // const height = 400;
+  // const canvas = createCanvas(width, height);
+  // const ctx = canvas.getContext('2d');
 
-  // Draw dark background
-  ctx.fillStyle = '#18181b';
-  ctx.fillRect(0, 0, width, height);
+  // // Draw dark background
+  // ctx.fillStyle = '#18181b';
+  // ctx.fillRect(0, 0, width, height);
 
-  // Draw 'Event' text
-  ctx.font = 'bold 64px Arial';
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('Event', width / 2, height / 2);
+  // // Draw 'Event' text
+  // ctx.font = 'bold 64px Arial';
+  // ctx.fillStyle = '#fff';
+  // ctx.textAlign = 'center';
+  // ctx.textBaseline = 'middle';
+  // ctx.fillText('Event', width / 2, height / 2);
 
-  // Save to a temp file
-  const fileName = `event-fallback-${Date.now()}.png`;
-  const filePath = path.join(__dirname, '../uploads', fileName);
-  const buffer = canvas.toBuffer('image/png');
-  fs.writeFileSync(filePath, buffer);
-  return filePath;
+  // // Save to a temp file
+  // const fileName = `event-fallback-${Date.now()}.png`;
+  // const filePath = path.join(__dirname, '../uploads', fileName);
+  // const buffer = canvas.toBuffer('image/png');
+  // fs.writeFileSync(filePath, buffer);
+  // return filePath;
+  
+  // Return a placeholder URL for now
+  return '/uploads/placeholder-event.png';
 }
 
 /**

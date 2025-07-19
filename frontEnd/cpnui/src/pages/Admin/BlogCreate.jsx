@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
+import MdEditor from 'react-markdown-editor-lite';
+import 'react-markdown-editor-lite/lib/index.css';
+import ReactMarkdown from 'react-markdown';
+import "../../styles/react-mde-all.css";
+import { Editor, EditorState, convertToRaw } from "draft-js";
+import "draft-js/dist/Draft.css";
+import { useCallback, useRef } from "react";
+import { HexColorPicker } from 'react-colorful';
+import { Modifier, RichUtils, AtomicBlockUtils, ContentState, convertFromRaw } from 'draft-js';
+import remarkGfm from 'remark-gfm';
 
 const BlogCreate = ({ token, onSuccess }) => {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [markdownValue, setMarkdownValue] = useState("");
   const [status, setStatus] = useState('draft');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,8 +22,13 @@ const BlogCreate = ({ token, onSuccess }) => {
   const [slug, setSlug] = useState('');
   const [slugEdited, setSlugEdited] = useState(false);
   const [excerpt, setExcerpt] = useState('');
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [color, setColor] = useState('#000000');
+  const fileInputRef = useRef();
+  const [showClearModal, setShowClearModal] = useState(false);
 
   const EXCERPT_MAX_LENGTH = 200;
+  const imageInputRef = useRef();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -49,18 +63,22 @@ const BlogCreate = ({ token, onSuccess }) => {
 
   const handleSubmit = async (e, publish = false) => {
     e.preventDefault();
-    if (!title || !content || !slug) {
-      toast.error('Title, content, and slug are required');
+    if (!title || !slug) {
+      toast.error('Title and slug are required');
       return;
     }
+    let content = "";
+    let contentType = "markdown";
+    content = markdownValue;
     setSubmitting(true);
     try {
       let formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
+      formData.append('contentType', contentType);
       formData.append('slug', slug);
       formData.append('excerpt', excerpt);
-      formData.append('tags', tags);
+      formData.append('tags', ''); // Tags removed
       formData.append('status', publish ? 'published' : 'draft');
       if (image) formData.append('image', image);
       const response = await fetch('http://localhost:5000/api/admin/blog', {
@@ -72,9 +90,8 @@ const BlogCreate = ({ token, onSuccess }) => {
       });
       if (response.ok) {
         setTitle('');
-        setContent('');
+        setMarkdownValue('');
         setExcerpt('');
-        setTags('');
         setStatus('draft');
         setImage(null);
         setImagePreview(null);
@@ -87,6 +104,132 @@ const BlogCreate = ({ token, onSuccess }) => {
       toast.error('Error creating blog post');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Markdown editor image upload handler for react-markdown-editor-lite
+  const handleMdImageUpload = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result;
+          const res = await fetch("/api/admin/blog/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ image: base64 })
+          });
+          const data = await res.json();
+          if (data.url && !data.url.includes('placeholder-event.png')) resolve(data.url);
+          else reject(new Error("Image upload failed. Please try again."));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Image upload for Draft.js
+  const handleRichTextImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = reader.result;
+        const res = await fetch('/api/admin/blog/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ image: base64 })
+        });
+        const data = await res.json();
+        if (data.url) {
+          const contentState = EditorState.getCurrentContent(); 
+          const contentStateWithEntity = ContentState.createEntity('IMAGE', 'IMMUTABLE', { src: data.url }); 
+          const entityKey = ContentState.getLastCreatedEntityKey(); 
+          const newState = AtomicBlockUtils.insertAtomicBlock( 
+            EditorState.set(EditorState.getCurrentContent(), { currentContent: contentStateWithEntity }), 
+            entityKey, 
+            ' ' 
+          ); 
+          setRichTextState(newState); 
+        }
+      } catch (e) {
+        toast.error('Image upload failed');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  // Color picker for Draft.js
+  const applyColor = (color) => {
+    const newState = RichUtils.toggleInlineStyle(EditorState.getCurrentContent(), `COLOR-${color}`); 
+    setRichTextState(newState); 
+  };
+  // Custom block renderer for images
+  const blockRendererFn = (block) => {
+    if (block.getType() === 'atomic') {
+      return {
+        component: ImageBlock,
+        editable: false,
+      };
+    }
+    return null;
+  };
+  function ImageBlock(props) {
+    const entity = props.contentState.getEntity(props.block.getEntityAt(0));
+    const { src } = entity.getData();
+    return <img src={src} alt="uploaded" style={{ maxWidth: '100%', margin: '12px 0' }} />;
+  }
+
+  // Custom toolbar commands for underline and color
+  const underlineCommand = {
+    name: 'underline',
+    icon: <u>U</u>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
+      }
+    }
+  };
+  const colorCommand = {
+    name: 'color',
+    icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
+    execute: (editor) => {
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const selected = value.substring(selection.start, selection.end);
+      const after = value.substring(selection.end);
+      editor.setText(before + `<span style="color:red">${selected || 'color'}</span>` + after);
+      if (!selected) {
+        editor.setSelection({ start: selection.start + 22, end: selection.start + 27 });
+      }
+    }
+  };
+  // Custom table command to insert a markdown table and move cursor to first cell
+  const tableCommand = {
+    name: 'table',
+    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
+    execute: (editor) => {
+      const table = `| Head | Head |
+| --- | --- |
+| Data | Data |
+| Data | Data |
+| Data | Data |\n`;
+      const selection = editor.getSelection();
+      const value = editor.getMdValue();
+      const before = value.substring(0, selection.start);
+      const after = value.substring(selection.end);
+      editor.setText(before + table + after);
+      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
     }
   };
 
@@ -104,14 +247,16 @@ const BlogCreate = ({ token, onSuccess }) => {
             required
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            rows={10}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y"
-            required
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Markdown Content</label>
+          <MdEditor
+            value={markdownValue}
+            style={{ height: '400px' }}
+            renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+            onChange={({ text }) => setMarkdownValue(text)}
+            onImageUpload={handleMdImageUpload}
+            view={{ menu: true, md: true, html: true }}
+            commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
         <div>
@@ -158,8 +303,8 @@ const BlogCreate = ({ token, onSuccess }) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
           <input
             type="text"
-            value={tags}
-            onChange={e => setTags(e.target.value)}
+            value={''} // Tags removed
+            onChange={() => {}} // Tags removed
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
             placeholder="e.g. faith, career, leadership"
           />
@@ -205,8 +350,47 @@ const BlogCreate = ({ token, onSuccess }) => {
           >
             {submitting ? 'Publishing...' : 'Publish'}
           </button>
+          <button
+            type="button"
+            className="px-6 py-2 rounded-lg border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 transition"
+            onClick={() => setShowClearModal(true)}
+            disabled={submitting}
+          >
+            {submitting ? 'Clearing...' : 'Clear'}
+          </button>
         </div>
       </form>
+      {/* Clear Confirmation Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 relative animate-fadeIn">
+            <h2 className="text-xl font-bold mb-4 text-amber-600">Clear All Fields?</h2>
+            <p className="mb-6 text-gray-700">Are you sure you want to clear all fields? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold"
+                onClick={() => setShowClearModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 font-semibold"
+                onClick={() => {
+                  setTitle('');
+                  setMarkdownValue('');
+                  setExcerpt('');
+                  setStatus('draft');
+                  setImage(null);
+                  setImagePreview(null);
+                  setShowClearModal(false);
+                }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

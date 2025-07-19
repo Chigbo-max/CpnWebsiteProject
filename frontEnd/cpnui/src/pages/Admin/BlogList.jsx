@@ -10,6 +10,7 @@ const BlogList = ({ token, onRefresh }) => {
   const [viewPost, setViewPost] = useState(null);
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
+  const [deletePostId, setDeletePostId] = useState(null);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -33,9 +34,13 @@ const BlogList = ({ token, onRefresh }) => {
   }, [fetchPosts]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this blog post?')) return;
+    setDeletePostId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletePostId) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/blog/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/admin/blog/${deletePostId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -45,6 +50,8 @@ const BlogList = ({ token, onRefresh }) => {
       if (onRefresh) onRefresh();
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setDeletePostId(null);
     }
   };
 
@@ -249,6 +256,29 @@ const BlogList = ({ token, onRefresh }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {deletePostId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 relative animate-fadeIn">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Delete Blog Post?</h2>
+            <p className="mb-6 text-gray-700">Are you sure you want to delete this blog post? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold"
+                onClick={() => setDeletePostId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 font-semibold"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

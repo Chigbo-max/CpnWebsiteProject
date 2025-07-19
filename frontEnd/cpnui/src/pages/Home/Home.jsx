@@ -153,7 +153,8 @@ function Home() {
 
       {/* Main Content Sections */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
-        
+                <Features />
+
         {/* Community Section */}
         <section className="mb-24 max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -353,7 +354,6 @@ function Home() {
 
       {/* Additional Components */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-amber-50">
-        <Features />
         <LatestRelease/>
         <Courses/>
         <FreeContent/>

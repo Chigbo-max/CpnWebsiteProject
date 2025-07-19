@@ -50,16 +50,18 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
           <p className="text-xs text-gray-400 truncate max-w-[90%] text-center">{admin?.email}</p>
         </div>
         <nav className="flex-1 mt-6">
-          {sidebarLinks.map(link => (
-            <button
-              key={link.id}
-              onClick={() => { setActiveSection(link.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
-            >
-              <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
-              {link.label}
-            </button>
-          ))}
+          {sidebarLinks
+            .filter(link => link.id !== 'admin-management' || admin?.role === 'superadmin')
+            .map(link => (
+              <button
+                key={link.id}
+                onClick={() => { setActiveSection(link.id); setSidebarOpen(false); }}
+                className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
+              >
+                <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
+                {link.label}
+              </button>
+            ))}
         </nav>
       </aside>
 
