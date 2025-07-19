@@ -1,4 +1,87 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
+
 function NewAndPastEvents() {
+    const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/events');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const events = await response.json();
+                
+                // Filter upcoming events (start_time > now) and sort by nearest date
+                const now = new Date();
+                const upcoming = events
+                    .filter(event => new Date(event.start_time) > now)
+                    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+                    .slice(0, 3); // Take only 3 nearest events
+                
+                setUpcomingEvents(upcoming);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
+    const formatEventDate = (startTime, endTime) => {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        
+        const startDate = start.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: 'numeric'
+        });
+        
+        const startTimeStr = start.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        
+        const endTimeStr = end.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        
+        return `${startDate} • ${startTimeStr} - ${endTimeStr}`;
+    };
+
+    const getEventTypeIcon = (eventType) => {
+        switch (eventType) {
+            case 'physical':
+                return <FontAwesomeIcon icon={faMapMarkerAlt} className="text-amber-400" />;
+            case 'virtual':
+                return <FontAwesomeIcon icon={faVideo} className="text-amber-400" />;
+            default:
+                return <FontAwesomeIcon icon={faCalendarAlt} className="text-amber-400" />;
+        }
+    };
+
+    const getEventTypeText = (eventType) => {
+        switch (eventType) {
+            case 'physical':
+                return 'In-Person Event';
+            case 'virtual':
+                return 'Virtual Event';
+            default:
+                return 'Event';
+        }
+    };
+
     return (
         <div className="w-full">
             <div className="w-full text-center mb-8 px-4 sm:px-6 lg:px-8">
@@ -8,19 +91,84 @@ function NewAndPastEvents() {
                 </h2>
             </div>
 
-            <div className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8 justify-center items-start p-4 sm:p-6 lg:p-8">
-                <div className="relative w-full sm:w-80 lg:w-96 xl:w-1/4 min-w-72 p-6 sm:p-8 border border-gray-200 rounded-xl bg-gray-900 text-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer group">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 relative">Upcoming Events</h3>
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-amber-700 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
+            {loading ? (
+                <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                    <p className="mt-4 text-gray-600">Loading upcoming events...</p>
                 </div>
-
-                <div className="relative w-full sm:w-80 lg:w-96 xl:w-1/4 min-w-72 p-6 sm:p-8 border border-gray-200 rounded-xl bg-gray-900 text-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer group">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 relative">Past Events</h3>
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-600 to-amber-700 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
+            ) : error ? (
+                <div className="text-center py-12">
+                    <p className="text-red-600">Error loading events: {error}</p>
                 </div>
+            ) : upcomingEvents.length === 0 ? (
+                <div className="text-center py-12">
+                    <p className="text-gray-600">No upcoming events at the moment.</p>
+                    <p className="text-gray-500 text-sm mt-2">Check back soon for new events!</p>
+                </div>
+            ) : (
+                <div className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8 justify-center items-start p-4 sm:p-6 lg:p-8">
+                    {upcomingEvents.map((event) => (
+                        <div 
+                            key={event.event_id}
+                            className="relative w-full sm:w-80 lg:w-96 xl:w-1/4 min-w-72 p-6 sm:p-8 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer group"
+                        >
+                            {event.image_url && (
+                                <div className="mb-4 overflow-hidden rounded-lg">
+                                    <img 
+                                        src={event.image_url} 
+                                        alt={event.title}
+                                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                </div>
+                            )}
+                            
+                            <div className="flex items-center gap-2 mb-3">
+                                {getEventTypeIcon(event.event_type)}
+                                <span className="text-sm font-medium text-gray-600">
+                                    {getEventTypeText(event.event_type)}
+                                </span>
+                            </div>
+                            
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 text-gray-900 group-hover:text-amber-600 transition-colors">
+                                {event.title}
+                            </h3>
+                            
+                            <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                                {event.description}
+                            </p>
+                            
+                            <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                <FontAwesomeIcon icon={faCalendarAlt} className="text-amber-400" />
+                                <span>{formatEventDate(event.start_time, event.end_time)}</span>
+                            </div>
+                            
+                            <Link
+                                to={`/events/${event.event_id}`}
+                                className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors group-hover:underline"
+                            >
+                                View Details
+                                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            )}
+            
+            <div className="text-center mt-8">
+                <Link
+                    to="/events"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                    View All Events
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                </Link>
             </div>
         </div>
-    )
+    );
 }
 
-export default NewAndPastEvents
+export default NewAndPastEvents;

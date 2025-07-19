@@ -6,20 +6,15 @@ const blogService = new BlogService(db);
 const redisClient = require('../config/redisClient');
 
 // Get all blog posts
-router.get('/', async (req, res) => {
-  const cacheKey = 'blog:posts';
-  const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
+router.get('/', async (req, res, next) => {
   try {
-    const result = await db.query(
-      'SELECT id, title, excerpt, slug, featured_image, status, created_at, content_type FROM blog_posts WHERE status = $1 ORDER BY created_at DESC',
+    const posts = await db.query(
+      'SELECT id, title, excerpt, slug, featured_image, status, created_at FROM blog_posts WHERE status = $1 ORDER BY created_at DESC',
       ['published']
     );
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(result.rows));
-    res.json(result.rows);
+    res.json(posts.rows);
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    res.status(500).json({ message: 'Server error' });
+    next(error);
   }
 });
 
@@ -49,7 +44,8 @@ router.get('/:slug', async (req, res) => {
       content: post.content,
       featuredImage: post.featured_image
     });
-    const response = { ...post, html, content_type: post.content_type };
+    // Remove content_type from the response object if present
+    const response = { ...post, html };
     await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
     res.json(response);
   } catch (error) {

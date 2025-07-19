@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     featured_image VARCHAR(255),
     slug VARCHAR(255) UNIQUE NOT NULL,
     status VARCHAR(20) DEFAULT 'published',
+    content_type VARCHAR(20) DEFAULT 'markdown',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -81,3 +82,5 @@ CREATE INDEX IF NOT EXISTS idx_event_registrations_event_id ON event_registratio
 INSERT INTO admins (username, email, password_hash) 
 VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
 ON CONFLICT (username) DO NOTHING;
+
+  ALTER TABLE blog_posts ADD COLUMN content_type VARCHAR(20) DEFAULT 'markdown';

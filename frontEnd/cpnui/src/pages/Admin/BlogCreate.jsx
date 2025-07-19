@@ -26,6 +26,7 @@ const BlogCreate = ({ token, onSuccess }) => {
   const [color, setColor] = useState('#000000');
   const fileInputRef = useRef();
   const [showClearModal, setShowClearModal] = useState(false);
+  const [tags, setTags] = useState('');
 
   const EXCERPT_MAX_LENGTH = 200;
   const imageInputRef = useRef();
@@ -68,17 +69,15 @@ const BlogCreate = ({ token, onSuccess }) => {
       return;
     }
     let content = "";
-    let contentType = "markdown";
     content = markdownValue;
     setSubmitting(true);
     try {
       let formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
-      formData.append('contentType', contentType);
       formData.append('slug', slug);
       formData.append('excerpt', excerpt);
-      formData.append('tags', ''); // Tags removed
+      formData.append('tags', tags);
       formData.append('status', publish ? 'published' : 'draft');
       if (image) formData.append('image', image);
       const response = await fetch('http://localhost:5000/api/admin/blog', {
@@ -95,6 +94,7 @@ const BlogCreate = ({ token, onSuccess }) => {
         setStatus('draft');
         setImage(null);
         setImagePreview(null);
+        setTags('');
         toast.success(publish ? 'Blog post published!' : 'Blog post saved as draft!');
         if (onSuccess) onSuccess();
       } else {
@@ -214,24 +214,6 @@ const BlogCreate = ({ token, onSuccess }) => {
       }
     }
   };
-  // Custom table command to insert a markdown table and move cursor to first cell
-  const tableCommand = {
-    name: 'table',
-    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
-    execute: (editor) => {
-      const table = `| Head | Head |
-| --- | --- |
-| Data | Data |
-| Data | Data |
-| Data | Data |\n`;
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const after = value.substring(selection.end);
-      editor.setText(before + table + after);
-      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
-    }
-  };
 
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-2xl mx-auto">
@@ -256,7 +238,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             onChange={({ text }) => setMarkdownValue(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
-            commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+            commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
         <div>
@@ -303,8 +285,8 @@ const BlogCreate = ({ token, onSuccess }) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
           <input
             type="text"
-            value={''} // Tags removed
-            onChange={() => {}} // Tags removed
+            value={tags}
+            onChange={e => setTags(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
             placeholder="e.g. faith, career, leadership"
           />
@@ -382,6 +364,7 @@ const BlogCreate = ({ token, onSuccess }) => {
                   setStatus('draft');
                   setImage(null);
                   setImagePreview(null);
+                  setTags('');
                   setShowClearModal(false);
                 }}
               >

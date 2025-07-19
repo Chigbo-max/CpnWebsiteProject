@@ -148,24 +148,11 @@ const ContactInquiries = ({ token }) => {
       }
     }
   };
-  const tableCommand = {
-    name: 'table',
-    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
-    execute: (editor) => {
-      const table = `| Head | Head |\n| --- | --- |\n| Data | Data |\n| Data | Data |\n| Data | Data |\n`;
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const after = value.substring(selection.end);
-      editor.setText(before + table + after);
-      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
-    }
-  };
   const handleSendResponse = async () => {
     if (!selected || !responseContent) return;
     setResponseSending(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/inquiries/${selected.id || selected._id}/respond`, {
+      const res = await fetch(`http://localhost:5000/api/admin/inquiries/${selected.id || selected._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -346,7 +333,7 @@ const ContactInquiries = ({ token }) => {
               onChange={({ text }) => setResponseContent(text)}
               onImageUpload={handleMdImageUpload}
               view={{ menu: true, md: true, html: true }}
-              commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+              commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
             />
             <div className="flex gap-4 mt-4">
               <button

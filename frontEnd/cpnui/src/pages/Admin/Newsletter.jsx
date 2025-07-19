@@ -91,19 +91,6 @@ const Newsletter = ({ token }) => {
       }
     }
   };
-  const tableCommand = {
-    name: 'table',
-    icon: <span style={{ fontWeight: 'bold' }}>Tbl</span>,
-    execute: (editor) => {
-      const table = `| Head | Head |\n| --- | --- |\n| Data | Data |\n| Data | Data |\n| Data | Data |\n`;
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const after = value.substring(selection.end);
-      editor.setText(before + table + after);
-      editor.setSelection({ start: before.length + 2, end: before.length + 6 });
-    }
-  };
 
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
@@ -128,7 +115,7 @@ const Newsletter = ({ token }) => {
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
-            commands={['bold', 'italic', underlineCommand, colorCommand, tableCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+            commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
         {/* Button group using Tailwind */}

@@ -12,7 +12,7 @@ services:
         condition: service_healthy
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/cpn_db
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/cpn_docker
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - EMAIL_USER=${EMAIL_USER}
@@ -50,20 +50,20 @@ services:
       start_period: 40s
 
   postgres:
-    image: postgres:14
+    image: postgres:17
     container_name: postgres-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=cpn_db
+      - POSTGRES_DB=cpn_docker
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/config/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cpn_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cpn_docker"]
       interval: 10s
       timeout: 5s
       retries: 5

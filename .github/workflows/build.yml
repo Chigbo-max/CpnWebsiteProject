@@ -15,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:17
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -41,10 +41,10 @@ jobs:
     env:
       NODE_ENV: test
       DB_HOST: localhost
-      DB_PORT: 5432
+      DB_PORT: 5433
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      DB_NAME: testdb
+      DB_NAME: cpn_docker
       REDIS_URL: ${{secrets.REDIS_URL}}}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}

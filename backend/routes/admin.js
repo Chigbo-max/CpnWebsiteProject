@@ -42,7 +42,7 @@ router.get('/blog', auth, async (req, res, next) => {
 // Blog post creation with multer for multipart/form-data
 router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
   try {
-    const { title, content, excerpt, tags, status, slug, contentType, content_type } = req.body;
+    const { title, content, excerpt, tags, status, slug } = req.body;
     let featured_image = null;
     if (req.file) {
       // Convert buffer to base64 data URL
@@ -52,7 +52,7 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     if (!title || !content || !slug) {
       return res.status(400).json({ message: 'Title, content, and slug are required' });
     }
-    const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image, contentType: contentType || content_type || 'markdown' });
+    const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image });
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
     res.status(201).json({ message: 'Blog post created successfully', post });
@@ -174,6 +174,37 @@ router.delete('/inquiries/:id', auth, async (req, res, next) => {
 
 // --- NEWSLETTER ---
 // (No caching needed for newsletter send)
+router.post('/newsletter', auth, async (req, res, next) => {
+  try {
+    const { subject, content } = req.body;
+    if (!subject || !content) {
+      return res.status(400).json({ message: 'Subject and content are required' });
+    }
+    const sentCount = await newsletterService.sendNewsletter(subject, content);
+    res.json({ message: `Newsletter sent to ${sentCount} subscribers`, sentCount });
+  } catch (error) {
+    console.error('Error sending newsletter:', error);
+    res.status(500).json({ message: 'Failed to send newsletter', error: error.message });
+  }
+});
+
+// --- PROFILE MANAGEMENT ---
+router.put('/profile', auth, async (req, res, next) => {
+  try {
+    const { username, email } = req.body;
+    if (!username || !email) {
+      return res.status(400).json({ message: 'Username and email are required' });
+    }
+    const updatedAdmin = await adminService.update(req.admin.id, { username, email });
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    res.json(updatedAdmin);
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Failed to update profile', error: error.message });
+  }
+});
 
 // --- ADMIN MANAGEMENT (SUPER ADMIN ONLY) ---
 function requireSuperAdmin(req, res, next) {

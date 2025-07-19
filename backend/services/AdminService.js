@@ -21,6 +21,15 @@ class AdminService {
     const result = await this.db.query('UPDATE admins SET password_hash=$1 WHERE id=$2 RETURNING email, username', [password_hash, id]);
     return result.rows[0];
   }
+
+  async update(id, updateData) {
+    const { username, email } = updateData;
+    const result = await this.db.query(
+      'UPDATE admins SET username=$1, email=$2 WHERE id=$3 RETURNING id, username, email, role, created_at',
+      [username, email, id]
+    );
+    return result.rows[0];
+  }
 }
 
 module.exports = AdminService; 

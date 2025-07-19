@@ -12,7 +12,7 @@ class BlogService {
               <table width="650" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(80,120,200,0.10); margin: 40px 0; border: 1.5px solid #e0e7ef;">
                 <tr>
                   <td style="background: #f59e42;  border-radius: 18px 18px 0 0; padding: 2px 0; text-align: center;">
-                    <img src='http://localhost:5173/src/assets/ChristianProfessionalsNetwork.png' alt='CPN Logo' style='height:250px; margin-bottom:0px;' />
+                    <img src='http://localhost/src/assets/ChristianProfessionalsNetwork.png' alt='CPN Logo' style='height:250px; margin-bottom:0px;' />
                   </td>
                 </tr>
                 <tr>
@@ -50,7 +50,7 @@ class BlogService {
   }
 
   async getPublished() {
-    return (await this.db.query('SELECT id, title, excerpt, slug, featured_image, created_at, content_type FROM blog_posts WHERE status = $1 ORDER BY created_at DESC', ['published'])).rows;
+    return (await this.db.query('SELECT id, title, excerpt, slug, featured_image, created_at FROM blog_posts WHERE status = $1 ORDER BY created_at DESC', ['published'])).rows;
   }
 
   async getById(id) {
@@ -61,18 +61,18 @@ class BlogService {
     return (await this.db.query('SELECT * FROM blog_posts WHERE slug = $1 AND status = $2', [slug, 'published'])).rows[0];
   }
 
-  async create({ title, content, excerpt, tags, status, slug, authorId, featured_image, contentType }) {
+  async create({ title, content, excerpt, tags, status, slug, authorId, featured_image }) {
     const result = await this.db.query(
-      'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image, content_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-      [title, content, excerpt, tags, status, slug, authorId, featured_image || null, contentType || 'markdown']
+      'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [title, content, excerpt, tags, status, slug, authorId, featured_image || null]
     );
     return result.rows[0];
   }
 
-  async update(id, { title, content, excerpt, slug, status, contentType }) {
+  async update(id, { title, content, excerpt, tags, slug, status }) {
     const result = await this.db.query(
-      'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, slug=$4, status=$5, content_type=$6 WHERE id=$7 RETURNING *',
-      [title, content, excerpt, slug, status, contentType || 'markdown', id]
+      'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
+      [title, content, excerpt, tags, slug, status, id]
     );
     return result.rows[0];
   }

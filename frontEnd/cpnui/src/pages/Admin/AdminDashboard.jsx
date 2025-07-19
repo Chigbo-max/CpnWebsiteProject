@@ -50,8 +50,29 @@ function AdminDashboard() {
     setIsLoggedIn(false);
   };
 
-  const handleProfileUpdate = () => {
-    // TODO: Send update to backend
+  const handleProfileUpdate = async (updatedData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/admin/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (response.ok) {
+        const updatedAdmin = await response.json();
+        // Update the admin context with new data
+        login(token, updatedAdmin);
+        toast.success('Profile updated successfully');
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Error updating profile');
+    }
   };
 
   const handleShowChangePassword = () => {
