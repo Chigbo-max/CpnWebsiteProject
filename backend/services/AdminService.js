@@ -1,5 +1,16 @@
-class AdminService {
+// IAdminService interface
+class IAdminService {
+  getAll() { throw new Error('Not implemented'); }
+  create(data) { throw new Error('Not implemented'); }
+  delete(id) { throw new Error('Not implemented'); }
+  updatePassword(id, password_hash) { throw new Error('Not implemented'); }
+  update(id, updateData) { throw new Error('Not implemented'); }
+}
+
+// AdminServiceImpl implements IAdminService
+class AdminServiceImpl extends IAdminService {
   constructor(db) {
+    super();
     this.db = db;
   }
 
@@ -32,4 +43,4 @@ class AdminService {
   }
 }
 
-module.exports = AdminService; 
+module.exports = { IAdminService, AdminServiceImpl }; 

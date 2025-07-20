@@ -6,11 +6,14 @@ import bgImage from "../../assets/cpnevent1.jpg";
 import { motion } from 'framer-motion';
 import { FaBullseye, FaEye, FaHandshake, FaLeaf, FaUsers, FaHandsHelping, FaBalanceScale, FaUserTie, FaChurch, FaRegCheckCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import ceo from "../../assets/ceo.jpeg";
+import commanager from "../../assets/commanager.jpeg";
+import contentlead from "../../assets/contentlead.jpeg";
 
 const team = [
-  { name: 'Jane Doe', role: 'Founder & CEO', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  { name: 'John Smith', role: 'Community Manager', img: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { name: 'Mary Johnson', role: 'Content Lead', img: 'https://randomuser.me/api/portraits/women/68.jpg' },
+  { name: 'Chigbo Ezeokeke', role: 'Founder', img: ceo },
+  { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
+  { name: 'Michael Aniakor', role: 'Content Lead', img: contentlead },
 ];
 
 const values = [
@@ -37,7 +40,7 @@ function About() {
             zIndex: 0,
           }}
         >
-          <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-60 z-10" />
+          <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-80 z-10" />
         </div>
         <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
           <motion.div

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 const redisClient = require('../config/redisClient');
+const { SubscriberServiceImpl } = require('../services/SubscriberService');
+const subscriberService = new SubscriberServiceImpl(db);
 
 // Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
@@ -9,11 +11,9 @@ router.get('/', async (req, res) => {
   const cached = await redisClient.get(cacheKey);
   if (cached) return res.json(JSON.parse(cached));
   try {
-    const result = await db.query(
-      'SELECT id, email, name, subscribed_at FROM subscribers ORDER BY subscribed_at DESC'
-    );
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(result.rows));
-    res.json(result.rows);
+    const result = await subscriberService.getAll();
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+    res.json(result);
   } catch (error) {
     console.error('Error fetching subscribers:', error);
     res.status(500).json({ message: 'Server error' });
@@ -24,13 +24,8 @@ router.get('/', async (req, res) => {
 router.delete('/:email', async (req, res) => {
   try {
     const { email } = req.params;
-    
-    const result = await db.query(
-      'DELETE FROM subscribers WHERE email = $1 RETURNING *',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
+    const result = await subscriberService.deleteByEmail(email);
+    if (!result) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
     await redisClient.del('subscribers:list');
@@ -49,16 +44,13 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Email is required' });
     }
     // Check if already exists
-    const existing = await db.query('SELECT * FROM subscribers WHERE email = $1', [email]);
-    if (existing.rows.length > 0) {
+    const existing = await subscriberService.findByEmail(email);
+    if (existing.length > 0) {
       return res.status(400).json({ message: 'Email already subscribed' });
     }
-    const result = await db.query(
-      'INSERT INTO subscribers (email, name) VALUES ($1, $2) RETURNING *',
-      [email, name]
-    );
+    const result = await subscriberService.create({ name, email });
     await redisClient.del('subscribers:list');
-    res.status(201).json({ message: 'Subscriber added', subscriber: result.rows[0] });
+    res.status(201).json({ message: 'Subscriber added', subscriber: result });
   } catch (error) {
     console.error('Error adding subscriber:', error);
     res.status(500).json({ message: 'Server error' });
@@ -75,20 +67,17 @@ router.put('/:id', async (req, res) => {
     }
     // If updating email, check for duplicate
     if (email) {
-      const existing = await db.query('SELECT * FROM subscribers WHERE email = $1 AND id != $2', [email, id]);
-      if (existing.rows.length > 0) {
+      const existing = await subscriberService.findByEmail(email);
+      if (existing.some(sub => sub.id != id)) {
         return res.status(400).json({ message: 'Email already subscribed by another user' });
       }
     }
-    const result = await db.query(
-      'UPDATE subscribers SET name = COALESCE($1, name), email = COALESCE($2, email) WHERE id = $3 RETURNING *',
-      [name, email, id]
-    );
-    if (result.rows.length === 0) {
+    const result = await subscriberService.update(id, { name, email });
+    if (!result) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
     await redisClient.del('subscribers:list');
-    res.json({ message: 'Subscriber updated', subscriber: result.rows[0] });
+    res.json({ message: 'Subscriber updated', subscriber: result });
   } catch (error) {
     console.error('Error updating subscriber:', error);
     res.status(500).json({ message: 'Server error' });

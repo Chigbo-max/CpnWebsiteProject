@@ -1,5 +1,15 @@
-class InquiryService {
+// IInquiryService interface
+class IInquiryService {
+  getAll() { throw new Error('Not implemented'); }
+  updateStatus(id, status) { throw new Error('Not implemented'); }
+  respond(id, admin_response) { throw new Error('Not implemented'); }
+  delete(id) { throw new Error('Not implemented'); }
+}
+
+// InquiryServiceImpl implements IInquiryService
+class InquiryServiceImpl extends IInquiryService {
   constructor(db) {
+    super();
     this.db = db;
   }
 
@@ -23,4 +33,4 @@ class InquiryService {
   }
 }
 
-module.exports = InquiryService; 
+module.exports = { IInquiryService, InquiryServiceImpl }; 

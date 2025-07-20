@@ -1,5 +1,19 @@
-class BlogService {
+// IBlogService interface
+class IBlogService {
+  generateUniqueSlug(title, existingSlug) { throw new Error('Not implemented'); }
+  getAll() { throw new Error('Not implemented'); }
+  getPublished() { throw new Error('Not implemented'); }
+  getById(id) { throw new Error('Not implemented'); }
+  getBySlug(slug) { throw new Error('Not implemented'); }
+  create(data) { throw new Error('Not implemented'); }
+  update(id, data) { throw new Error('Not implemented'); }
+  delete(id) { throw new Error('Not implemented'); }
+}
+
+// BlogServiceImpl implements IBlogService
+class BlogServiceImpl extends IBlogService {
   constructor(db) {
+    super();
     this.db = db;
   }
 
@@ -11,11 +25,8 @@ class BlogService {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim('-');
-    
     let slug = baseSlug;
     let counter = 1;
-    
-    // Check if slug exists (excluding current post if updating)
     const checkSlug = async (testSlug) => {
       const query = existingSlug 
         ? 'SELECT id FROM blog_posts WHERE slug = $1 AND slug != $2'
@@ -24,13 +35,10 @@ class BlogService {
       const result = await this.db.query(query, params);
       return result.rows.length > 0;
     };
-    
-    // Keep trying until we find a unique slug
     while (await checkSlug(slug)) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    
     return slug;
   }
 
@@ -154,4 +162,4 @@ class BlogService {
   }
 }
 
-module.exports = BlogService; 
+module.exports = { IBlogService, BlogServiceImpl }; 

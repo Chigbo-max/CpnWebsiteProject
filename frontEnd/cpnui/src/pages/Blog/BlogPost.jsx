@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCalendarAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCalendarAlt, faUser, faShare, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faFacebook, faTwitter, faLinkedin, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import ServerDown from '../Error/ServerDown';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +15,7 @@ function BlogPost() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [serverDown, setServerDown] = useState(false);
+    const [showShareOptions, setShowShareOptions] = useState(false);
 
     const fetchBlogPost = useCallback(async () => {
         try {
@@ -37,6 +39,51 @@ function BlogPost() {
     useEffect(() => {
         fetchBlogPost();
     }, [fetchBlogPost]);
+
+    const shareUrl = window.location.href;
+    const shareTitle = post?.title || 'Check out this blog post';
+
+    const shareOptions = [
+        {
+            name: 'Email',
+            icon: faEnvelope,
+            action: () => {
+                const subject = encodeURIComponent(shareTitle);
+                const body = encodeURIComponent(`I thought you might be interested in this article: ${shareTitle}\n\nRead it here: ${shareUrl}`);
+                window.open(`mailto:?subject=${subject}&body=${body}`);
+            }
+        },
+        {
+            name: 'Facebook',
+            icon: faFacebook,
+            action: () => {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
+            }
+        },
+        {
+            name: 'Twitter',
+            icon: faTwitter,
+            action: () => {
+                const text = encodeURIComponent(`${shareTitle} - ${shareUrl}`);
+                window.open(`https://twitter.com/intent/tweet?text=${text}`);
+            }
+        },
+        {
+            name: 'LinkedIn',
+            icon: faLinkedin,
+            action: () => {
+                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`);
+            }
+        },
+        {
+            name: 'WhatsApp',
+            icon: faWhatsapp,
+            action: () => {
+                const text = encodeURIComponent(`${shareTitle} - ${shareUrl}`);
+                window.open(`https://wa.me/?text=${text}`);
+            }
+        }
+    ];
 
     if (serverDown) {
         return <ServerDown />;
@@ -173,6 +220,47 @@ function BlogPost() {
                             >
                                 {post.content}
                             </ReactMarkdown>
+                        </div>
+
+                        {/* Share Section */}
+                        <div className="mt-8 pt-8 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-semibold text-gray-900">Share this article</h3>
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowShareOptions(!showShareOptions)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                                    >
+                                        <FontAwesomeIcon icon={faShare} className="text-sm" />
+                                        Share
+                                    </button>
+                                    
+                                    {showShareOptions && (
+                                        <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[200px]">
+                                            {shareOptions.map((option, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => {
+                                                        option.action();
+                                                        setShowShareOptions(false);
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <FontAwesomeIcon icon={option.icon} className="text-gray-600" />
+                                                    <span className="text-gray-700">{option.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Faded CPN Name at Bottom */}
+                        <div className="mt-8 pt-8 border-t border-gray-200 text-center pb-32">
+                            <p className="text-gray-400 text-sm font-medium">
+                                Christian Professionals Network
+                            </p>
                         </div>
                     </div>
                 </div>

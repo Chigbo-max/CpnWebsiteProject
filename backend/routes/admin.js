@@ -7,26 +7,27 @@ const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const upload = multer();
-const { uploadImage } = require('../services/CloudinaryService');
+const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const redisClient = require('../config/redisClient');
 
-// Import services
-const BlogService = require('../services/BlogService');
-const SubscriberService = require('../services/SubscriberService');
-const InquiryService = require('../services/InquiryService');
-const AdminService = require('../services/AdminService');
-const NewsletterService = require('../services/NewsletterService');
+// Import services (use *Impl)
+const { BlogServiceImpl } = require('../services/BlogService');
+const { SubscriberServiceImpl } = require('../services/SubscriberService');
+const { InquiryServiceImpl } = require('../services/InquiryService');
+const { AdminServiceImpl } = require('../services/AdminService');
+const { NewsletterServiceImpl } = require('../services/NewsletterService');
 
 // Instantiate services
-const blogService = new BlogService(db);
-const subscriberService = new SubscriberService(db);
-const inquiryService = new InquiryService(db);
-const adminService = new AdminService(db);
+const blogService = new BlogServiceImpl(db);
+const subscriberService = new SubscriberServiceImpl(db);
+const inquiryService = new InquiryServiceImpl(db);
+const adminService = new AdminServiceImpl(db);
 const mailer = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
-const newsletterService = new NewsletterService(db, mailer);
+const newsletterService = new NewsletterServiceImpl(db, mailer);
+const cloudinaryService = new CloudinaryServiceImpl();
 
 // --- BLOG MANAGEMENT ---
 router.get('/blog', auth, async (req, res, next) => {
@@ -47,7 +48,7 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     if (req.file) {
       // Convert buffer to base64 data URL
       const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-      featured_image = await uploadImage(base64, 'blog-images');
+      featured_image = await cloudinaryService.uploadImage(base64, 'blog-images');
     }
     if (!title || !content || !slug) {
       return res.status(400).json({ message: 'Title, content, and slug are required' });
@@ -131,7 +132,7 @@ router.post('/blog/upload-image', auth, async (req, res) => {
   try {
     const { image } = req.body;
     if (!image) return res.status(400).json({ message: 'No image provided' });
-    const url = await uploadImage(image, 'blog-images');
+    const url = await cloudinaryService.uploadImage(image, 'blog-images');
     res.json({ url });
   } catch (err) {
     res.status(500).json({ message: 'Image upload failed', error: err.message });
@@ -204,7 +205,10 @@ router.put('/inquiries/:id', auth, async (req, res, next) => {
       from: process.env.EMAIL_USER,
       to: inquiry.email,
       subject: 'Response to your inquiry',
-      html: `<p>Hello ${inquiry.name},</p><p>${req.body.admin_response}</p><p>Thank you for contacting us!</p>`
+      html: require('../services/NewsletterService').renderNewsletterTemplate({
+        name: inquiry.name,
+        content: `<p>${req.body.admin_response}</p><p>Thank you for contacting us!</p>`
+      })
     });
     await redisClient.del('admin:inquiries:list');
     res.json({ message: 'Response sent successfully', inquiry });
@@ -301,7 +305,10 @@ router.post('/admins/:id/reset-password', auth, requireSuperAdmin, async (req, r
       from: process.env.EMAIL_USER,
       to: admin.email,
       subject: 'CPN Admin Password Reset',
-      html: `<p>Hello ${admin.username},<br>Your new password is: <b>${newPassword}</b></p>`
+      html: require('../services/NewsletterService').renderNewsletterTemplate({
+        name: admin.username,
+        content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your new password is: <b>${newPassword}</b></p>`
+      })
     });
     res.json({ message: 'Password reset and emailed to admin' });
   } catch (error) { next(error); }

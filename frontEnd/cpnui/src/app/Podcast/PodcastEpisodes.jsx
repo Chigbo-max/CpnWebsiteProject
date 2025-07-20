@@ -61,7 +61,7 @@ const PodcastEpisodes = () => {
         <select 
           value={episodesPerPage} 
           onChange={handlePageSizeChange}
-          className="rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 text-gray-900 bg-white shadow-sm"
+          className="rounded-md px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 text-white bg-gray-900 shadow-sm"
         >
           <option value={12}>12</option>
           <option value={16}>16</option>
@@ -76,54 +76,56 @@ const PodcastEpisodes = () => {
           {filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
             <div
               key={episode.id}
-              className={`rounded-xl shadow-lg text-white p-4 flex flex-col gap-3 border-2 border-gray-700 hover:shadow-xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
-              style={{backgroundColor: '#111826ff'}}
+              className={`rounded-2xl shadow-xl text-white p-0 flex flex-col gap-0 border-0 bg-gradient-to-br from-gray-900 to-gray-800 hover:scale-[1.025] hover:shadow-2xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
+              style={{ minHeight: '370px', position: 'relative' }}
             >
               {episode.images?.length > 0 && (
                 <img
                   src={episode.images[0].url}
                   alt={episode.name}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
+                  className="w-full h-40 object-cover rounded-t-2xl shadow-md border-b-2 border-gray-800"
+                  style={{ objectPosition: 'center' }}
                 />
               )}
 
-              <div className="flex-1">
-                <h3 className="text-lg font-bold mb-2 line-clamp-2 text-white">{episode.name}</h3>
-                <p className="text-sm text-gray-300 mb-3 line-clamp-3">{episode.description}</p>
-              </div>
+              <div className="flex-1 flex flex-col justify-between p-6">
+                <div>
+                  <h3 className="text-lg font-bold mb-2 line-clamp-2 text-white tracking-tight leading-snug">{episode.name}</h3>
+                  <p className="text-sm text-gray-300 mb-4 line-clamp-3 leading-relaxed">{episode.description}</p>
+                </div>
 
-              <div className="flex flex-col gap-2">
-                {episode.audio_preview_url ? (
-                  <button 
-                    onClick={() => handlePlayPause(episode.id)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:bg-gray-700 transition-all duration-300 text-sm shadow-md hover:shadow-lg"
-                    style={{backgroundColor: '#111826ff'}}
-                  >
-                    <FontAwesomeIcon 
-                      icon={playingId === episode.id ? faPause : faPlay} 
-                      className="text-sm" 
-                    />
-                    {playingId === episode.id ? "Pause" : "Play"}
-                  </button>
-                ) : (
-                  <p className="text-gray-400 text-sm">No preview available.</p>
-                )}
+                <div className="flex flex-col gap-2 mt-2">
+                  {episode.audio_preview_url ? (
+                    <button 
+                      onClick={() => handlePlayPause(episode.id)}
+                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'ring-2 ring-amber-400' : ''}`}
+                    >
+                      <FontAwesomeIcon 
+                        icon={playingId === episode.id ? faPause : faPlay} 
+                        className="text-base" 
+                      />
+                      {playingId === episode.id ? "Pause Preview" : "Play Preview"}
+                    </button>
+                  ) : (
+                    <p className="text-gray-400 text-sm">No preview available.</p>
+                  )}
 
-                {episode.external_urls?.spotify && (
-                  <a
-                    href={episode.external_urls.spotify}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-all duration-300 text-sm shadow-md hover:shadow-lg"
-                  >
-                    <FontAwesomeIcon icon={faSpotify} className="text-sm" />
-                    Spotify
-                  </a>
-                )}
+                  {episode.external_urls?.spotify && (
+                    <a
+                      href={episode.external_urls.spotify}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'bg-green-700 text-white' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                    >
+                      <FontAwesomeIcon icon={faSpotify} className="text-base" />
+                      {playingId === episode.id ? "Play full episode on Spotify" : "Spotify"}
+                    </a>
+                  )}
+                </div>
               </div>
 
               {episode.audio_preview_url && playingId === episode.id && (
-                <audio autoPlay controls className="w-full mt-2">
+                <audio autoPlay controls className="w-full mt-2 rounded-b-2xl bg-gray-900">
                   <source src={episode.audio_preview_url} type="audio/mpeg" />
                 </audio>
               )}
