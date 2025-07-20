@@ -35,17 +35,14 @@ router.get('/:slug', async (req, res) => {
     }
 
     const post = result.rows[0];
-    // Render HTML template for the blog post
-    const html = BlogService.renderBlogTemplate({
-      title: post.title,
-      author: post.author_id || 'CPN Team',
-      date: post.created_at,
-      excerpt: post.excerpt,
-      content: post.content,
-      featuredImage: post.featured_image
-    });
-    // Remove content_type from the response object if present
-    const response = { ...post, html };
+    
+    // Set content_type to markdown for proper rendering
+    const response = { 
+      ...post, 
+      content_type: 'markdown',
+      html: null // Don't use HTML template, let frontend handle markdown
+    };
+    
     await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
     res.json(response);
   } catch (error) {

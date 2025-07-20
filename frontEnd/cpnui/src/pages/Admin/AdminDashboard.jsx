@@ -79,6 +79,14 @@ function AdminDashboard() {
     setShowChangePassword(true);
   };
 
+  // Ensure only super admins can access admin management
+  useEffect(() => {
+    if (admin && admin.role !== 'superadmin' && activeSection === 'admin-management') {
+      setActiveSection('profile');
+      toast.error('Access denied. Only super admins can manage other admins.');
+    }
+  }, [admin, activeSection]);
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -144,7 +152,7 @@ function AdminDashboard() {
         {activeSection === 'inquiries' && (
           <ContactInquiries token={token} />
         )}
-        {activeSection === 'admin-management' && (
+        {activeSection === 'admin-management' && admin?.role === 'superadmin' && (
           <AdminManagement token={token} currentAdmin={admin} />
         )}
         {activeSection === 'events' && (

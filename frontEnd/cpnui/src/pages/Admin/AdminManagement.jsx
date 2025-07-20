@@ -4,6 +4,18 @@ import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
 const AdminManagement = ({ token, currentAdmin }) => {
+  // Ensure only super admins can access this component
+  if (!currentAdmin || currentAdmin.role !== 'superadmin') {
+    return (
+      <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-4xl mx-auto">
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
+          <p className="text-gray-600">Only super admins can manage other admins.</p>
+        </div>
+      </div>
+    );
+  }
+
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

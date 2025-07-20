@@ -27,6 +27,17 @@ const BlogCreate = ({ token, onSuccess }) => {
   const fileInputRef = useRef();
   const [showClearModal, setShowClearModal] = useState(false);
   const [tags, setTags] = useState('');
+  const [error, setError] = useState(null);
+  const [form, setForm] = useState({
+    title: '',
+    content: '',
+    excerpt: '',
+    tags: '',
+    status: 'draft',
+    slug: '',
+    featuredImage: null
+  });
+  const [previewImage, setPreviewImage] = useState(null);
 
   const EXCERPT_MAX_LENGTH = 200;
   const imageInputRef = useRef();
@@ -62,46 +73,63 @@ const BlogCreate = ({ token, onSuccess }) => {
     setSlugEdited(true);
   };
 
-  const handleSubmit = async (e, publish = false) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !slug) {
-      toast.error('Title and slug are required');
-      return;
-    }
-    let content = "";
-    content = markdownValue;
     setSubmitting(true);
+    setError(null);
+
     try {
-      let formData = new FormData();
-      formData.append('title', title);
-      formData.append('content', content);
-      formData.append('slug', slug);
-      formData.append('excerpt', excerpt);
-      formData.append('tags', tags);
-      formData.append('status', publish ? 'published' : 'draft');
-      if (image) formData.append('image', image);
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('content', form.content);
+      formData.append('excerpt', form.excerpt);
+      formData.append('tags', form.tags);
+      formData.append('status', form.status);
+      formData.append('slug', form.slug);
+      if (form.featuredImage) {
+        formData.append('image', form.featuredImage);
+      }
+
       const response = await fetch('http://localhost:5000/api/admin/blog', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: formData
       });
+
+      const data = await response.json();
+
       if (response.ok) {
-        setTitle('');
-        setMarkdownValue('');
-        setExcerpt('');
-        setStatus('draft');
-        setImage(null);
-        setImagePreview(null);
-        setTags('');
-        toast.success(publish ? 'Blog post published!' : 'Blog post saved as draft!');
-        if (onSuccess) onSuccess();
+        toast.success('Blog post created successfully!');
+        onSuccess();
+        setForm({
+          title: '',
+          content: '',
+          excerpt: '',
+          tags: '',
+          status: 'draft',
+          slug: '',
+          featuredImage: null
+        });
+        setPreviewImage(null);
       } else {
-        toast.error('Failed to create blog post');
+        // Handle specific error types
+        if (data.error === 'DUPLICATE_SLUG') {
+          toast.error('A blog post with this slug already exists. Please choose a different slug.');
+          setError('Please choose a different slug for your blog post.');
+        } else if (data.error === 'DATABASE_ERROR') {
+          toast.error('Database error occurred. Please check your input and try again.');
+          setError('Please check your input and try again.');
+        } else {
+          toast.error(data.message || 'Failed to create blog post');
+          setError(data.message || 'An error occurred while creating the blog post.');
+        }
       }
-    } catch {
-      toast.error('Error creating blog post');
+    } catch (err) {
+      console.error('Error creating blog post:', err);
+      toast.error('Network error. Please check your connection and try again.');
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -218,7 +246,7 @@ const BlogCreate = ({ token, onSuccess }) => {
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Blog Post</h2>
-      <form className="space-y-6" onSubmit={e => handleSubmit(e, status === 'published')} encType="multipart/form-data">
+      <form className="space-y-6" onSubmit={e => handleSubmit(e)} encType="multipart/form-data">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
           <input
@@ -342,6 +370,11 @@ const BlogCreate = ({ token, onSuccess }) => {
           </button>
         </div>
       </form>
+      {error && (
+        <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg">
+          {error}
+        </div>
+      )}
       {/* Clear Confirmation Modal */}
       {showClearModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

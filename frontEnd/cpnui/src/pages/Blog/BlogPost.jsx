@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCalendarAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import ServerDown from '../Error/ServerDown';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import ReactMarkdown from 'react-markdown';
-import { EditorState, convertFromRaw } from 'draft-js';
+import remarkGfm from 'remark-gfm';
+import CpnLogo from '../../assets/ChristianProfessionalsNetwork.png';
 
 function BlogPost() {
     const { slug } = useParams();
@@ -83,19 +84,97 @@ function BlogPost() {
                     </Link>
                 </div>
 
-                {/* Render backend HTML template or markdown */}
-                <div className="bg-transparent rounded-lg shadow-xl overflow-hidden">
-                    {post.content_type === 'markdown' ? (
-                        <div className="prose prose-lg max-w-none bg-white p-6 rounded-xl">
-                            <ReactMarkdown>{post.content}</ReactMarkdown>
+                {/* Blog Post Content */}
+                <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+                    {/* Header with CPN Logo */}
+                    <div className="bg-amber-600 p-8 text-center">
+                        <img 
+                            src={CpnLogo} 
+                            alt="CPN Logo" 
+                            className="h-32 mx-auto mb-4"
+                        />
+                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                            {post.title}
+                        </h1>
+                        <div className="flex items-center justify-center gap-6 text-white/90">
+                            <div className="flex items-center gap-2">
+                                <FontAwesomeIcon icon={faUser} className="text-sm" />
+                                <span>CPN Team</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <FontAwesomeIcon icon={faCalendarAlt} className="text-sm" />
+                                <span>{new Date(post.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}</span>
+                            </div>
                         </div>
-                    ) : post.content_type === 'richtext' ? (
-                        <div className="prose prose-lg max-w-none bg-white p-6 rounded-xl" dangerouslySetInnerHTML={{ __html: draftRawToHtml(post.content) }} />
-                    ) : post.html ? (
-                        <div dangerouslySetInnerHTML={{ __html: post.html }} />
-                    ) : (
-                        <div className="text-red-400">No blog template available.</div>
+                    </div>
+
+                    {/* Featured Image */}
+                    {post.featured_image && (
+                        <div className="w-full h-64 md:h-80 overflow-hidden">
+                            <img 
+                                src={post.featured_image} 
+                                alt={post.title}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                     )}
+
+                    {/* Content */}
+                    <div className="p-8">
+                        {/* Excerpt */}
+                        {post.excerpt && (
+                            <div className="mb-8 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                                <p className="text-lg text-gray-700 italic">{post.excerpt}</p>
+                            </div>
+                        )}
+
+                        {/* Tags */}
+                        {post.tags && (
+                            <div className="mb-6 flex flex-wrap gap-2">
+                                {post.tags.split(',').map((tag, index) => (
+                                    <span 
+                                        key={index}
+                                        className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium"
+                                    >
+                                        #{tag.trim()}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Markdown Content */}
+                        <div className="prose prose-lg max-w-none">
+                            <ReactMarkdown 
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-gray-900 mb-3 mt-6" {...props} />,
+                                    h3: ({node, ...props}) => <h3 className="text-xl font-bold text-gray-900 mb-2 mt-5" {...props} />,
+                                    p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
+                                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
+                                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
+                                    li: ({node, ...props}) => <li className="text-gray-700" {...props} />,
+                                    strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                                    em: ({node, ...props}) => <em className="italic text-gray-800" {...props} />,
+                                    blockquote: ({node, ...props}) => (
+                                        <blockquote className="border-l-4 border-amber-500 pl-4 italic text-gray-600 mb-4" {...props} />
+                                    ),
+                                    code: ({node, ...props}) => (
+                                        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono" {...props} />
+                                    ),
+                                    pre: ({node, ...props}) => (
+                                        <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4" {...props} />
+                                    )
+                                }}
+                            >
+                                {post.content}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,19 +182,3 @@ function BlogPost() {
 }
 
 export default BlogPost; 
-
-// Helper to convert Draft.js raw content to HTML
-function draftRawToHtml(raw) {
-    try {
-        const contentState = convertFromRaw(typeof raw === 'string' ? JSON.parse(raw) : raw);
-        // For simplicity, use built-in Draft.js convertToRaw and map blocks to HTML
-        // For production, use draft-js-export-html or similar
-        let html = '';
-        contentState.getBlocksAsArray().forEach(block => {
-            html += `<p>${block.getText()}</p>`;
-        });
-        return html;
-    } catch (e) {
-        return '<p>Could not render rich text content.</p>';
-    }
-} 

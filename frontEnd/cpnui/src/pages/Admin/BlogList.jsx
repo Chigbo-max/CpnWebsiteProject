@@ -1,7 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faFilter, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 
 const BlogList = ({ token, onRefresh }) => {
   const [posts, setPosts] = useState([]);
@@ -11,6 +13,12 @@ const BlogList = ({ token, onRefresh }) => {
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [deletePostId, setDeletePostId] = useState(null);
+  
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -32,6 +40,41 @@ const BlogList = ({ token, onRefresh }) => {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  // Filter and search logic
+  const filteredPosts = useMemo(() => {
+    let filtered = posts;
+
+    // Search by title, content, or excerpt
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(post => 
+        post.title?.toLowerCase().includes(searchLower) ||
+        post.content?.toLowerCase().includes(searchLower) ||
+        post.excerpt?.toLowerCase().includes(searchLower) ||
+        post.slug?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filter by status
+    if (statusFilter) {
+      filtered = filtered.filter(post => post.status === statusFilter);
+    }
+
+    // Filter by date
+    if (dateFilter) {
+      const filterDate = new Date(dateFilter);
+      const startOfDay = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
+      const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+      
+      filtered = filtered.filter(post => {
+        const postDate = new Date(post.created_at);
+        return postDate >= startOfDay && postDate < endOfDay;
+      });
+    }
+
+    return filtered;
+  }, [posts, searchTerm, statusFilter, dateFilter]);
 
   const handleDelete = async (id) => {
     setDeletePostId(id);
@@ -98,15 +141,113 @@ const BlogList = ({ token, onRefresh }) => {
     setEditPost({ ...post, status: post.status === 'published' ? 'draft' : 'published' });
   };
 
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setDateFilter('');
+  };
+
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Blog Posts</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Blog Posts</h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <FontAwesomeIcon icon={faFilter} className="text-sm" />
+            Filters
+          </button>
+          {(searchTerm || statusFilter || dateFilter) && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-2 text-sm text-red-600 hover:text-red-700 font-medium"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Search and Filter Section */}
+      {showFilters && (
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div className="relative">
+                <FontAwesomeIcon 
+                  icon={faSearch} 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" 
+                />
+                <input
+                  type="text"
+                  placeholder="Search by title, content, or slug..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                <option value="">All Statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date Created</label>
+              <div className="relative">
+                <FontAwesomeIcon 
+                  icon={faCalendarAlt} 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" 
+                />
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Results Summary */}
+          <div className="mt-4 text-sm text-gray-600">
+            Showing {filteredPosts.length} of {posts.length} posts
+            {(searchTerm || statusFilter || dateFilter) && (
+              <span className="ml-2">
+                (filtered by {[
+                  searchTerm && 'search',
+                  statusFilter && 'status',
+                  dateFilter && 'date'
+                ].filter(Boolean).join(', ')})
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <SimpleSpinner message="Loading blog posts..." />
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
-      ) : posts.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No blog posts found.</div>
+      ) : filteredPosts.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          {posts.length === 0 ? 'No blog posts found.' : 'No posts match your search criteria.'}
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -119,7 +260,7 @@ const BlogList = ({ token, onRefresh }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {posts.map(post => (
+              {filteredPosts.map(post => (
                 <tr key={post.id || post._id}>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{post.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">

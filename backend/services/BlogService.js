@@ -3,6 +3,37 @@ class BlogService {
     this.db = db;
   }
 
+  // Generate a unique slug from title
+  async generateUniqueSlug(title, existingSlug = null) {
+    let baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim('-');
+    
+    let slug = baseSlug;
+    let counter = 1;
+    
+    // Check if slug exists (excluding current post if updating)
+    const checkSlug = async (testSlug) => {
+      const query = existingSlug 
+        ? 'SELECT id FROM blog_posts WHERE slug = $1 AND slug != $2'
+        : 'SELECT id FROM blog_posts WHERE slug = $1';
+      const params = existingSlug ? [testSlug, existingSlug] : [testSlug];
+      const result = await this.db.query(query, params);
+      return result.rows.length > 0;
+    };
+    
+    // Keep trying until we find a unique slug
+    while (await checkSlug(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    
+    return slug;
+  }
+
   static renderBlogTemplate({ title, author, date, excerpt, content, featuredImage, tags }) {
     return `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e3e9f6 100%); padding: 0; margin: 0; min-height: 100vh;">
@@ -62,19 +93,59 @@ class BlogService {
   }
 
   async create({ title, content, excerpt, tags, status, slug, authorId, featured_image }) {
-    const result = await this.db.query(
-      'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [title, content, excerpt, tags, status, slug, authorId, featured_image || null]
-    );
-    return result.rows[0];
+    try {
+      // Generate unique slug if not provided or if it might conflict
+      const uniqueSlug = slug ? await this.generateUniqueSlug(title, slug) : await this.generateUniqueSlug(title);
+      
+      const result = await this.db.query(
+        'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        [title, content, excerpt, tags, status, uniqueSlug, authorId, featured_image || null]
+      );
+      return result.rows[0];
+    } catch (error) {
+      if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
+        // Handle duplicate slug error
+        const uniqueSlug = await this.generateUniqueSlug(title);
+        const result = await this.db.query(
+          'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+          [title, content, excerpt, tags, status, uniqueSlug, authorId, featured_image || null]
+        );
+        return result.rows[0];
+      }
+      throw error;
+    }
   }
 
   async update(id, { title, content, excerpt, tags, slug, status }) {
-    const result = await this.db.query(
-      'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
-      [title, content, excerpt, tags, slug, status, id]
-    );
-    return result.rows[0];
+    try {
+      // Get current post to check existing slug
+      const currentPost = await this.getById(id);
+      if (!currentPost) {
+        throw new Error('Blog post not found');
+      }
+      
+      // Generate unique slug if slug is being changed
+      const uniqueSlug = slug && slug !== currentPost.slug 
+        ? await this.generateUniqueSlug(title, currentPost.slug)
+        : slug || currentPost.slug;
+      
+      const result = await this.db.query(
+        'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
+        [title, content, excerpt, tags, uniqueSlug, status, id]
+      );
+      return result.rows[0];
+    } catch (error) {
+      if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
+        // Handle duplicate slug error
+        const uniqueSlug = await this.generateUniqueSlug(title);
+        const result = await this.db.query(
+          'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
+          [title, content, excerpt, tags, uniqueSlug, status, id]
+        );
+        return result.rows[0];
+      }
+      throw error;
+    }
   }
 
   async delete(id) {

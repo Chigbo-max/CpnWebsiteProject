@@ -52,12 +52,35 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     if (!title || !content || !slug) {
       return res.status(400).json({ message: 'Title, content, and slug are required' });
     }
+    
     const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image });
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
     res.status(201).json({ message: 'Blog post created successfully', post });
   } catch (err) {
-    next(err);
+    console.error('Error creating blog post:', err);
+    
+    // Handle specific slug-related errors
+    if (err.code === '23505' && err.constraint === 'blog_posts_slug_key') {
+      return res.status(400).json({ 
+        message: 'A blog post with this slug already exists. Please choose a different slug.',
+        error: 'DUPLICATE_SLUG'
+      });
+    }
+    
+    // Handle other database errors
+    if (err.code && err.code.startsWith('23')) {
+      return res.status(400).json({ 
+        message: 'Database error occurred. Please check your input and try again.',
+        error: 'DATABASE_ERROR'
+      });
+    }
+    
+    // Handle general errors
+    res.status(500).json({ 
+      message: 'Failed to create blog post. Please try again.',
+      error: err.message 
+    });
   }
 });
 router.put('/blog/:id', auth, async (req, res, next) => {
@@ -67,7 +90,31 @@ router.put('/blog/:id', auth, async (req, res, next) => {
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
     res.json({ message: 'Blog post updated', post });
-  } catch (error) { next(error); }
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    
+    // Handle specific slug-related errors
+    if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
+      return res.status(400).json({ 
+        message: 'A blog post with this slug already exists. Please choose a different slug.',
+        error: 'DUPLICATE_SLUG'
+      });
+    }
+    
+    // Handle other database errors
+    if (error.code && error.code.startsWith('23')) {
+      return res.status(400).json({ 
+        message: 'Database error occurred. Please check your input and try again.',
+        error: 'DATABASE_ERROR'
+      });
+    }
+    
+    // Handle general errors
+    res.status(500).json({ 
+      message: 'Failed to update blog post. Please try again.',
+      error: error.message 
+    });
+  }
 });
 router.delete('/blog/:id', auth, async (req, res, next) => {
   try {
