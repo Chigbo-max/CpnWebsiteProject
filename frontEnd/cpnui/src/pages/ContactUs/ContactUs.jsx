@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import NewsLetter from "../../components/newLetter/NewsLetter";
-import bgImage from "../../assets/contact.jpeg"
-import { motion } from "framer-motion"; 
+import bgImage from "../../assets/contact.jpeg";
+import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { useSubmitContactMutation } from '../../features/contact/contactApi';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +12,7 @@ const Contact = () => {
     email: '',
     message: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [submitContact, { isLoading }] = useSubmitContactMutation();
   const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleInputChange = (e) => {
@@ -24,28 +25,13 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setSubmitStatus(null);
-
     try {
-      const response = await fetch('http://localhost:5000/api/contact/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setSubmitStatus('error');
-      }
+      await submitContact(formData).unwrap();
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', message: '' });
     } catch {
       setSubmitStatus('error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -150,10 +136,10 @@ const Contact = () => {
                   </div>
                   <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={isLoading}
                     className="w-full bg-gray-900 text-white font-bold py-3 px-6 rounded-lg border-2 border-gray-900 transition-all duration-300 hover:bg-amber-600 hover:text-gray-900 hover:border-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Sending...' : 'Submit Ticket'}
+                    {isLoading ? 'Sending...' : 'Submit Ticket'}
                   </button>
                 </form>
               </div>

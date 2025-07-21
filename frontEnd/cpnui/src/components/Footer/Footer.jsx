@@ -68,11 +68,14 @@ function Footer() {
                         <div className="sm:col-span-1">
                             <h3 className="text-base sm:text-lg font-bold text-amber-400 mb-4 sm:mb-6">Quick Links</h3>
                             <ul className="space-y-2 sm:space-y-3">
-                                {quickLinks.map((link, index) => (
-                                    <li key={index}>
+                                {quickLinks.concat([
+                                    { title: "Terms of Service", path: "/terms" },
+                                    { title: "Privacy Policy", path: "/privacy" }
+                                ]).map((link, idx) => (
+                                    <li key={idx}>
                                         <Link 
                                             to={link.path}
-                                            className="text-gray-300 hover:text-amber-400 transition-colors duration-300 text-sm"
+                                            className="text-gray-300 hover:text-amber-400 transition-colors duration-200 block py-1"
                                         >
                                             {link.title}
                                         </Link>

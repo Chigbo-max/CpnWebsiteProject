@@ -43,6 +43,21 @@ class SubscriberServiceImpl extends ISubscriberService {
     const result = await this.db.query('DELETE FROM subscribers WHERE email = $1 RETURNING *', [email]);
     return result.rows[0];
   }
+
+  async getMonthlyCounts() {
+    // Returns [{ year: 2024, month: 6, count: 10 }, ...]
+    const result = await this.db.query(`
+      SELECT 
+        EXTRACT(YEAR FROM subscribed_at) AS year,
+        EXTRACT(MONTH FROM subscribed_at) AS month,
+        COUNT(*) AS count
+      FROM subscribers
+      WHERE subscribed_at >= (CURRENT_DATE - INTERVAL '12 months')
+      GROUP BY year, month
+      ORDER BY year, month
+    `);
+    return result.rows;
+  }
 }
 
 module.exports = { ISubscriberService, SubscriberServiceImpl }; 

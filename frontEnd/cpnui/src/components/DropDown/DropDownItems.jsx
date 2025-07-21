@@ -7,18 +7,6 @@ export const dropDownItems = [
     },
 
     {
-        "title": "Culture",
-        "path": "/InsideCPN/culture",
-        "cName": "drop_down_item"
-    },
-
-    {
-        "title": "News Letter",
-        "path": "/InsideCPN/newsLetter",
-        "cName": "drop_down_item"
-    },
-
-    {
         "title": "Blog",
         "path": "/InsideCPN/blog",
         "cName": "drop_down_item"

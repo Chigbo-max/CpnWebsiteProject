@@ -5,12 +5,14 @@ import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useSendNewsletterMutation, useUploadImageMutation } from '../../features/newsletter/newsletterApi';
 
 const Newsletter = ({ token }) => {
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [sendNewsletter, { isLoading: sending }] = useSendNewsletterMutation();
+  const [uploadImage] = useUploadImageMutation();
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -18,24 +20,13 @@ const Newsletter = ({ token }) => {
       toast.error('Subject and content are required');
       return;
     }
-    setSending(true);
     try {
-      const res = await fetch('http://localhost:5000/api/admin/newsletter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ subject, content })
-      });
-      if (!res.ok) throw new Error('Failed to send newsletter');
+      await sendNewsletter({ subject, content, token }).unwrap();
       toast.success('Newsletter sent to all subscribers!');
       setSubject('');
       setContent('');
     } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSending(false);
+      toast.error(err?.data?.message || 'Failed to send newsletter');
     }
   };
 
@@ -45,12 +36,7 @@ const Newsletter = ({ token }) => {
       reader.onload = async () => {
         try {
           const base64 = reader.result;
-          const res = await fetch("/api/admin/blog/upload-image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ image: base64 })
-          });
-          const data = await res.json();
+          const data = await uploadImage({ image: base64, token }).unwrap();
           if (data.url && !data.url.includes('placeholder-event.png')) resolve(data.url);
           else reject(new Error("Image upload failed. Please try again."));
         } catch (e) {
@@ -85,7 +71,7 @@ const Newsletter = ({ token }) => {
       const before = value.substring(0, selection.start);
       const selected = value.substring(selection.start, selection.end);
       const after = value.substring(selection.end);
-      editor.setText(before + `<span style="color:red">${selected || 'color'}</span>` + after);
+      editor.setText(before + `<span style=\"color:red\">${selected || 'color'}</span>` + after);
       if (!selected) {
         editor.setSelection({ start: selection.start + 22, end: selection.start + 27 });
       }

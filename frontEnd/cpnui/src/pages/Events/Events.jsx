@@ -1,36 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import { useGetEventsQuery } from '../../features/event/eventApi';
 
 function Events() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch('/api/events');
-        if (!res.ok) throw new Error('Failed to fetch events');
-        setEvents(await res.json());
-      } catch {
-        // Optionally show a toast
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+  const { data: events = [], isLoading, isError, error } = useGetEventsQuery();
 
   const now = new Date();
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     let data = events;
     if (search) {
       data = data.filter(ev =>
@@ -49,7 +34,7 @@ function Events() {
 
   // Pagination for upcoming events
   const totalPages = Math.ceil(upcoming.length / PER_PAGE);
-  const paginatedUpcoming = React.useMemo(() => {
+  const paginatedUpcoming = useMemo(() => {
     const start = (page - 1) * PER_PAGE;
     return upcoming.slice(start, start + PER_PAGE);
   }, [upcoming, page]);
@@ -91,7 +76,6 @@ function Events() {
       {/* Main Content */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
         <div className="max-w-7xl mx-auto">
-          
           {/* Search and Filter Section */}
           <div className="mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -117,8 +101,10 @@ function Events() {
           {/* Upcoming Events Section */}
           <section className="mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-gray-900 text-center">Upcoming Events</h2>
-            {loading ? (
+            {isLoading ? (
               <SimpleSpinner message="Loading events..." />
+            ) : isError ? (
+              <div className="text-center py-12 text-red-400">{error?.data?.message || error?.message || 'Error loading events.'}</div>
             ) : paginatedUpcoming.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -187,7 +173,6 @@ function Events() {
                 ))}
               </div>
             )}
-            
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-8">

@@ -1,39 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useGetEventsQuery } from '../../features/event/eventApi';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faUsers, faBookOpen, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 function UpcomingEvents() {
-    const [upcomingEvents, setUpcomingEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/events');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch events');
-                }
-                const events = await response.json();
-                
-                // Filter upcoming events (start_time > now) and sort by nearest date
-                const now = new Date();
-                const upcoming = events
-                    .filter(event => new Date(event.start_time) > now)
-                    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
-                    .slice(0, 3); // Take only 3 nearest events
-                
-                setUpcomingEvents(upcoming);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchEvents();
-    }, []);
+    const { data: events = [], isLoading, isError, error } = useGetEventsQuery();
+    let upcomingEvents = [];
+    if (events.length > 0) {
+        const now = new Date();
+        upcomingEvents = events
+            .filter(event => new Date(event.start_time) > now)
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+            .slice(0, 3);
+    }
 
     const formatEventDate = (startTime) => {
         const start = new Date(startTime);
@@ -64,7 +43,7 @@ function UpcomingEvents() {
         return gradients[index % gradients.length];
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3].map((i) => (
@@ -81,7 +60,7 @@ function UpcomingEvents() {
         );
     }
 
-    if (error) {
+    if (isError) {
         return (
             <div className="text-center py-8">
                 <p className="text-gray-500">Unable to load upcoming events.</p>

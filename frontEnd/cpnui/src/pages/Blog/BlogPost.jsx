@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCalendarAlt, faUser, faShare, faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -8,37 +8,13 @@ import SimpleSpinner from '../../components/SimpleSpinner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CpnLogo from '../../assets/ChristianProfessionalsNetwork.png';
+import { useGetBlogBySlugQuery } from '../../features/blog/blogApi';
 
 function BlogPost() {
     const { slug } = useParams();
-    const [post, setPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [serverDown, setServerDown] = useState(false);
     const [showShareOptions, setShowShareOptions] = useState(false);
-
-    const fetchBlogPost = useCallback(async () => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/blog/${slug}`);
-            if (!response.ok) {
-                throw new Error('Blog post not found');
-            }
-            const data = await response.json();
-            setPost(data);
-        } catch (err) {
-            if (err.message === 'Failed to fetch' || err.message === 'NetworkError when attempting to fetch resource.') {
-                setServerDown(true);
-            } else {
-                setError(err.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    }, [slug]);
-
-    useEffect(() => {
-        fetchBlogPost();
-    }, [fetchBlogPost]);
+    const { data: post, isLoading, isError, error } = useGetBlogBySlugQuery(slug);
+    const serverDown = isError && (error?.message === 'Failed to fetch' || error?.message === 'NetworkError when attempting to fetch resource.');
 
     const shareUrl = window.location.href;
     const shareTitle = post?.title || 'Check out this blog post';
@@ -89,17 +65,17 @@ function BlogPost() {
         return <ServerDown />;
     }
 
-    if (loading) {
+    if (isLoading) {
         return <SimpleSpinner message="Loading blog post..." />;
     }
 
-    if (error) {
+    if (isError) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center text-red-400">
                         <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
-                        <p className="mb-8">{error}</p>
+                        <p className="mb-8">{error?.data?.message || error?.message}</p>
                         <Link 
                             to="/blog"
                             className="inline-flex items-center text-amber-500 hover:text-amber-400 font-semibold"

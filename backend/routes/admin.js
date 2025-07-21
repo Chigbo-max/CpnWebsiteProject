@@ -10,14 +10,12 @@ const upload = multer();
 const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const redisClient = require('../config/redisClient');
 
-// Import services (use *Impl)
 const { BlogServiceImpl } = require('../services/BlogService');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const { InquiryServiceImpl } = require('../services/InquiryService');
 const { AdminServiceImpl } = require('../services/AdminService');
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
 
-// Instantiate services
 const blogService = new BlogServiceImpl(db);
 const subscriberService = new SubscriberServiceImpl(db);
 const inquiryService = new InquiryServiceImpl(db);
@@ -29,7 +27,6 @@ const mailer = nodemailer.createTransport({
 const newsletterService = new NewsletterServiceImpl(db, mailer);
 const cloudinaryService = new CloudinaryServiceImpl();
 
-// --- BLOG MANAGEMENT ---
 router.get('/blog', auth, async (req, res, next) => {
   try {
     const cacheKey = 'admin:blog:posts';
@@ -46,7 +43,6 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     const { title, content, excerpt, tags, status, slug } = req.body;
     let featured_image = null;
     if (req.file) {
-      // Convert buffer to base64 data URL
       const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
       featured_image = await cloudinaryService.uploadImage(base64, 'blog-images');
     }
@@ -61,7 +57,6 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
   } catch (err) {
     console.error('Error creating blog post:', err);
     
-    // Handle specific slug-related errors
     if (err.code === '23505' && err.constraint === 'blog_posts_slug_key') {
       return res.status(400).json({ 
         message: 'A blog post with this slug already exists. Please choose a different slug.',
@@ -69,7 +64,6 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
       });
     }
     
-    // Handle other database errors
     if (err.code && err.code.startsWith('23')) {
       return res.status(400).json({ 
         message: 'Database error occurred. Please check your input and try again.',
@@ -77,7 +71,6 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
       });
     }
     
-    // Handle general errors
     res.status(500).json({ 
       message: 'Failed to create blog post. Please try again.',
       error: err.message 
@@ -94,7 +87,6 @@ router.put('/blog/:id', auth, async (req, res, next) => {
   } catch (error) {
     console.error('Error updating blog post:', error);
     
-    // Handle specific slug-related errors
     if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
       return res.status(400).json({ 
         message: 'A blog post with this slug already exists. Please choose a different slug.',
@@ -102,7 +94,6 @@ router.put('/blog/:id', auth, async (req, res, next) => {
       });
     }
     
-    // Handle other database errors
     if (error.code && error.code.startsWith('23')) {
       return res.status(400).json({ 
         message: 'Database error occurred. Please check your input and try again.',
@@ -110,7 +101,6 @@ router.put('/blog/:id', auth, async (req, res, next) => {
       });
     }
     
-    // Handle general errors
     res.status(500).json({ 
       message: 'Failed to update blog post. Please try again.',
       error: error.message 
@@ -127,7 +117,6 @@ router.delete('/blog/:id', auth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// Blog editor image upload endpoint
 router.post('/blog/upload-image', auth, async (req, res) => {
   try {
     const { image } = req.body;
@@ -139,7 +128,6 @@ router.post('/blog/upload-image', auth, async (req, res) => {
   }
 });
 
-// --- SUBSCRIBER MANAGEMENT ---
 router.get('/subscribers', auth, async (req, res, next) => {
   try {
     const cacheKey = 'admin:subscribers:list';
@@ -177,7 +165,6 @@ router.delete('/subscribers/:id', auth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// --- CONTACT INQUIRY MANAGEMENT ---
 router.get('/inquiries', auth, async (req, res, next) => {
   try {
     const cacheKey = 'admin:inquiries:list';
@@ -200,12 +187,11 @@ router.put('/inquiries/:id', auth, async (req, res, next) => {
   try {
     const inquiry = await inquiryService.respond(req.params.id, req.body.admin_response);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
-    // Send email to the user with the admin's response
     await mailer.sendMail({
       from: process.env.EMAIL_USER,
       to: inquiry.email,
       subject: 'Response to your inquiry',
-      html: require('../services/NewsletterService').renderNewsletterTemplate({
+      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
         name: inquiry.name,
         content: `<p>${req.body.admin_response}</p><p>Thank you for contacting us!</p>`
       })
@@ -224,7 +210,6 @@ router.delete('/inquiries/:id', auth, async (req, res, next) => {
 });
 
 // --- NEWSLETTER ---
-// (No caching needed for newsletter send)
 router.post('/newsletter', auth, async (req, res, next) => {
   try {
     const { subject, content } = req.body;
@@ -239,7 +224,6 @@ router.post('/newsletter', auth, async (req, res, next) => {
   }
 });
 
-// --- PROFILE MANAGEMENT ---
 router.put('/profile', auth, async (req, res, next) => {
   try {
     const { username, email } = req.body;
@@ -282,6 +266,15 @@ router.post('/admins', auth, requireSuperAdmin, async (req, res, next) => {
     const password_hash = await bcrypt.hash(password, 10);
     const admin = await adminService.create({ username, email, password_hash, role });
     await redisClient.del('admin:admins:list');
+    await mailer.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your CPN Admin Account',
+      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
+        name: username,
+        content: `<p>Hello <b>${username.split(' ')[0]}</b>,<br>Your admin account has been created.<br><br><b>Username:</b> ${username}<br><b>Password:</b> ${password}</p><p>Please log in and change your password after your first login.</p>`
+      })
+    });
     res.status(201).json({ message: 'Admin added', admin });
   } catch (error) { next(error); }
 });
@@ -305,7 +298,7 @@ router.post('/admins/:id/reset-password', auth, requireSuperAdmin, async (req, r
       from: process.env.EMAIL_USER,
       to: admin.email,
       subject: 'CPN Admin Password Reset',
-      html: require('../services/NewsletterService').renderNewsletterTemplate({
+      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
         name: admin.username,
         content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your new password is: <b>${newPassword}</b></p>`
       })
@@ -314,7 +307,6 @@ router.post('/admins/:id/reset-password', auth, requireSuperAdmin, async (req, r
   } catch (error) { next(error); }
 });
 
-// Admin profile image upload (example, adjust as needed)
-// (No caching needed for profile image upload)
+
 
 module.exports = router; 

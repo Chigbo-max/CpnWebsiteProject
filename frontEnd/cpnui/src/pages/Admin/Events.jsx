@@ -1,14 +1,13 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../app/useAdminAuth';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import { useGetEventsQuery, useDeleteEventMutation } from '../../features/event/eventApi';
 
 const AdminEvents = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -16,33 +15,15 @@ const AdminEvents = () => {
   const { token } = useAdminAuth();
   const navigate = useNavigate();
 
-  const fetchEvents = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/events');
-      if (!res.ok) throw new Error('Failed to fetch events');
-      setEvents(await res.json());
-    } catch {
-      toast.error('Error fetching events');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  const { data: events = [], isLoading, isError, error, refetch } = useGetEventsQuery();
+  const [deleteEvent] = useDeleteEventMutation();
 
   const handleDelete = async (event_id) => {
     if (!window.confirm('Are you sure you want to delete this event?')) return;
     try {
-      const res = await fetch(`/api/events/${event_id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed to delete event');
+      await deleteEvent(event_id).unwrap();
       toast.success('Event deleted');
-      setEvents(events.filter(ev => ev.event_id !== event_id));
+      refetch();
     } catch {
       toast.error('Error deleting event');
     }
@@ -92,8 +73,10 @@ const AdminEvents = () => {
           <FontAwesomeIcon icon={faPlus} /> Create Event
         </Link>
       </div>
-      {loading ? (
+      {isLoading ? (
         <SimpleSpinner message="Loading events..." />
+      ) : isError ? (
+        <div className="w-full text-center py-8 text-red-400">{error?.data?.message || error?.message || 'Error loading events.'}</div>
       ) : paginated.length === 0 ? (
         <div className="w-full text-center py-8 text-gray-400">No events found.</div>
       ) : (

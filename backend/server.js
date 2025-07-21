@@ -36,6 +36,7 @@ app.use('/api/blog', require('./routes/blog'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/subscribers', require('./routes/subscribers'));
 app.use('/api/events', require('./routes/events'));
+app.use('/api/enrollments', require('./routes/enrollments'));
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

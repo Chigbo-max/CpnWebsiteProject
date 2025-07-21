@@ -1,11 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "../pages/Home/Home";
-import Community from "../pages/Community/Community";
+import Courses from "../pages/Courses/Courses";
 import KnowledgeHub from "../pages/knowledgeHub/KnowledgeHub";
 import Events from "../pages/Events/Events";
 import Listen from "../pages/Listen/Listen";
-import Culture from "../pages/Culture/Culture";
-import NewsLetter from '../pages/NewsLetter/NewsLetter';
 import Blog from "../pages/Blog/Blog"
 import BlogPost from "../pages/Blog/BlogPost"
 import AdminDashboard from "../pages/Admin/AdminDashboard"
@@ -19,6 +17,17 @@ import EventDetail from "../pages/Events/EventDetail";
 import EventRegistrations from "../pages/Admin/EventRegistrations";
 import AdminEvents from '../pages/Admin/Events';
 import EventEdit from '../pages/Admin/EventEdit';
+import AdminLogin from '../pages/Admin/AdminLogin';
+import RequireAdminAuth from '../pages/Admin/RequireAdminAuth';
+import AdminProfile from '../pages/Admin/AdminProfile';
+import AdminForgotPassword from '../pages/Admin/AdminForgotPassword';
+import AdminResetPassword from '../pages/Admin/AdminResetPassword';
+import AdminSecuritySettings from '../pages/Admin/AdminSecuritySettings';
+import Terms from '../pages/Legal/Terms';
+import Privacy from '../pages/Legal/Privacy';
+import DoingWorkDifferently from '../pages/Courses/DoingWorkDifferently.jsx';
+import DoingLeadershipDifferently from '../pages/Courses/DoingLeadershipDifferently.jsx';
+import DoingBusinessDifferently from '../pages/Courses/DoingBusinessDifferently.jsx';
 
 const BrowserRouter = createBrowserRouter(
     [{
@@ -26,27 +35,33 @@ const BrowserRouter = createBrowserRouter(
         element: <Layout />,
         children: [
         { path: "/", element: <Home /> },
-        { path: "/community", element: <Community /> },
+        { path: "/courses", element: <Courses /> },
+        { path: "/courses/doingWorkDifferently", element: <DoingWorkDifferently /> },
+        { path: "/courses/doingLeadershipDifferently", element: <DoingLeadershipDifferently /> },
+        { path: "/courses/doingBusinessDifferently", element: <DoingBusinessDifferently /> },
         { path: "/blog", element: <Blog /> },
         { path: "/blog/:slug", element: <BlogPost /> },
         { path: "/read", element: <Blog /> },
         { path: "/knowledgeHub", element: <KnowledgeHub /> },
         { path: "/knowledgeHub/listen", element: <Listen /> },
         { path: "/knowledgeHub/read", element: <Blog /> },
-        { path: "/knowledgeHub/blog", element: <Blog /> },
         { path: "/events", element: <Events /> },
-        { path: "/insideCPN/culture", element: <Culture /> },
-        { path: "/insideCPN/newsLetter", element: <NewsLetter /> },
-        { path: "/insideCPN/theTeam", element: <TheTeam /> },
-        { path: "/insideCPN/about", element: <About /> },
-        { path: "/InsideCPN/blog", element: <Blog /> },
+        { path: "/events/:eventId", element: <EventDetail /> },
+        { path: "/about", element: <About /> },
+        { path: "/team", element: <TheTeam /> },
         { path: "/contactUs", element: <ContactUs /> },
-        { path: "/admin", element: <AdminDashboard /> },
-        { path: "/admin/events/create", element: <EventCreate /> },
-        { path: "/admin/events/registrations", element: <EventRegistrations /> },
-        { path: "/admin/events", element: <AdminEvents /> },
-        { path: "/admin/events/edit/:event_id", element: <EventEdit /> },
-        { path: "/events/:event_id", element: <EventDetail /> },
+        { path: "/terms", element: <Terms /> },
+        { path: "/privacy", element: <Privacy /> },
+        { path: "/admin/login", element: <AdminLogin /> },
+        { path: "/admin/forgot-password", element: <AdminForgotPassword /> },
+        { path: "/admin/reset-password", element: <AdminResetPassword /> },
+        { path: "/admin/profile", element: <RequireAdminAuth><AdminProfile /></RequireAdminAuth> },
+        { path: "/admin", element: <RequireAdminAuth><AdminDashboard /></RequireAdminAuth> },
+        { path: "/admin/events/create", element: <RequireAdminAuth><EventCreate /></RequireAdminAuth> },
+        { path: "/admin/events/registrations", element: <RequireAdminAuth><EventRegistrations /></RequireAdminAuth> },
+        { path: "/admin/events", element: <RequireAdminAuth><AdminEvents /></RequireAdminAuth> },
+        { path: "/admin/events/edit/:event_id", element: <RequireAdminAuth><EventEdit /></RequireAdminAuth> },
+        { path: "/admin/security", element: <RequireAdminAuth><AdminSecuritySettings /></RequireAdminAuth> },
         { path: "*", element: <NotFound /> }
         ]
     }]

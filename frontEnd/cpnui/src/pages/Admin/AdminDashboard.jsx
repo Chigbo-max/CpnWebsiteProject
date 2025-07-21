@@ -12,14 +12,42 @@ import AdminManagement from './AdminManagement';
 import AdminEvents from './Events';
 import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
+import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
+import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function AdminDashboard() {
   const { token, admin, login, logout } = useAdminAuth();
-  const [activeSection, setActiveSection] = useState('profile');
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+
+  // Analytics dashboard data
+  const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
+  const [monthlyCounts, setMonthlyCounts] = useState([]);
+  useEffect(() => {
+    if (activeSection === 'dashboard' && token) {
+      (async () => {
+        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes] = await Promise.all([
+          fetch('http://localhost:5000/api/admin/enrollments', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:5000/api/subscribers', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:5000/api/blog', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:5000/api/subscribers/monthly-counts', { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+        const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+        const events = (await eventsRes.json()).events?.length || 0;
+        const blogs = (await blogsRes.json()).blogs?.length || 0;
+        setAnalytics({ enrollees, subscribers, events, blogs });
+        const monthly = (await monthlyCountsRes.json()).data || [];
+        // Format for chart: [{ name: '2024-06', count: 10 }, ...]
+        setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+      })();
+    }
+  }, [activeSection, token]);
 
   useEffect(() => {
     setIsLoggedIn(!!token);
@@ -130,6 +158,33 @@ function AdminDashboard() {
       onShowChangePassword={handleShowChangePassword}
     >
       <div className="w-full h-full">
+        {activeSection === 'dashboard' && (
+          <div className="w-full min-h-[60vh] flex flex-col items-center justify-center">
+            <h2 className="text-3xl font-bold mb-8 text-gray-900">Admin Analytics Dashboard</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mb-12">
+              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+                <FaUserGraduate className="text-5xl text-amber-600 mb-4" />
+                <div className="text-4xl font-bold text-gray-900">{analytics.enrollees}</div>
+                <div className="text-lg text-gray-600 mt-2">Enrolled Students</div>
+              </div>
+              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+                <FaUsers className="text-5xl text-amber-600 mb-4" />
+                <div className="text-4xl font-bold text-gray-900">{analytics.subscribers}</div>
+                <div className="text-lg text-gray-600 mt-2">Subscribers</div>
+              </div>
+              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+                <FaCalendarAlt className="text-5xl text-amber-600 mb-4" />
+                <div className="text-4xl font-bold text-gray-900">{analytics.events}</div>
+                <div className="text-lg text-gray-600 mt-2">Events</div>
+              </div>
+              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+                <FaFileAlt className="text-5xl text-amber-600 mb-4" />
+                <div className="text-4xl font-bold text-gray-900">{analytics.blogs}</div>
+                <div className="text-lg text-gray-600 mt-2">Blogs</div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeSection === 'profile' && (
           <Profile admin={admin} onUpdate={handleProfileUpdate} showChangePassword={showChangePassword} setShowChangePassword={setShowChangePassword} />
         )}
@@ -163,6 +218,23 @@ function AdminDashboard() {
         )}
         {activeSection === 'event-registrations' && (
           <EventRegistrations />
+        )}
+        {activeSection === 'enrollees' && (
+          <EnrolleeManagement token={token} />
+        )}
+        {activeSection === 'dashboard' && (
+          <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyCounts} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="count" stroke="#f59e42" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
     </AdminLayout>

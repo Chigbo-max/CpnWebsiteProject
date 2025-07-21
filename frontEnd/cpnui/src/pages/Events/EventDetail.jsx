@@ -1,32 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useGetEventByIdQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
 
 const EventDetail = () => {
   const { event_id } = useParams();
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [regLoading, setRegLoading] = useState(false);
+  const { data: event, isLoading, isError } = useGetEventByIdQuery(event_id);
+  const [registerForEvent, { isLoading: regLoading }] = useRegisterForEventMutation();
   const [registered, setRegistered] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
-
-  useEffect(() => {
-    const fetchEvent = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/events/${event_id}`);
-        if (!res.ok) throw new Error('Event not found');
-        const data = await res.json();
-        setEvent(data);
-      } catch (err) {
-        toast.error(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvent();
-  }, [event_id]);
 
   const isPast = event && new Date(event.end_time) < new Date();
 
@@ -37,25 +20,17 @@ const EventDetail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setRegLoading(true);
     try {
-      const res = await fetch(`/api/events/${event_id}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error((await res.json()).message || 'Registration failed');
+      await registerForEvent({ event_id, ...form }).unwrap();
       setRegistered(true);
       toast.success('Registration successful! Check your email for details.');
     } catch (err) {
-      toast.error(err.message || 'Registration failed');
-    } finally {
-      setRegLoading(false);
+      toast.error(err?.data?.message || 'Registration failed');
     }
   };
 
-      if (loading) return <LoadingSpinner message="Loading event..." />;
-  if (!event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
+  if (isLoading) return <LoadingSpinner message="Loading event..." />;
+  if (isError || !event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8">

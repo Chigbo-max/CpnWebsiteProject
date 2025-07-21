@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faUser, faSignOutAlt, faCog, faUsers, faEnvelope, faFileAlt, faCalendarAlt, faPlus, faList } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faUser, faSignOutAlt, faCog, faUsers, faEnvelope, faFileAlt, faCalendarAlt, faPlus, faList, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
 
 const sidebarLinks = [
   { id: 'profile', label: 'Profile', icon: faUser },
   { id: 'subscribers', label: 'Subscribers', icon: faUsers },
   { id: 'newsletter', label: 'Newsletter', icon: faList },
+  { id: 'enrollees', label: 'Enrollee Management', icon: faUserGraduate },
   { id: 'blog-create', label: 'Create Blog Post', icon: faPlus },
   { id: 'blog-list', label: 'Blog Posts', icon: faFileAlt },
   { id: 'inquiries', label: 'Contact Inquiries', icon: faEnvelope },

@@ -4,6 +4,7 @@ const db = require('../config/database');
 const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const subscriberService = new SubscriberServiceImpl(db);
+const { authenticateAdmin } = require('../middleware/auth');
 
 // Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
@@ -80,6 +81,17 @@ router.put('/:id', async (req, res) => {
     res.json({ message: 'Subscriber updated', subscriber: result });
   } catch (error) {
     console.error('Error updating subscriber:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Admin: Get monthly subscriber counts for dashboard analytics
+router.get('/monthly-counts', authenticateAdmin, async (req, res) => {
+  try {
+    const result = await subscriberService.getMonthlyCounts();
+    res.json({ data: result });
+  } catch (error) {
+    console.error('Error fetching monthly subscriber counts:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

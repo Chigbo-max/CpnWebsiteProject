@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -6,36 +6,11 @@ import { motion } from "framer-motion";
 import ServerDown from '../Error/ServerDown';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { FaRegNewspaper } from 'react-icons/fa';
+import { useGetBlogsQuery } from '../../features/blog/blogApi';
 
 function Blog() {
-    const [blogPosts, setBlogPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [serverDown, setServerDown] = useState(false);
-
-    useEffect(() => {
-        fetchBlogPosts();
-    }, []);
-
-    const fetchBlogPosts = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/api/blog');
-            if (!response.ok) {
-                throw new Error('Failed to fetch blog posts');
-            }
-            const data = await response.json();
-            console.log("blogs: ", data);
-            setBlogPosts(data);
-        } catch (err) {
-            if (err.message === 'Failed to fetch' || err.message === 'NetworkError when attempting to fetch resource.') {
-                setServerDown(true);
-            } else {
-                setError(err.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { data: blogPosts = [], isLoading, isError, error } = useGetBlogsQuery();
+    const serverDown = isError && (error?.message === 'Failed to fetch' || error?.message === 'NetworkError when attempting to fetch resource.');
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -46,16 +21,18 @@ function Blog() {
         });
     };
 
+    const publishedPosts = useMemo(() => blogPosts.filter(post => post.status === 'published'), [blogPosts]);
+
     if (serverDown) {
         return <ServerDown />;
     }
 
-    if (loading) {
+    if (isLoading) {
         return <LoadingSpinner message="Loading blog posts..." />;
     }
 
-    if (error) {
-        return <LoadingSpinner message={`Error: ${error}`} />;
+    if (isError) {
+        return <LoadingSpinner message={`Error: ${error?.data?.message || error?.message}`} />;
     }
 
     return (
@@ -95,7 +72,7 @@ function Blog() {
             {/* Main Content */}
             <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
                 <div className="max-w-7xl mx-auto">
-                    {blogPosts.filter(post => post.status === 'published').length === 0 ? (
+                    {publishedPosts.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <FaRegNewspaper className="text-4xl text-gray-400" />
@@ -105,7 +82,7 @@ function Blog() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {blogPosts.filter(post => post.status === 'published').map((post, index) => (
+                            {publishedPosts.map((post, index) => (
                                 <motion.article 
                                     key={post.id} 
                                     initial={{ opacity: 0, y: 20 }}

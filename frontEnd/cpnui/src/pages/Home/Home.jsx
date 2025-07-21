@@ -22,6 +22,7 @@ const slides = [
     text: "Empowering professionals to excel in their industries through biblical principles, ethical leadership, and Kingdom-focused excellence.",
     buttonText: "Discover Our Mission",
     buttonLink: "/insideCPN/about",
+    buttonType: "link"
   },
   {
     image: Cpn2,
@@ -30,6 +31,7 @@ const slides = [
     text: "Access high-quality, biblically-aligned resources designed to help you grow professionally while maintaining Kingdom values.",
     buttonText: "Explore Resources",
     buttonLink: "/knowledgeHub",
+    buttonType: "link"
   },
   {
     image: Cpn3,
@@ -37,7 +39,17 @@ const slides = [
     subtitle: "Connect & Grow Together",
     text: "Connect with like-minded professionals who share your values and commitment to Kingdom excellence in the workplace.",
     buttonText: "Join Community",
-    buttonLink: "/community",
+    buttonLink: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ",
+    buttonType: "external"
+  },
+  {
+    image: Cpn1, // Use cpnevent1.jpg for the Courses slide
+    title: "Courses",
+    subtitle: "Grow Professionally & Spiritually",
+    text: "Explore our range of courses designed to help you do work, leadership, and business differently—anchored in Kingdom values and practical excellence.",
+    buttonText: "Learn More",
+    buttonLink: "/courses",
+    buttonType: "link"
   },
 ];
 
@@ -77,7 +89,7 @@ function Home() {
           </motion.div>
         </AnimatePresence>
         
-        <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
+        <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 pt-40 pb-24 mx-auto">
           <motion.div
             key={slides[currentIndex].subtitle}
             initial={{ opacity: 0, y: 20 }}
@@ -121,20 +133,24 @@ function Home() {
             transition={{ duration: 1.5, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link
-              to={slides[currentIndex].buttonLink}
-              className="inline-block px-10 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
-            >
-              {slides[currentIndex].buttonText}
-            </Link>
-            <a
-              href="https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-10 py-4 bg-transparent text-white font-bold text-lg rounded-xl shadow-2xl hover:bg-white hover:text-gray-900 transition-all duration-300 border-2 border-white focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
-            >
-              Join WhatsApp Group
-            </a>
+            {slides[currentIndex].buttonType === "link" && (
+              <Link
+                to={slides[currentIndex].buttonLink}
+                className="inline-block px-10 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+              >
+                {slides[currentIndex].buttonText}
+              </Link>
+            )}
+            {slides[currentIndex].buttonType === "external" && (
+              <a
+                href={slides[currentIndex].buttonLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-10 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+              >
+                {slides[currentIndex].buttonText}
+              </a>
+            )}
           </motion.div>
         </div>
         

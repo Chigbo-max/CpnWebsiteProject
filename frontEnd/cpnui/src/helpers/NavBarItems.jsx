@@ -6,8 +6,8 @@ export const navBarItems = [
     },
 
     {
-        "title": "Community",
-        "path": "/community",
+        "title": "Courses",
+        "path": "/courses",
         "cName": "nav_bar_item"
     },
 

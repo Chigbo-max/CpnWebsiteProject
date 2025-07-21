@@ -5,7 +5,6 @@ const { BlogServiceImpl } = require('../services/BlogService');
 const blogService = new BlogServiceImpl(db);
 const redisClient = require('../config/redisClient');
 
-// Get all blog posts
 router.get('/', async (req, res, next) => {
   try {
     // Use blogService.getPublished for consistency
@@ -30,7 +29,7 @@ router.get('/:slug', async (req, res) => {
     const response = { 
       ...post, 
       content_type: 'markdown',
-      html: null // Don't use HTML template, let frontend handle markdown
+      html: null 
     };
     await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
     res.json(response);

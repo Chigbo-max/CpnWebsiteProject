@@ -1,62 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useGetEventsQuery } from '../../features/event/eventApi';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 function NewAndPastEvents() {
-    const [upcomingEvents, setUpcomingEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/events');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch events');
-                }
-                const events = await response.json();
-                
-                // Filter upcoming events (start_time > now) and sort by nearest date
-                const now = new Date();
-                const upcoming = events
-                    .filter(event => new Date(event.start_time) > now)
-                    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
-                    .slice(0, 3); // Take only 3 nearest events
-                
-                setUpcomingEvents(upcoming);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchEvents();
-    }, []);
+    const { data: events = [], isLoading, isError, error } = useGetEventsQuery();
+    let upcomingEvents = [];
+    if (events.length > 0) {
+        const now = new Date();
+        upcomingEvents = events
+            .filter(event => new Date(event.start_time) > now)
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+            .slice(0, 3);
+    }
 
     const formatEventDate = (startTime, endTime) => {
         const start = new Date(startTime);
         const end = new Date(endTime);
-        
-        const startDate = start.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            year: 'numeric'
-        });
-        
-        const startTimeStr = start.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-        });
-        
-        const endTimeStr = end.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-        });
-        
+        const startDate = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const startTimeStr = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        const endTimeStr = end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         return `${startDate} • ${startTimeStr} - ${endTimeStr}`;
     };
 
@@ -90,15 +53,14 @@ function NewAndPastEvents() {
                     Connect at <span className="text-amber-600">Our Events</span>
                 </h2>
             </div>
-
-            {loading ? (
+            {isLoading ? (
                 <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
                     <p className="mt-4 text-gray-600">Loading upcoming events...</p>
                 </div>
-            ) : error ? (
+            ) : isError ? (
                 <div className="text-center py-12">
-                    <p className="text-red-600">Error loading events: {error}</p>
+                    <p className="text-red-600">Error loading events: {error?.data?.message || error?.message}</p>
                 </div>
             ) : upcomingEvents.length === 0 ? (
                 <div className="text-center py-12">
@@ -121,27 +83,22 @@ function NewAndPastEvents() {
                                     />
                                 </div>
                             )}
-                            
                             <div className="flex items-center gap-2 mb-3">
                                 {getEventTypeIcon(event.event_type)}
                                 <span className="text-sm font-medium text-gray-600">
                                     {getEventTypeText(event.event_type)}
                                 </span>
                             </div>
-                            
                             <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 text-gray-900 group-hover:text-amber-600 transition-colors">
                                 {event.title}
                             </h3>
-                            
                             <p className="text-sm text-gray-600 mb-4 line-clamp-3">
                                 {event.description}
                             </p>
-                            
                             <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
                                 <FontAwesomeIcon icon={faCalendarAlt} className="text-amber-400" />
                                 <span>{formatEventDate(event.start_time, event.end_time)}</span>
                             </div>
-                            
                             <Link
                                 to={`/events/${event.event_id}`}
                                 className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors group-hover:underline"
@@ -155,7 +112,6 @@ function NewAndPastEvents() {
                     ))}
                 </div>
             )}
-            
             <div className="text-center mt-8">
                 <Link
                     to="/events"

@@ -7,6 +7,7 @@ import { LiaAngleDownSolid } from "react-icons/lia";
 import { useDispatch, useSelector } from 'react-redux';
 import { setDropDown, setKnowledgeHubDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
 import Switch from "../Switch.jsx"
+import CoursesDropDown from "../DropDown/CoursesDropDown/CoursesDropDown.jsx"
 
 function NavBar() {
     const dispatch = useDispatch();
@@ -37,9 +38,8 @@ function NavBar() {
                 </div>
                 
                 <div className="flex-1 flex justify-center">
-                    <ul className={`flex justify-around items-center list-none gap-4 sm:gap-6 lg:gap-8 ${
-                        openLink ? 'flex' : 'hidden lg:flex'
-                    }`}>
+                    {/* Only show nav items inline on large screens */}
+                    <ul className={"hidden lg:flex justify-around items-center list-none gap-4 sm:gap-6 lg:gap-8"}>
                         {navBarItems.map((item, index) => {
                             if (item.title === "Inside CPN") {
                                 return (
@@ -58,7 +58,6 @@ function NavBar() {
                                     </li>
                                 )
                             }
-
                             if (item.title === "Knowledge Hub") {
                                 return (
                                     <li 
@@ -79,23 +78,24 @@ function NavBar() {
                                     </li>
                                 )
                             }
-
-                            if (item.title === "Community") {
+                            if (item.title === "Courses") {
                                 return (
                                     <li 
                                         key={index} 
-                                        className="relative"
+                                        className="relative group"
                                     >
                                         <Link 
                                             to={item.path}
-                                            className="text-white text-sm lg:text-base font-medium px-2 py-1 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
+                                            className="flex items-center gap-1 text-white text-sm lg:text-base font-medium px-2 py-1 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
                                         >
-                                            {item.title}
+                                            <span>{item.title}</span>
+                                            <LiaAngleDownSolid className="text-xs" />
                                         </Link>
+                                        <div className="absolute top-full left-0 w-full h-2 bg-transparent"></div>
+                                        <CoursesDropDown />
                                     </li>
                                 )
                             }
-
                             return (
                                 <li key={index} className="relative">
                                     <Link 
@@ -118,8 +118,9 @@ function NavBar() {
                     </Link>
                 </div>
                 
+                {/* Only show toggle on mobile/tablet */}
                 <div className="lg:hidden">
-                    <Switch onClick={toggleBar} />
+                    <Switch open={openLink} onClick={toggleBar} />
                 </div>
             </div>
             

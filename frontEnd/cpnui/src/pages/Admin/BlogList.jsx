@@ -1,51 +1,32 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+  useGetBlogsQuery,
+  useDeleteBlogMutation,
+  useUpdateBlogMutation,
+} from '../../features/blog/blogApi';
 
 const BlogList = ({ token, onRefresh }) => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [viewPost, setViewPost] = useState(null);
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [deletePostId, setDeletePostId] = useState(null);
-  
-  // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('http://localhost:5000/api/admin/blog', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch blog posts');
-      const data = await res.json();
-      setPosts(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  const { data: posts = [], isLoading, isError, error, refetch } = useGetBlogsQuery();
+  const [deleteBlog] = useDeleteBlogMutation();
+  const [updateBlog] = useUpdateBlogMutation();
 
   // Filter and search logic
   const filteredPosts = useMemo(() => {
     let filtered = posts;
-
-    // Search by title, content, or excerpt
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(post => 
@@ -55,44 +36,34 @@ const BlogList = ({ token, onRefresh }) => {
         post.slug?.toLowerCase().includes(searchLower)
       );
     }
-
-    // Filter by status
     if (statusFilter) {
       filtered = filtered.filter(post => post.status === statusFilter);
     }
-
-    // Filter by date
     if (dateFilter) {
       const filterDate = new Date(dateFilter);
       const startOfDay = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
       const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
-      
       filtered = filtered.filter(post => {
         const postDate = new Date(post.created_at);
         return postDate >= startOfDay && postDate < endOfDay;
       });
     }
-
     return filtered;
   }, [posts, searchTerm, statusFilter, dateFilter]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     setDeletePostId(id);
   };
 
   const confirmDelete = async () => {
     if (!deletePostId) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/blog/${deletePostId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to delete blog post');
+      await deleteBlog(deletePostId).unwrap();
       toast.success('Blog post deleted');
-      fetchPosts();
+      refetch();
       if (onRefresh) onRefresh();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.data?.message || 'Failed to delete blog post');
     } finally {
       setDeletePostId(null);
     }
@@ -111,27 +82,13 @@ const BlogList = ({ token, onRefresh }) => {
     e.preventDefault();
     setEditLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/blog/${editPost.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title: editPost.title,
-          content: editPost.content,
-          excerpt: editPost.excerpt,
-          slug: editPost.slug,
-          status: editPost.status
-        })
-      });
-      if (!res.ok) throw new Error('Failed to update blog post');
+      await updateBlog({ id: editPost.id, ...editPost }).unwrap();
       toast.success('Blog post updated');
       setEditPost(null);
-      fetchPosts();
+      refetch();
       if (onRefresh) onRefresh();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.data?.message || 'Failed to update blog post');
     } finally {
       setEditLoading(false);
     }
@@ -240,10 +197,10 @@ const BlogList = ({ token, onRefresh }) => {
         </div>
       )}
 
-      {loading ? (
+      {isLoading ? (
         <SimpleSpinner message="Loading blog posts..." />
-      ) : error ? (
-        <div className="text-center py-8 text-red-500">{error}</div>
+      ) : isError ? (
+        <div className="text-center py-8 text-red-500">{error?.data?.message || error?.message || 'Error loading blog posts.'}</div>
       ) : filteredPosts.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           {posts.length === 0 ? 'No blog posts found.' : 'No posts match your search criteria.'}

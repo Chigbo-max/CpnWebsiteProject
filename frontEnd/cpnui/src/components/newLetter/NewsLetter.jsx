@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { useSubscribeNewsletterMutation } from '../../features/newsletter/newsletterApi';
 
 const NewsLetter = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -8,11 +9,10 @@ const NewsLetter = () => {
     name: '',
     email: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [subscribe, { isLoading }] = useSubscribeNewsletterMutation();
   const [submitStatus, setSubmitStatus] = useState(null);
 
   useEffect(() => {
-    console.log("rendering properly")
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -27,28 +27,13 @@ const NewsLetter = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setSubmitStatus(null);
-
     try {
-      const response = await fetch('http://localhost:5000/api/contact/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '' });
-      } else {
-        setSubmitStatus('error');
-      }
+      await subscribe(formData).unwrap();
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '' });
     } catch {
       setSubmitStatus('error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -68,7 +53,6 @@ const NewsLetter = () => {
       }`}>
         Stay up-to-date with our latest news, tips, and resources.
       </p>
-
       {/* Status Messages */}
       {submitStatus === 'success' && (
         <div className={`mb-6 p-4 rounded-lg flex items-center ${
@@ -80,7 +64,6 @@ const NewsLetter = () => {
           </span>
         </div>
       )}
-      
       {submitStatus === 'error' && (
         <div className={`mb-6 p-4 rounded-lg flex items-center ${
           theme === "dark" ? "bg-red-900/20 border border-red-700" : "bg-red-50 border border-red-200"
@@ -91,7 +74,6 @@ const NewsLetter = () => {
           </span>
         </div>
       )}
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center p-4">
         <input 
           type="text" 
@@ -120,14 +102,14 @@ const NewsLetter = () => {
         />
         <button 
           type="submit"
-          disabled={loading}
+          disabled={isLoading}
           className={`w-full px-6 py-3 rounded-lg font-bold cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed ${
             theme === "dark" 
               ? "bg-amber-600 hover:bg-amber-700 text-white" 
               : "bg-gray-900 hover:bg-amber-600 text-white"
           }`}
         >
-          {loading ? 'Subscribing...' : 'Subscribe'}
+          {isLoading ? 'Subscribing...' : 'Subscribe'}
         </button>
         <p className={`text-xs sm:text-sm text-center ${
           theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -135,7 +117,6 @@ const NewsLetter = () => {
           No spam guaranteed, So please don&apos;t send any spam mail.
         </p>
       </form>
-
       <button 
         onClick={() => setTheme(theme === "light" ? "dark" : "light")} 
         className={`mt-6 px-6 py-3 rounded-lg font-medium cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 mx-auto block ${

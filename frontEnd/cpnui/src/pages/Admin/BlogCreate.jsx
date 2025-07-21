@@ -11,6 +11,7 @@ import { useCallback, useRef } from "react";
 import { HexColorPicker } from 'react-colorful';
 import { Modifier, RichUtils, AtomicBlockUtils, ContentState, convertFromRaw } from 'draft-js';
 import remarkGfm from 'remark-gfm';
+import { useCreateBlogMutation } from '../../features/blog/blogApi';
 
 const BlogCreate = ({ token, onSuccess }) => {
   const [title, setTitle] = useState('');
@@ -38,6 +39,7 @@ const BlogCreate = ({ token, onSuccess }) => {
     featuredImage: null
   });
   const [previewImage, setPreviewImage] = useState(null);
+  const [createBlog] = useCreateBlogMutation();
 
   const EXCERPT_MAX_LENGTH = 200;
   const imageInputRef = useRef();
@@ -80,56 +82,38 @@ const BlogCreate = ({ token, onSuccess }) => {
 
     try {
       const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('content', form.content);
-      formData.append('excerpt', form.excerpt);
-      formData.append('tags', form.tags);
-      formData.append('status', form.status);
-      formData.append('slug', form.slug);
-      if (form.featuredImage) {
-        formData.append('image', form.featuredImage);
+      formData.append('title', title);
+      formData.append('content', markdownValue);
+      formData.append('excerpt', excerpt);
+      formData.append('tags', tags);
+      formData.append('status', status);
+      formData.append('slug', slug);
+      if (image) {
+        formData.append('image', image);
       }
-
-      const response = await fetch('http://localhost:5000/api/admin/blog', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success('Blog post created successfully!');
-        onSuccess();
-        setForm({
-          title: '',
-          content: '',
-          excerpt: '',
-          tags: '',
-          status: 'draft',
-          slug: '',
-          featuredImage: null
-        });
-        setPreviewImage(null);
-      } else {
-        // Handle specific error types
-        if (data.error === 'DUPLICATE_SLUG') {
-          toast.error('A blog post with this slug already exists. Please choose a different slug.');
-          setError('Please choose a different slug for your blog post.');
-        } else if (data.error === 'DATABASE_ERROR') {
-          toast.error('Database error occurred. Please check your input and try again.');
-          setError('Please check your input and try again.');
-        } else {
-          toast.error(data.message || 'Failed to create blog post');
-          setError(data.message || 'An error occurred while creating the blog post.');
-        }
-      }
+      const result = await createBlog(formData).unwrap();
+      toast.success('Blog post created successfully!');
+      onSuccess && onSuccess();
+      setTitle('');
+      setMarkdownValue('');
+      setExcerpt('');
+      setStatus('draft');
+      setImage(null);
+      setImagePreview(null);
+      setTags('');
+      setSlug('');
+      setSlugEdited(false);
     } catch (err) {
-      console.error('Error creating blog post:', err);
-      toast.error('Network error. Please check your connection and try again.');
-      setError('Network error. Please check your connection and try again.');
+      if (err?.data?.error === 'DUPLICATE_SLUG') {
+        toast.error('A blog post with this slug already exists. Please choose a different slug.');
+        setError('Please choose a different slug for your blog post.');
+      } else if (err?.data?.error === 'DATABASE_ERROR') {
+        toast.error('Database error occurred. Please check your input and try again.');
+        setError('Please check your input and try again.');
+      } else {
+        toast.error(err?.data?.message || 'Failed to create blog post');
+        setError(err?.data?.message || 'An error occurred while creating the blog post.');
+      }
     } finally {
       setSubmitting(false);
     }

@@ -1,13 +1,16 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 import SimpleSpinner from '../../components/SimpleSpinner';
-
-// Remove demoSubscribers and related code
+import {
+  useGetSubscribersQuery,
+  useAddSubscriberMutation,
+  useUpdateSubscriberMutation,
+  useDeleteSubscriberMutation,
+} from '../../features/subscriber/subscriberApi';
 
 const Subscribers = () => {
-  const [subscribers, setSubscribers] = useState([]);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -15,30 +18,14 @@ const Subscribers = () => {
   const [modalData, setModalData] = useState({ name: '', email: '', id: null });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIds, setDeleteIds] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [domainFilter, setDomainFilter] = useState('');
   const PER_PAGE = 10;
 
-  // Fetch subscribers from backend
-  const fetchSubscribers = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('http://localhost:5000/api/subscribers');
-      if (!res.ok) throw new Error('Failed to fetch subscribers');
-      const data = await res.json();
-      // The backend returns id, name, email, subscribed_at
-      setSubscribers(data);
-    } catch {
-      toast.error('Error fetching subscribers');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSubscribers();
-  }, []);
+  const { data: subscribers = [], isLoading, isError, error, refetch } = useGetSubscribersQuery();
+  const [addSubscriber] = useAddSubscriberMutation();
+  const [updateSubscriber] = useUpdateSubscriberMutation();
+  const [deleteSubscriber] = useDeleteSubscriberMutation();
 
   // Filtered subscribers
   const filtered = useMemo(() => {
@@ -92,33 +79,17 @@ const Subscribers = () => {
       return;
     }
     try {
-    if (modalMode === 'add') {
-        const res = await fetch('http://localhost:5000/api/subscribers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: modalData.name, email: modalData.email })
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.message || 'Failed to add subscriber');
-        }
-      toast.success('Subscriber added');
-    } else {
-        const res = await fetch(`http://localhost:5000/api/subscribers/${modalData.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: modalData.name, email: modalData.email })
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.message || 'Failed to update subscriber');
-        }
-      toast.success('Subscriber updated');
-    }
-    setShowModal(false);
-      await fetchSubscribers();
-    } catch {
-      toast.error('Error saving subscriber');
+      if (modalMode === 'add') {
+        await addSubscriber({ name: modalData.name, email: modalData.email }).unwrap();
+        toast.success('Subscriber added');
+      } else {
+        await updateSubscriber({ id: modalData.id, name: modalData.name, email: modalData.email }).unwrap();
+        toast.success('Subscriber updated');
+      }
+      setShowModal(false);
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || 'Error saving subscriber');
     }
   };
 
@@ -130,30 +101,24 @@ const Subscribers = () => {
   const handleDelete = async () => {
     try {
       for (const id of deleteIds) {
-        // Find the subscriber by id to get the email
-        const sub = subscribers.find(s => s.id === id);
-        if (!sub) continue;
-        const res = await fetch(`http://localhost:5000/api/subscribers/${encodeURIComponent(sub.email)}`, {
-          method: 'DELETE',
-        });
-        if (!res.ok) throw new Error('Failed to delete subscriber');
+        await deleteSubscriber(id).unwrap();
       }
       toast.success(deleteIds.length > 1 ? 'Subscribers deleted' : 'Subscriber deleted');
-    setSelected(sel => sel.filter(id => !deleteIds.includes(id)));
-      await fetchSubscribers(); // Refresh list after delete
+      setSelected(sel => sel.filter(id => !deleteIds.includes(id)));
+      refetch();
     } catch {
       toast.error('Error deleting subscriber(s)');
     } finally {
-    setShowDeleteModal(false);
+      setShowDeleteModal(false);
     }
   };
 
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
-      {loading && (
+      {isLoading && (
         <SimpleSpinner message="Loading subscribers..." />
       )}
-      {!loading && (
+      {!isLoading && (
         <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Subscribers</h2>

@@ -78,6 +78,43 @@ CREATE TABLE IF NOT EXISTS event_registrations (
 
 CREATE INDEX IF NOT EXISTS idx_event_registrations_event_id ON event_registrations(event_id);
 
+-- Enrollments table
+CREATE TABLE IF NOT EXISTS enrollments (
+    id SERIAL PRIMARY KEY,
+    enrollment_id UUID DEFAULT gen_random_uuid(),
+    course VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for password reset tokens
+CREATE TABLE IF NOT EXISTS reset_tokens (
+  admin_id INTEGER PRIMARY KEY REFERENCES admins(id) ON DELETE CASCADE,
+  token VARCHAR(255) NOT NULL,
+  expires_at TIMESTAMP NOT NULL
+);
+
+-- Table for admin sessions (JWT tokens)
+CREATE TABLE IF NOT EXISTS admin_sessions (
+  id SERIAL PRIMARY KEY,
+  admin_id INTEGER REFERENCES admins(id) ON DELETE CASCADE,
+  token VARCHAR(512) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for password reset audit log
+CREATE TABLE IF NOT EXISTS password_reset_audit (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255),
+  token VARCHAR(255),
+  ip VARCHAR(64),
+  status VARCHAR(32),
+  reason TEXT,
+  type VARCHAR(16), -- 'forgot' or 'reset'
+  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert default admin
 INSERT INTO admins (username, email, password_hash) 
 VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
