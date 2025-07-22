@@ -56,6 +56,21 @@ class EnrollmentService {
     await Promise.all(emailPromises);
     return enrollees.length;
   }
+
+  // Get enrollments per month for a given period (default 60 months = 5 years)
+  async getMonthlyCounts(months = 60) {
+    const result = await this.db.query(`
+      SELECT 
+        EXTRACT(YEAR FROM enrolled_at) AS year,
+        EXTRACT(MONTH FROM enrolled_at) AS month,
+        COUNT(*) AS count
+      FROM enrollments
+      WHERE enrolled_at >= (CURRENT_DATE - INTERVAL '${months} months')
+      GROUP BY year, month
+      ORDER BY year, month
+    `);
+    return result.rows;
+  }
 }
 
 module.exports = EnrollmentService; 

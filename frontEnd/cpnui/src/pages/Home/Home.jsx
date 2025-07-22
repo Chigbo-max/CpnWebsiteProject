@@ -7,6 +7,8 @@ import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@for
 import Cpn1 from "../../assets/cpnevent1.jpg";
 import Cpn2 from "../../assets/cpnevent2.jpg";
 import Cpn3 from "../../assets/cpnevent3.jpg";
+import Bookshelf from "../../assets/bookshelf.jpeg";
+
 import Features from "../../components/Features/Features";
 import LatestRelease from "../../components/LatestRelease/LatestRelease";
 import Courses from "../../components/Courses/Courses";
@@ -43,7 +45,7 @@ const slides = [
     buttonType: "external"
   },
   {
-    image: Cpn1, // Use cpnevent1.jpg for the Courses slide
+    image: Bookshelf, 
     title: "Courses",
     subtitle: "Grow Professionally & Spiritually",
     text: "Explore our range of courses designed to help you do work, leadership, and business differently—anchored in Kingdom values and practical excellence.",
@@ -66,7 +68,6 @@ function Home() {
 
   return (
     <div className="w-full">
-      {/* Full-Width Hero Section */}
       <section className="relative w-full min-h-screen flex items-center justify-center text-center overflow-hidden">
         <AnimatePresence mode="sync">
           <motion.div

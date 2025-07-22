@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import Cpn1 from '../../assets/cpnevent1.jpg';
-import Cpn2 from '../../assets/cpnevent2.jpg';
-import Cpn3 from '../../assets/cpnevent3.jpg';
+import Cpn1 from '../../assets/dwd.jpeg';
+import Cpn2 from '../../assets/dld.jpeg';
+import Cpn3 from '../../assets/dbd.jpeg';
+import bgImage from '../../assets/bookshelf.jpeg';
 
 function Courses() {
   const courses = [
@@ -26,14 +27,27 @@ function Courses() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 py-16 px-4 sm:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-4">Our <span className="text-amber-600">Courses</span></h1>
-          <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50">
+      {/* Hero Section */}
+      <section className="relative w-full min-h-[400px] sm:min-h-[500px] flex items-center justify-center text-center overflow-hidden">
+        <div
+          className="absolute inset-0 w-full h-full"
+          style={{
+            background: `linear-gradient(rgba(17, 24, 38, 0.9), rgba(17, 24, 38, 0.9)), url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+        <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-amber-400 mb-6">Courses</h1>
+          <p className="text-xl sm:text-2xl md:text-3xl text-white max-w-4xl mx-auto leading-relaxed">
             Explore our range of courses designed to help you do work, leadership, and business differently—anchored in Kingdom values and practical excellence.
           </p>
         </div>
+      </section>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {courses.map((course, idx) => (
             <div key={idx} className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center p-8 text-center">

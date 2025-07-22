@@ -6,7 +6,7 @@ function Courses() {
     return (
         <div className="w-full">
             <div className="flex flex-col justify-center items-center mt-24 md:mt-32 lg:mt-40 w-full text-center px-4 sm:px-6 lg:px-8 py-8">
-                <h5 className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">COMMUNITY</h5>
+                <h5 className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">COURSES</h5>
                 <h4 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     Our <span className="text-amber-600">Courses</span>
                 </h4>

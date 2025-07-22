@@ -1,13 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquareXTwitter, faFacebook, faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faHouse } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute
 import FooterLogo from "../../assets/ChristianProfessionalsNetwork.png";
 import { Link } from "react-router-dom";
 
 const quickLinks = [
     { title: "Home", path: "/" },
-    { title: "About Us", path: "/about" },
-    { title: "Community", path: "/community" },
+    { title: "About Us", path: "/InsideCPN/about" },
+    { title: "Courses", path: "/courses" },
     { title: "Knowledge Hub", path: "/knowledgeHub" },
     { title: "Events", path: "/events" },
     { title: "Contact Us", path: "/contactUs" }
@@ -15,7 +15,7 @@ const quickLinks = [
 
 const resources = [
     { title: "Latest Podcast", path: "/knowledgeHub/listen" },
-    { title: "Blog Articles", path: "/blog" },
+    { title: "Blog Articles", path: "InsideCPN/blog" },
     { title: "Leadership Resources", path: "/knowledgeHub" },
     { title: "Bible Study Series", path: "/events" },
     { title: "Professional Development", path: "/knowledgeHub" }
@@ -25,8 +25,7 @@ const socialLinks = [
     { icon: faSpotify, url: "https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP", label: "Spotify" },
     { icon: faWhatsapp, url: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ", label: "WhatsApp" },
     { icon: faInstagram, url: "https://www.instagram.com/christianprofessionalsnetwork/", label: "Instagram" },
-    { icon: faFacebook, url: "#", label: "Facebook" },
-    { icon: faSquareXTwitter, url: "#", label: "Twitter" }
+    { icon: faHouse, url: "https://www.clubhouse.com/house/christian-professionals-network", label: "Clubhouse" }
 ];
 
 function Footer() {

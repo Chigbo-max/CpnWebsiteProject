@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Cpn3 from '../../assets/cpnevent3.jpg';
+import Cpn3 from '../../assets/dbd.jpeg';
 
 const faqs = [
   {
@@ -50,16 +50,18 @@ function DoingBusinessDifferently() {
         setStatus({ type: 'success', message: 'Enrollment successful! Check your email for confirmation.' });
         setForm({ name: '', email: '' });
       } else {
-        setStatus({ type: 'error', message: data.error || 'Enrollment failed.' });
+        setStatus({ type: 'error', message: data.error || data.message || 'Enrollment failed.' });
+        console.log('Enrollment error:', data);
       }
-    } catch {
+    } catch (err) {
       setStatus({ type: 'error', message: 'Network error. Please try again.' });
+      console.log('Network error:', err);
     }
     setLoading(false);
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 py-16 px-4 sm:px-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 py-16 px-4 sm:px-8 mt-16">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
         <div className="flex flex-col md:flex-row gap-8 items-center mb-8">
           <img src={Cpn3} alt="Doing Business Differently" className="w-full md:w-1/2 h-64 object-cover rounded-xl" />

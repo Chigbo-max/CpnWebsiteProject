@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faUser, faSignOutAlt, faCog, faUsers, faEnvelope, faFileAlt, faCalendarAlt, faPlus, faList, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
 
 const sidebarLinks = [
+  { id: 'dashboard', label: 'Dashboard', icon: faFileAlt },
   { id: 'profile', label: 'Profile', icon: faUser },
   { id: 'subscribers', label: 'Subscribers', icon: faUsers },
   { id: 'newsletter', label: 'Newsletter', icon: faList },

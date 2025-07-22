@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
+const WebSocket = require('ws');
 
 // Load environment variables
 dotenv.config();
@@ -47,8 +49,23 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+function broadcastDashboardUpdate(data) {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'dashboard-update', ...data }));
+    }
+  });
+}
+
+app.set('broadcastDashboardUpdate', broadcastDashboardUpdate);
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});
+
+module.exports = { broadcastDashboardUpdate }; 

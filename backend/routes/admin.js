@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const { authenticateAdmin } = require('../middleware/auth');
 const db = require('../config/database');
 const dotenv = require('dotenv');
 
@@ -15,6 +15,7 @@ const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const { InquiryServiceImpl } = require('../services/InquiryService');
 const { AdminServiceImpl } = require('../services/AdminService');
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
+const { broadcastDashboardUpdate } = require('../server');
 
 const blogService = new BlogServiceImpl(db);
 const subscriberService = new SubscriberServiceImpl(db);
@@ -27,7 +28,7 @@ const mailer = nodemailer.createTransport({
 const newsletterService = new NewsletterServiceImpl(db, mailer);
 const cloudinaryService = new CloudinaryServiceImpl();
 
-router.get('/blog', auth, async (req, res, next) => {
+router.get('/blog', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:blog:posts';
     const cached = await redisClient.get(cacheKey);
@@ -38,7 +39,7 @@ router.get('/blog', auth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 // Blog post creation with multer for multipart/form-data
-router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
+router.post('/blog', authenticateAdmin, upload.single('image'), async (req, res, next) => {
   try {
     const { title, content, excerpt, tags, status, slug } = req.body;
     let featured_image = null;
@@ -53,6 +54,8 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image });
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
+    // Broadcast dashboard update
+    broadcastDashboardUpdate({ entity: 'blog', action: 'create' });
     res.status(201).json({ message: 'Blog post created successfully', post });
   } catch (err) {
     console.error('Error creating blog post:', err);
@@ -77,7 +80,7 @@ router.post('/blog', auth, upload.single('image'), async (req, res, next) => {
     });
   }
 });
-router.put('/blog/:id', auth, async (req, res, next) => {
+router.put('/blog/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const post = await blogService.update(req.params.id, req.body);
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
@@ -107,7 +110,7 @@ router.put('/blog/:id', auth, async (req, res, next) => {
     });
   }
 });
-router.delete('/blog/:id', auth, async (req, res, next) => {
+router.delete('/blog/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const post = await blogService.delete(req.params.id);
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
@@ -117,7 +120,7 @@ router.delete('/blog/:id', auth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.post('/blog/upload-image', auth, async (req, res) => {
+router.post('/blog/upload-image', authenticateAdmin, async (req, res) => {
   try {
     const { image } = req.body;
     if (!image) return res.status(400).json({ message: 'No image provided' });
@@ -128,7 +131,7 @@ router.post('/blog/upload-image', auth, async (req, res) => {
   }
 });
 
-router.get('/subscribers', auth, async (req, res, next) => {
+router.get('/subscribers', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:subscribers:list';
     const cached = await redisClient.get(cacheKey);
@@ -138,7 +141,7 @@ router.get('/subscribers', auth, async (req, res, next) => {
     res.json(subs);
   } catch (error) { next(error); }
 });
-router.post('/subscribers', auth, async (req, res, next) => {
+router.post('/subscribers', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.create(req.body);
     await redisClient.del('admin:subscribers:list');
@@ -146,7 +149,7 @@ router.post('/subscribers', auth, async (req, res, next) => {
     res.status(201).json({ message: 'Subscriber added', subscriber: sub });
   } catch (error) { next(error); }
 });
-router.put('/subscribers/:id', auth, async (req, res, next) => {
+router.put('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.update(req.params.id, req.body);
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
@@ -155,7 +158,7 @@ router.put('/subscribers/:id', auth, async (req, res, next) => {
     res.json({ message: 'Subscriber updated', subscriber: sub });
   } catch (error) { next(error); }
 });
-router.delete('/subscribers/:id', auth, async (req, res, next) => {
+router.delete('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.delete(req.params.id);
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
@@ -165,7 +168,7 @@ router.delete('/subscribers/:id', auth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/inquiries', auth, async (req, res, next) => {
+router.get('/inquiries', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:inquiries:list';
     const cached = await redisClient.get(cacheKey);
@@ -175,7 +178,7 @@ router.get('/inquiries', auth, async (req, res, next) => {
     res.json(inquiries);
   } catch (error) { next(error); }
 });
-router.patch('/inquiries/:id/status', auth, async (req, res, next) => {
+router.patch('/inquiries/:id/status', authenticateAdmin, async (req, res, next) => {
   try {
     const inquiry = await inquiryService.updateStatus(req.params.id, req.body.status);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
@@ -183,7 +186,7 @@ router.patch('/inquiries/:id/status', auth, async (req, res, next) => {
     res.json({ message: 'Inquiry status updated', inquiry });
   } catch (error) { next(error); }
 });
-router.put('/inquiries/:id', auth, async (req, res, next) => {
+router.put('/inquiries/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const inquiry = await inquiryService.respond(req.params.id, req.body.admin_response);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
@@ -200,7 +203,7 @@ router.put('/inquiries/:id', auth, async (req, res, next) => {
     res.json({ message: 'Response sent successfully', inquiry });
   } catch (error) { next(error); }
 });
-router.delete('/inquiries/:id', auth, async (req, res, next) => {
+router.delete('/inquiries/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const inquiry = await inquiryService.delete(req.params.id);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
@@ -210,7 +213,7 @@ router.delete('/inquiries/:id', auth, async (req, res, next) => {
 });
 
 // --- NEWSLETTER ---
-router.post('/newsletter', auth, async (req, res, next) => {
+router.post('/newsletter', authenticateAdmin, async (req, res, next) => {
   try {
     const { subject, content } = req.body;
     if (!subject || !content) {
@@ -224,7 +227,7 @@ router.post('/newsletter', auth, async (req, res, next) => {
   }
 });
 
-router.put('/profile', auth, async (req, res, next) => {
+router.put('/profile', authenticateAdmin, async (req, res, next) => {
   try {
     const { username, email } = req.body;
     if (!username || !email) {
@@ -248,7 +251,7 @@ function requireSuperAdmin(req, res, next) {
   }
   next();
 }
-router.get('/admins', auth, requireSuperAdmin, async (req, res, next) => {
+router.get('/admins', authenticateAdmin, requireSuperAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:admins:list';
     const cached = await redisClient.get(cacheKey);
@@ -258,7 +261,7 @@ router.get('/admins', auth, requireSuperAdmin, async (req, res, next) => {
     res.json(admins);
   } catch (error) { next(error); }
 });
-router.post('/admins', auth, requireSuperAdmin, async (req, res, next) => {
+router.post('/admins', authenticateAdmin, requireSuperAdmin, async (req, res, next) => {
   try {
     const { username, email, password, role } = req.body;
     if (!username || !email || !password) return res.status(400).json({ message: 'Username, email, and password are required' });
@@ -278,7 +281,7 @@ router.post('/admins', auth, requireSuperAdmin, async (req, res, next) => {
     res.status(201).json({ message: 'Admin added', admin });
   } catch (error) { next(error); }
 });
-router.delete('/admins/:id', auth, requireSuperAdmin, async (req, res, next) => {
+router.delete('/admins/:id', authenticateAdmin, requireSuperAdmin, async (req, res, next) => {
   try {
     if (req.admin.id == req.params.id) return res.status(400).json({ message: 'Cannot delete yourself' });
     const admin = await adminService.delete(req.params.id);
@@ -287,7 +290,7 @@ router.delete('/admins/:id', auth, requireSuperAdmin, async (req, res, next) => 
     res.json({ message: 'Admin deleted' });
   } catch (error) { next(error); }
 });
-router.post('/admins/:id/reset-password', auth, requireSuperAdmin, async (req, res, next) => {
+router.post('/admins/:id/reset-password', authenticateAdmin, requireSuperAdmin, async (req, res, next) => {
   try {
     const newPassword = Math.random().toString(36).slice(-8);
     const bcrypt = require('bcryptjs');

@@ -15,7 +15,9 @@ import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ResponsiveLine } from '@nivo/line';
+import { ResponsiveBar } from '@nivo/bar';
+import { ResponsivePie } from '@nivo/pie';
 
 function AdminDashboard() {
   const { token, admin, login, logout } = useAdminAuth();
@@ -27,15 +29,17 @@ function AdminDashboard() {
   // Analytics dashboard data
   const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
   const [monthlyCounts, setMonthlyCounts] = useState([]);
+  const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
   useEffect(() => {
     if (activeSection === 'dashboard' && token) {
       (async () => {
-        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes] = await Promise.all([
+        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
           fetch('http://localhost:5000/api/admin/enrollments', { headers: { Authorization: `Bearer ${token}` } }),
           fetch('http://localhost:5000/api/subscribers', { headers: { Authorization: `Bearer ${token}` } }),
           fetch('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${token}` } }),
           fetch('http://localhost:5000/api/blog', { headers: { Authorization: `Bearer ${token}` } }),
           fetch('http://localhost:5000/api/subscribers/monthly-counts', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('http://localhost:5000/api/admin/enrollments/monthly-counts?months=60', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
         const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
@@ -43,10 +47,44 @@ function AdminDashboard() {
         const blogs = (await blogsRes.json()).blogs?.length || 0;
         setAnalytics({ enrollees, subscribers, events, blogs });
         const monthly = (await monthlyCountsRes.json()).data || [];
-        // Format for chart: [{ name: '2024-06', count: 10 }, ...]
         setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+        const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
       })();
     }
+    // WebSocket for real-time updates
+    let ws;
+    if (activeSection === 'dashboard') {
+      ws = new window.WebSocket('ws://localhost:5000');
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'dashboard-update') {
+          // Refetch analytics data on any dashboard update
+          (async () => {
+            const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
+              fetch('http://localhost:5000/api/admin/enrollments', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch('http://localhost:5000/api/subscribers', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch('http://localhost:5000/api/blog', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch('http://localhost:5000/api/subscribers/monthly-counts', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch('http://localhost:5000/api/admin/enrollments/monthly-counts?months=60', { headers: { Authorization: `Bearer ${token}` } }),
+            ]);
+            const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+            const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+            const events = (await eventsRes.json()).events?.length || 0;
+            const blogs = (await blogsRes.json()).blogs?.length || 0;
+            setAnalytics({ enrollees, subscribers, events, blogs });
+            const monthly = (await monthlyCountsRes.json()).data || [];
+            setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+            const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+          })();
+        }
+      };
+    }
+    return () => {
+      if (ws) ws.close();
+    };
   }, [activeSection, token]);
 
   useEffect(() => {
@@ -114,6 +152,69 @@ function AdminDashboard() {
       toast.error('Access denied. Only super admins can manage other admins.');
     }
   }, [admin, activeSection]);
+
+  // Prepare Nivo data for subscribers
+  const nivoSubscribersData = [
+    {
+      id: 'Subscribers',
+      color: 'hsl(34, 70%, 50%)',
+      data: monthlyCounts.map(m => ({ x: m.name, y: m.count }))
+    }
+  ];
+  // Prepare Nivo data for enrolled students (real data for 5 years)
+  const nivoEnrolleesData = [
+    {
+      id: 'Enrolled Students',
+      color: 'hsl(210, 70%, 50%)',
+      data: enrolleeMonthlyCounts.map(m => ({ x: m.name, y: m.count }))
+    }
+  ];
+  // Prepare Nivo bar chart data (compare all analytics)
+  const barData = [
+    {
+      category: 'Enrollees',
+      count: analytics.enrollees,
+    },
+    {
+      category: 'Subscribers',
+      count: analytics.subscribers,
+    },
+    {
+      category: 'Events',
+      count: analytics.events,
+    },
+    {
+      category: 'Blogs',
+      count: analytics.blogs,
+    },
+  ];
+  // Prepare Nivo pie chart data (distribution)
+  const pieData = [
+    {
+      id: 'Enrollees',
+      label: 'Enrollees',
+      value: analytics.enrollees,
+      color: 'hsl(210, 70%, 50%)',
+    },
+    {
+      id: 'Subscribers',
+      label: 'Subscribers',
+      value: analytics.subscribers,
+      color: 'hsl(34, 70%, 50%)',
+    },
+    {
+      id: 'Events',
+      label: 'Events',
+      value: analytics.events,
+      color: 'hsl(120, 70%, 50%)',
+    },
+    {
+      id: 'Blogs',
+      label: 'Blogs',
+      value: analytics.blogs,
+      color: 'hsl(10, 70%, 50%)',
+    },
+  ];
 
   if (!isLoggedIn) {
     return (
@@ -183,6 +284,140 @@ function AdminDashboard() {
                 <div className="text-lg text-gray-600 mt-2">Blogs</div>
               </div>
             </div>
+            {/* Modern Bar Chart */}
+            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Overview Comparison (Bar Chart)</h3>
+              <div style={{ height: 300 }}>
+                {barData.every(d => d.count === 0) ? (
+                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
+                ) : (
+                  <ResponsiveBar
+                    data={barData}
+                    keys={["count"]}
+                    indexBy="category"
+                    margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
+                    padding={0.3}
+                    colors={{ scheme: 'nivo' }}
+                    axisBottom={{ legend: 'Category', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Count', legendOffset: -50, legendPosition: 'middle' }}
+                    enableLabel={false}
+                    tooltip={({ id, value, color }) => (
+                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
+                        <strong>{id}:</strong> {value}
+                      </div>
+                    )}
+                    theme={{
+                      axis: {
+                        ticks: { text: { fontSize: 12, fill: '#333' } },
+                        legend: { text: { fontSize: 14, fill: '#222' } }
+                      },
+                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+            {/* Modern Pie Chart */}
+            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Distribution (Pie Chart)</h3>
+              <div style={{ height: 300 }}>
+                {pieData.every(d => d.value === 0) ? (
+                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
+                ) : (
+                  <ResponsivePie
+                    data={pieData}
+                    margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
+                    innerRadius={0.5}
+                    padAngle={1}
+                    cornerRadius={5}
+                    activeOuterRadiusOffset={8}
+                    colors={{ scheme: 'nivo' }}
+                    borderWidth={1}
+                    borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                    arcLinkLabelsSkipAngle={10}
+                    arcLinkLabelsTextColor="#333"
+                    arcLinkLabelsThickness={2}
+                    arcLinkLabelsColor={{ from: 'color' }}
+                    arcLabelsSkipAngle={10}
+                    arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+                    tooltip={({ datum }) => (
+                      <div style={{ color: datum.color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
+                        <strong>{datum.label}:</strong> {datum.value}
+                      </div>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+            {/* Modernized Line Charts with error/empty state handling */}
+            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
+              <div style={{ height: 300 }}>
+                {nivoSubscribersData[0].data.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
+                ) : (
+                  <ResponsiveLine
+                    data={nivoSubscribersData}
+                    margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
+                    xScale={{ type: 'point' }}
+                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
+                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Subscribers', legendOffset: -50, legendPosition: 'middle' }}
+                    colors={{ scheme: 'category10' }}
+                    pointSize={12}
+                    pointColor={{ theme: 'background' }}
+                    pointBorderWidth={3}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    pointLabelYOffset={-12}
+                    useMesh={true}
+                    enableSlices="x"
+                    enableArea={true}
+                    areaOpacity={0.15}
+                    theme={{
+                      axis: {
+                        ticks: { text: { fontSize: 12, fill: '#333' } },
+                        legend: { text: { fontSize: 14, fill: '#222' } }
+                      },
+                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Enrolled Students Per Month (Last 5 Years)</h3>
+              <div style={{ height: 300 }}>
+                {nivoEnrolleesData[0].data.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
+                ) : (
+                  <ResponsiveLine
+                    data={nivoEnrolleesData}
+                    margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
+                    xScale={{ type: 'point' }}
+                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
+                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Enrolled Students', legendOffset: -50, legendPosition: 'middle' }}
+                    colors={{ scheme: 'category10' }}
+                    pointSize={12}
+                    pointColor={{ theme: 'background' }}
+                    pointBorderWidth={3}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    pointLabelYOffset={-12}
+                    useMesh={true}
+                    enableSlices="x"
+                    enableArea={true}
+                    areaOpacity={0.15}
+                    theme={{
+                      axis: {
+                        ticks: { text: { fontSize: 12, fill: '#333' } },
+                        legend: { text: { fontSize: 14, fill: '#222' } }
+                      },
+                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    }}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         )}
         {activeSection === 'profile' && (
@@ -221,20 +456,6 @@ function AdminDashboard() {
         )}
         {activeSection === 'enrollees' && (
           <EnrolleeManagement token={token} />
-        )}
-        {activeSection === 'dashboard' && (
-          <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyCounts} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#f59e42" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         )}
       </div>
     </AdminLayout>

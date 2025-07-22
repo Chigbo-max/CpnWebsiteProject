@@ -11,7 +11,7 @@ import commanager from "../../assets/commanager.jpeg";
 import contentlead from "../../assets/contentlead.jpeg";
 
 const team = [
-  { name: 'Chigbo Ezeokeke', role: 'Founder', img: ceo },
+  { name: 'Chigbo Guy', role: 'Founder', img: ceo },
   { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
   { name: 'Michael Aniakor', role: 'Content Lead', img: contentlead },
 ];
@@ -27,7 +27,6 @@ const values = [
 function About() {
   return (
     <div className="w-full">
-      {/* Hero Section - Already updated */}
       <section className="relative w-full min-h-screen flex items-center justify-center text-center overflow-hidden">
         <div
           style={{

@@ -12,7 +12,7 @@ const mailer = nodemailer.createTransport({
 });
 const { renderNewsletterTemplate } = require('../services/NewsletterService');
 const { v4: uuidv4 } = require('uuid');
-const auth = require('../middleware/auth');
+const { authenticateAdmin } = require('../middleware/auth');
 
 router.post('/login', async (req, res) => {
   try {
@@ -25,7 +25,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/logout', auth, async (req, res) => {
+router.post('/logout', authenticateAdmin, async (req, res) => {
   try {
     await authService.invalidateToken(req.token, req.admin.id);
     res.json({ message: 'Logged out' });
@@ -34,7 +34,7 @@ router.post('/logout', auth, async (req, res) => {
   }
 });
 
-router.get('/me', auth, async (req, res) => {
+router.get('/me', authenticateAdmin, async (req, res) => {
   try {
     const admin = await authService.getAdminById(req.admin.id);
     res.json(admin);
@@ -53,17 +53,26 @@ router.post('/forgot-password', async (req, res) => {
     if (admin) {
       const token = uuidv4();
       await authService.saveResetToken(admin.id, token);
-      await mailer.sendMail({
-        from: process.env.EMAIL_USER,
-        to: admin.email,
-        subject: 'CPN Password Reset Request',
-        html: renderNewsletterTemplate({
-          name: admin.username,
-          content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>If you requested a password reset, click <a href="${process.env.FRONTEND_URL}/admin/reset-password?token=${token}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
-        })
-      });
-      status = 'success';
-      reason = 'Email sent';
+      const resetLink = `${process.env.FRONTEND_URL}/admin/reset-password?token=${token}`;
+      console.log(`[RESET] Sending password reset email to: ${admin.email}`);
+      console.log(`[RESET] Reset link: ${resetLink}`);
+      try {
+        await mailer.sendMail({
+          from: process.env.EMAIL_USER,
+          to: admin.email,
+          subject: 'CPN Password Reset Request',
+          html: renderNewsletterTemplate({
+            name: admin.username,
+            content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>If you requested a password reset, click <a href="${resetLink}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
+          })
+        });
+        console.log(`[RESET] Password reset email sent successfully to: ${admin.email}`);
+        status = 'success';
+        reason = 'Email sent';
+      } catch (mailErr) {
+        console.error(`[RESET] Failed to send password reset email:`, mailErr);
+        reason = mailErr.message;
+      }
     } else {
       status = 'not_found';
       reason = 'Email not found';
@@ -71,6 +80,7 @@ router.post('/forgot-password', async (req, res) => {
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
   } catch (error) {
     reason = error.message;
+    console.error(`[RESET] Error in forgot-password:`, error);
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
   } finally {
     await authService.logResetAttempt({ email, ip, status, reason, type: 'forgot' });
@@ -80,7 +90,7 @@ router.post('/forgot-password', async (req, res) => {
 // Reset password (with token, log attempt, invalidate sessions)
 router.post('/reset-password', async (req, res) => {
   const { token, password } = req.body;
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const ip =   req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
   let status = 'failure';
   let reason = 'Unknown error';
   try {
@@ -88,20 +98,28 @@ router.post('/reset-password', async (req, res) => {
     if (!admin) throw new Error('Invalid or expired token');
     await authService.updatePasswordAndInvalidateSessions(admin.id, password);
     await authService.clearResetToken(admin.id);
-    await mailer.sendMail({
-      from: process.env.EMAIL_USER,
-      to: admin.email,
-      subject: 'CPN Password Reset Notification',
-      html: renderNewsletterTemplate({
-        name: admin.username,
-        content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your password was just reset. If you did not request this, please contact support immediately.</p>`
-      })
-    });
-    status = 'success';
-    reason = 'Password reset';
+    console.log(`[RESET] Password reset for admin: ${admin.email}`);
+    try {
+      await mailer.sendMail({
+        from: process.env.EMAIL_USER,
+        to: admin.email,
+        subject: 'CPN Password Reset Notification',
+        html: renderNewsletterTemplate({
+          name: admin.username,
+          content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your password was just reset. If you did not request this, please contact support immediately.</p>`
+        })
+      });
+      console.log(`[RESET] Password reset notification sent to: ${admin.email}`);
+      status = 'success';
+      reason = 'Password reset';
+    } catch (mailErr) {
+      console.error(`[RESET] Failed to send password reset notification:`, mailErr);
+      reason = mailErr.message;
+    }
     res.json({ message: 'Password reset successful. You may now log in.' });
   } catch (error) {
     reason = error.message;
+    console.error(`[RESET] Error in reset-password:`, error);
     res.status(400).json({ message: 'Reset failed. The link may be invalid or expired.' });
   } finally {
     await authService.logResetAttempt({ token, ip, status, reason, type: 'reset' });
@@ -109,7 +127,7 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // Change password (authenticated)
-router.post('/change-password', auth, async (req, res) => {
+router.post('/change-password', authenticateAdmin, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   try {
     const ok = await authService.changePassword(req.admin.id, currentPassword, newPassword);
@@ -121,7 +139,7 @@ router.post('/change-password', auth, async (req, res) => {
 });
 
 // Fetch audit log (admin only, for own account)
-router.get('/audit-log', auth, async (req, res) => {
+router.get('/audit-log', authenticateAdmin, async (req, res) => {
   try {
     const logs = await authService.getAuditLog(req.admin.email);
     res.json(logs);

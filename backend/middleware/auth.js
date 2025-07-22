@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const auth = (req, res, next) => {
+const authenticateAdmin = (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
@@ -14,4 +14,4 @@ const auth = (req, res, next) => {
   }
 };
 
-module.exports = auth; 
+module.exports = { authenticateAdmin }; 

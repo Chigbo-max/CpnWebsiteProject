@@ -4,8 +4,9 @@ const db = require('../config/database');
 const { EventServiceImpl } = require('../services/EventService');
 const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
-const authMiddleware = require('../middleware/auth');
+const { authenticateAdmin } = require('../middleware/auth');
 const redisClient = require('../config/redisClient');
+const { broadcastDashboardUpdate } = require('../server');
 
 console.log('Loaded events routes');
 
@@ -13,7 +14,7 @@ const eventService = new EventServiceImpl(db);
 const cloudinaryService = new CloudinaryServiceImpl();
 
 // POST /api/events (admin only)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authenticateAdmin, async (req, res) => {
   try {
     let image_url = null;
     if (req.body.image) {
@@ -28,6 +29,8 @@ router.post('/', authMiddleware, async (req, res) => {
     console.log('Event created:', event);
     // Invalidate events list cache
     await redisClient.del('events:list');
+    // Broadcast dashboard update
+    broadcastDashboardUpdate({ entity: 'event', action: 'create' });
     res.status(201).json(event);
   } catch (err) {
     console.error('Error creating event:', err); // <-- Add this line
@@ -104,7 +107,7 @@ router.post('/:event_id/register', async (req, res) => {
 });
 
 // GET /api/events/:event_id/registrations (admin only)
-router.get('/:event_id/registrations', authMiddleware, async (req, res) => {
+router.get('/:event_id/registrations', authenticateAdmin, async (req, res) => {
   const cacheKey = `event_registrations:${req.params.event_id}`;
   const cached = await redisClient.get(cacheKey);
   if (cached) return res.json(JSON.parse(cached));
@@ -114,7 +117,7 @@ router.get('/:event_id/registrations', authMiddleware, async (req, res) => {
 });
 
 // GET /api/events/:event_id/registrations/csv (admin only)
-router.get('/:event_id/registrations/csv', authMiddleware, async (req, res) => {
+router.get('/:event_id/registrations/csv', authenticateAdmin, async (req, res) => {
   const cacheKey = `event_registrations_csv:${req.params.event_id}`;
   const cached = await redisClient.get(cacheKey);
   if (cached) {
@@ -130,7 +133,7 @@ router.get('/:event_id/registrations/csv', authMiddleware, async (req, res) => {
 });
 
 // Update event (admin only)
-router.put('/:event_id', authMiddleware, async (req, res) => {
+router.put('/:event_id', authenticateAdmin, async (req, res) => {
   try {
     let image_url = null;
     if (req.body.image) {
@@ -152,7 +155,7 @@ router.put('/:event_id', authMiddleware, async (req, res) => {
 });
 
 // Delete event (admin only)
-router.delete('/:event_id', authMiddleware, async (req, res) => {
+router.delete('/:event_id', authenticateAdmin, async (req, res) => {
   try {
     const deleted = await eventService.deleteEvent(req.params.event_id);
     if (!deleted) return res.status(404).json({ message: 'Event not found' });

@@ -5,6 +5,7 @@ const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const subscriberService = new SubscriberServiceImpl(db);
 const { authenticateAdmin } = require('../middleware/auth');
+const { broadcastDashboardUpdate } = require('../server');
 
 // Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
@@ -51,6 +52,8 @@ router.post('/', async (req, res) => {
     }
     const result = await subscriberService.create({ name, email });
     await redisClient.del('subscribers:list');
+    // Broadcast dashboard update
+    broadcastDashboardUpdate({ entity: 'subscriber', action: 'create' });
     res.status(201).json({ message: 'Subscriber added', subscriber: result });
   } catch (error) {
     console.error('Error adding subscriber:', error);
