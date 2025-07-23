@@ -9,7 +9,6 @@ function Listen() {
 
   return (
     <div className="w-full">
-      {/* Full-Width Hero Section */}
       <section className="relative w-full min-h-screen flex items-start justify-center text-center overflow-hidden pt-20 sm:pt-24 md:pt-32">
         <div className="absolute inset-0 w-full h-full bg-gray-900" />
         <div className="relative z-20 flex flex-col justify-start items-center w-full px-6 py-20 mx-auto">
@@ -52,7 +51,6 @@ function Listen() {
         </div>
       </section>
 
-      {/* Main Content Sections */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
         <div className="max-w-7xl mx-auto">
           
@@ -65,7 +63,6 @@ function Listen() {
               </p>
             </div>
             
-            {/* Search and Filter Section */}
             <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-4 sm:gap-6 mb-8">
               <div className="w-full sm:w-auto">
                 <PodcastSearch />
