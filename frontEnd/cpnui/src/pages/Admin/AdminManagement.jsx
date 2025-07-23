@@ -280,6 +280,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
 
 AdminManagement.propTypes = {
   currentAdmin: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     role: PropTypes.string.isRequired,
   }).isRequired,
   token: PropTypes.string.isRequired,

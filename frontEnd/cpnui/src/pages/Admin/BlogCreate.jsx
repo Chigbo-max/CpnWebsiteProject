@@ -24,19 +24,9 @@ const BlogCreate = ({ token, onSuccess }) => {
   const [showClearModal, setShowClearModal] = useState(false);
   const [tags, setTags] = useState('');
   const [error, setError] = useState(null);
-  const [form, setForm] = useState({
-    title: '',
-    content: '',
-    excerpt: '',
-    tags: '',
-    status: 'draft',
-    slug: '',
-    featuredImage: null
-  });
   const [createBlog] = useCreateBlogMutation();
 
   const EXCERPT_MAX_LENGTH = 200;
-  const imageInputRef = useRef();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -137,40 +127,10 @@ const BlogCreate = ({ token, onSuccess }) => {
     });
   };
 
-  const handleRichTextImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64 = reader.result;
-        const res = await fetch('/api/admin/blog/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ image: base64 })
-        });
-        const data = await res.json();
-        if (data.url) {
-          const contentState = EditorState.getCurrentContent(); 
-          const contentStateWithEntity = ContentState.createEntity('IMAGE', 'IMMUTABLE', { src: data.url }); 
-          const entityKey = ContentState.getLastCreatedEntityKey(); 
-          const newState = AtomicBlockUtils.insertAtomicBlock( 
-            EditorState.set(EditorState.getCurrentContent(), { currentContent: contentStateWithEntity }), 
-            entityKey, 
-            ' ' 
-          ); 
-          setRichTextState(newState); 
-        }
-      } catch (e) {
-        toast.error('Image upload failed');
-      }
-    };
-    reader.readAsDataURL(file);
-  };
   // Color picker for Draft.js
   const applyColor = (color) => {
     const newState = RichUtils.toggleInlineStyle(EditorState.getCurrentContent(), `COLOR-${color}`); 
-    setRichTextState(newState); 
+    // setRichTextState(newState); // This line was removed as per the edit hint
   };
   // Custom block renderer for images
   const blockRendererFn = (block) => {
@@ -310,7 +270,7 @@ const BlogCreate = ({ token, onSuccess }) => {
           <button
             type="button"
             className="px-6 py-2 rounded-lg border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 transition"
-            onClick={e => handleSubmit(e, false)}
+            onClick={e => handleSubmit(e)}
             disabled={submitting}
           >
             {submitting ? 'Saving...' : 'Save as Draft'}
