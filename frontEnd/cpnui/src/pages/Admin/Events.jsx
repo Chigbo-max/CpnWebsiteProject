@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { useAdminAuth } from '../../app/useAdminAuth';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { useGetEventsQuery, useDeleteEventMutation } from '../../features/event/eventApi';
 

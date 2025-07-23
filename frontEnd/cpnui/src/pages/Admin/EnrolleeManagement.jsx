@@ -158,7 +158,7 @@ const EnrolleeManagement = ({ token }) => {
                 <MdEditor
                   value={content}
                   style={{ height: '300px' }}
-                  renderHTML={text => <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+                  renderHTML={text => <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
                   onChange={({ text }) => setContent(text)}
                   view={{ menu: true, md: true, html: true }}
                   commands={['bold', 'italic', colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
@@ -193,7 +193,7 @@ const EnrolleeManagement = ({ token }) => {
                   </button>
                   <h2 className="text-xl font-bold mb-4">{subject}</h2>
                   <div className="prose prose-amber max-w-none">
-                    <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
+                    <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
                   </div>
                 </div>
               </div>

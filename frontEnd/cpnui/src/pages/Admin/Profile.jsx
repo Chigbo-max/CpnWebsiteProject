@@ -264,11 +264,12 @@ Profile.propTypes = {
   admin: PropTypes.shape({
     username: PropTypes.string,
     email: PropTypes.string,
-    profilePic: PropTypes.string
-  }).isRequired,
+    profilePic: PropTypes.string,
+    profile_pic: PropTypes.string,
+  }),
   onUpdate: PropTypes.func.isRequired,
   showChangePassword: PropTypes.bool.isRequired,
-  setShowChangePassword: PropTypes.func.isRequired
+  setShowChangePassword: PropTypes.func.isRequired,
 };
 
 export default Profile; 

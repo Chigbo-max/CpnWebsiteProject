@@ -276,7 +276,7 @@ const ContactInquiries = () => {
             <MdEditor
               value={responseContent}
               style={{ height: '250px' }}
-              renderHTML={text => <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+              renderHTML={text => <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
               onChange={({ text }) => setResponseContent(text)}
               onImageUpload={handleMdImageUpload}
               view={{ menu: true, md: true, html: true }}
@@ -309,7 +309,7 @@ const ContactInquiries = () => {
             </div>
             {previewResponse && (
               <div className="prose prose-amber max-w-none mt-4 p-4 border rounded bg-gray-50">
-                <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{responseContent}</ReactMarkdown>
+                <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{responseContent}</ReactMarkdown>
               </div>
             )}
           </div>

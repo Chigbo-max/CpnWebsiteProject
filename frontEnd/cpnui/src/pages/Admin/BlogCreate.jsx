@@ -5,7 +5,6 @@ import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
 import "../../styles/react-mde-all.css";
-import { EditorState} from "draft-js";
 import "draft-js/dist/Draft.css";
 import { useCreateBlogMutation } from '../../features/blog/blogApi';
 
@@ -73,7 +72,7 @@ const BlogCreate = ({ token, onSuccess }) => {
       if (image) {
         formData.append('image', image);
       }
-      const result = await createBlog(formData).unwrap();
+      await createBlog(formData).unwrap();
       toast.success('Blog post created successfully!');
       onSuccess && onSuccess();
       setTitle('');
@@ -161,7 +160,7 @@ const BlogCreate = ({ token, onSuccess }) => {
           <MdEditor
             value={markdownValue}
             style={{ height: '400px' }}
-            renderHTML={text => <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+            renderHTML={text => <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
             onChange={({ text }) => setMarkdownValue(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
