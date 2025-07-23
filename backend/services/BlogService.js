@@ -89,7 +89,7 @@ class BlogServiceImpl extends IBlogService {
   }
 
   async getPublished() {
-    return (await this.db.query('SELECT id, title, excerpt, slug, featured_image, created_at FROM blog_posts WHERE status = $1 ORDER BY created_at DESC', ['published'])).rows;
+    return (await this.db.query('SELECT id, title, excerpt, slug,content, featured_image, created_at, status FROM blog_posts WHERE status = $1 ORDER BY created_at DESC', ['published'])).rows;
   }
 
   async getById(id) {

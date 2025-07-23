@@ -7,9 +7,8 @@ const redisClient = require('../config/redisClient');
 
 router.get('/', async (req, res, next) => {
   try {
-    // Use blogService.getPublished for consistency
     const posts = await blogService.getPublished();
-    res.json(posts);
+    res.json({ blogs: posts });
   } catch (error) {
     next(error);
   }

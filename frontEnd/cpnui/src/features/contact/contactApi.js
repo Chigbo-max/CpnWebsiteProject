@@ -1,8 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+
 export const contactApi = createApi({
   reducerPath: 'contactApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: '/api',
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   tagTypes: ['Contact'],
   endpoints: (builder) => ({
     getInquiries: builder.query({
@@ -10,9 +20,9 @@ export const contactApi = createApi({
       providesTags: (result = [], error, arg) =>
         result
           ? [
-              ...result.map(({ id, _id }) => ({ type: 'Contact', id: id || _id })),
-              { type: 'Contact', id: 'LIST' },
-            ]
+            ...result.map(({ id, _id }) => ({ type: 'Contact', id: id || _id })),
+            { type: 'Contact', id: 'LIST' },
+          ]
           : [{ type: 'Contact', id: 'LIST' }],
     }),
     deleteInquiry: builder.mutation({

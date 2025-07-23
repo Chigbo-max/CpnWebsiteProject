@@ -6,7 +6,6 @@ const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
 const { authenticateAdmin } = require('../middleware/auth');
 const redisClient = require('../config/redisClient');
-const { broadcastDashboardUpdate } = require('../server');
 
 console.log('Loaded events routes');
 
@@ -30,7 +29,7 @@ router.post('/', authenticateAdmin, async (req, res) => {
     // Invalidate events list cache
     await redisClient.del('events:list');
     // Broadcast dashboard update
-    broadcastDashboardUpdate({ entity: 'event', action: 'create' });
+    req.app.get('broadcastDashboardUpdate')({ entity: 'event', action: 'create' });
     res.status(201).json(event);
   } catch (err) {
     console.error('Error creating event:', err); // <-- Add this line
@@ -42,10 +41,13 @@ router.post('/', authenticateAdmin, async (req, res) => {
 router.get('/', async (req, res) => {
   const cacheKey = 'events:list';
   const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    return res.json(Array.isArray(parsed) ? { events: parsed } : parsed);
+  }
   const events = await eventService.getEvents();
   await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
-  res.json(events);
+  res.json({ events });
 });
 
 // GET /api/events/:event_id
@@ -120,55 +122,12 @@ router.get('/:event_id/registrations', authenticateAdmin, async (req, res) => {
 router.get('/:event_id/registrations/csv', authenticateAdmin, async (req, res) => {
   const cacheKey = `event_registrations_csv:${req.params.event_id}`;
   const cached = await redisClient.get(cacheKey);
-  if (cached) {
-    res.header('Content-Type', 'text/csv');
-    res.attachment('registrations.csv');
-    return res.send(cached);
-  }
-  const csv = await eventService.getRegistrationsCSV(req.params.event_id);
-  await redisClient.setEx(cacheKey, 300, csv);
-  res.header('Content-Type', 'text/csv');
-  res.attachment('registrations.csv');
-  res.send(csv);
+  if (cached) return res.json(JSON.parse(cached));
+  const csvData = await eventService.getRegistrationsCSV(req.params.event_id);
+  await redisClient.setEx(cacheKey, 300, JSON.stringify(csvData));
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename=registrations_${req.params.event_id}.csv`);
+  res.send(csvData);
 });
 
-// Update event (admin only)
-router.put('/:event_id', authenticateAdmin, async (req, res) => {
-  try {
-    let image_url = null;
-    if (req.body.image) {
-      image_url = await cloudinaryService.uploadImage(req.body.image);
-    }
-    const updatedEvent = await eventService.updateEvent(req.params.event_id, {
-      ...req.body,
-      ...(image_url && { image_url })
-    });
-    if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
-    // Invalidate caches for this event and event list
-    await redisClient.del(`events:${req.params.event_id}`);
-    await redisClient.del('events:list');
-    res.json(updatedEvent);
-  } catch (err) {
-    console.error('Error updating event:', err);
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Delete event (admin only)
-router.delete('/:event_id', authenticateAdmin, async (req, res) => {
-  try {
-    const deleted = await eventService.deleteEvent(req.params.event_id);
-    if (!deleted) return res.status(404).json({ message: 'Event not found' });
-    // Invalidate caches for this event, event list, and registrations
-    await redisClient.del(`events:${req.params.event_id}`);
-    await redisClient.del('events:list');
-    await redisClient.del(`event_registrations:${req.params.event_id}`);
-    await redisClient.del(`event_registrations_csv:${req.params.event_id}`);
-    res.json({ message: 'Event deleted' });
-  } catch (err) {
-    console.error('Error deleting event:', err);
-    res.status(500).json({ message: err.message });
-  }
-});
-
-module.exports = router; 
+module.exports = router;

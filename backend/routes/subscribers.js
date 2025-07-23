@@ -5,22 +5,24 @@ const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const subscriberService = new SubscriberServiceImpl(db);
 const { authenticateAdmin } = require('../middleware/auth');
-const { broadcastDashboardUpdate } = require('../server');
 
-// Get all subscribers (public route for admin dashboard)
 router.get('/', async (req, res) => {
   const cacheKey = 'subscribers:list';
   const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    return res.json(Array.isArray(parsed) ? { subscribers: parsed } : parsed);
+  }
   try {
     const result = await subscriberService.getAll();
     await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
-    res.json(result);
+    res.json({ subscribers: result });
   } catch (error) {
     console.error('Error fetching subscribers:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // Unsubscribe from newsletter
 router.delete('/:email', async (req, res) => {
@@ -31,6 +33,8 @@ router.delete('/:email', async (req, res) => {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
     await redisClient.del('subscribers:list');
+    // Broadcast dashboard update
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'delete' });
     res.json({ message: 'Successfully unsubscribed' });
   } catch (error) {
     console.error('Error unsubscribing:', error);
@@ -53,7 +57,7 @@ router.post('/', async (req, res) => {
     const result = await subscriberService.create({ name, email });
     await redisClient.del('subscribers:list');
     // Broadcast dashboard update
-    broadcastDashboardUpdate({ entity: 'subscriber', action: 'create' });
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'create' });
     res.status(201).json({ message: 'Subscriber added', subscriber: result });
   } catch (error) {
     console.error('Error adding subscriber:', error);
@@ -81,6 +85,8 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
     await redisClient.del('subscribers:list');
+    // Broadcast dashboard update
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'update' });
     res.json({ message: 'Subscriber updated', subscriber: result });
   } catch (error) {
     console.error('Error updating subscriber:', error);

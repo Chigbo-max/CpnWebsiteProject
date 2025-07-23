@@ -66,7 +66,13 @@ const EventCreate = () => {
       toast.success('Event created!');
       navigate('/admin');
     } catch (err) {
-      toast.error(err.message || 'Error creating event');
+      if (err?.data?.message) {
+        toast.error(err.data.message);
+      } else if (err?.message) {
+        toast.error(err.message);
+      } else {
+        toast.error('Error creating event');
+      }
     } finally {
       setLoading(false);
     }

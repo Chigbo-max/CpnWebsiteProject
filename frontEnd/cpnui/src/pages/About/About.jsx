@@ -26,7 +26,7 @@ const values = [
 
 function About() {
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       <section className="relative w-full min-h-screen flex items-center justify-center text-center overflow-hidden">
         <div
           style={{
@@ -46,7 +46,7 @@ function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-amber-400 text-lg sm:text-xl md:text-2xl font-semibold mb-4 tracking-wide"
+            className="text-amber-400 text-lg sm:text-xl md:text-2xl font-semibold mb-4 mt-16 tracking-wide"
           >
             Empowering Professionals for Kingdom Impact
           </motion.div>
@@ -69,8 +69,7 @@ function About() {
         </div>
       </section>
 
-      {/* Who We Are / Name Meaning */}
-      <section className="max-w-7xl mx-auto py-16 px-6 text-center">
+      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 text-center">
         <h2 className="text-4xl font-extrabold mb-4 text-amber-600">Who We Are</h2>
         <p className="text-2xl sm:text-3xl text-gray-700 mb-6 font-semibold">
           Christian Professionals Network (CPN) is a vibrant community of faith-driven professionals dedicated to making a Kingdom impact in the marketplace.
@@ -81,7 +80,7 @@ function About() {
       </section>
 
       {/* Mission, Vision, Promise with Icons and Contact Button */}
-      <section className="max-w-7xl mx-auto py-12 px-6">
+      <section className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center">
             <FaBullseye className="text-5xl text-amber-600 mb-4" />
@@ -109,7 +108,7 @@ function About() {
       </section>
 
       {/* Values - Horizontal layout with icons, icon stands alone */}
-      <section className="w-full bg-gray-900 py-12 px-6">
+      <section className="w-full bg-gray-900 py-12 px-4 sm:px-6">
         <h3 className="text-3xl font-extrabold text-amber-600 mb-8 text-center">Our Values</h3>
         <div className="flex flex-row justify-between gap-0 max-w-7xl mx-auto flex-wrap md:flex-nowrap">
           {values.map((val, idx) => (
@@ -124,7 +123,7 @@ function About() {
       </section>
 
       {/* Commitments + Statement of Faith - joined, dark background */}
-      <section className="w-full bg-gray-900 py-16 px-6">
+      <section className="w-full bg-gray-900 py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
           <div>
             <h3 className="text-3xl font-extrabold text-white mb-6 flex items-center gap-3"><FaRegCheckCircle className="text-amber-600" /> Our Commitments</h3>
@@ -146,7 +145,7 @@ function About() {
       </section>
 
       {/* Team / Contributors */}
-      <section className="max-w-7xl mx-auto py-16 px-6">
+      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6">
         <h3 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">Meet Our Team & Contributors</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {team.map((member, idx) => (
@@ -160,7 +159,7 @@ function About() {
       </section>
 
       {/* Call to Action */}
-      <section className="max-w-7xl mx-auto py-12 px-6 text-center">
+      <section className="max-w-7xl mx-auto py-12 px-4 sm:px-6 text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Connected</h3>
         <p className="text-lg text-gray-700 mb-6">Join our community, learn, and be inspired!</p>
         <div className="flex justify-center gap-4 mt-2">

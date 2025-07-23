@@ -25,7 +25,8 @@ const ContactInquiries = () => {
   const [responseSending, setResponseSending] = useState(false);
   const [previewResponse, setPreviewResponse] = useState(false);
 
-  const { data: inquiries = [], isLoading, isError, error, refetch } = useGetInquiriesQuery();
+  const { data, isLoading, isError, error, refetch } = useGetInquiriesQuery();
+  const inquiries = Array.isArray(data) ? data : [];
   const [deleteInquiry] = useDeleteInquiryMutation();
   const [updateInquiryStatus] = useUpdateInquiryStatusMutation();
   const [respondInquiry] = useRespondInquiryMutation();
@@ -77,7 +78,6 @@ const ContactInquiries = () => {
       reader.onload = async () => {
         try {
           const base64 = reader.result;
-          // You may want to implement image upload for responses if needed
           resolve(base64);
         } catch (e) {
           reject(e);
@@ -86,21 +86,6 @@ const ContactInquiries = () => {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-  };
-  const underlineCommand = {
-    name: 'underline',
-    icon: <u>U</u>,
-    execute: (editor) => {
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const selected = value.substring(selection.start, selection.end);
-      const after = value.substring(selection.end);
-      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
-      if (!selected) {
-        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
-      }
-    }
   };
   const colorCommand = {
     name: 'color',
@@ -294,7 +279,7 @@ const ContactInquiries = () => {
               onChange={({ text }) => setResponseContent(text)}
               onImageUpload={handleMdImageUpload}
               view={{ menu: true, md: true, html: true }}
-              commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+              commands={['bold', 'italic', colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
             />
             <div className="flex gap-4 mt-4">
               <button

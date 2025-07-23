@@ -65,6 +65,10 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE INDEX IF NOT EXISTS idx_events_event_id ON events(event_id);
 
+ALTER TABLE events ALTER COLUMN location_map_url TYPE TEXT;
+ALTER TABLE events ALTER COLUMN image_url TYPE TEXT;
+ALTER TABLE events ALTER COLUMN virtual_link TYPE TEXT;
+
 -- Event Registrations table
 CREATE TABLE IF NOT EXISTS event_registrations (
     id SERIAL PRIMARY KEY,
@@ -120,4 +124,6 @@ INSERT INTO admins (username, email, password_hash)
 VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
 ON CONFLICT (username) DO NOTHING;
 
-  ALTER TABLE blog_posts ADD COLUMN content_type VARCHAR(20) DEFAULT 'markdown';
+ALTER TABLE blog_posts ADD COLUMN content_type VARCHAR(20) DEFAULT 'markdown';
+
+ALTER TABLE admins ADD COLUMN IF NOT EXISTS profile_pic VARCHAR(255);

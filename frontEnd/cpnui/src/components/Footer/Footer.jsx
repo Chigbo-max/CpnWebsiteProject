@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { faHouse } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute
+import { faHouse, faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute and for contact icons
 import FooterLogo from "../../assets/ChristianProfessionalsNetwork.png";
 import { Link } from "react-router-dom";
 

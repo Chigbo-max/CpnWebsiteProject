@@ -9,7 +9,7 @@ const NewsLetter = () => {
     name: '',
     email: ''
   });
-  const [subscribe, { isLoading }] = useSubscribeNewsletterMutation();
+  const [subscribe,  { isLoading}] = useSubscribeNewsletterMutation();
   const [submitStatus, setSubmitStatus] = useState(null);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const NewsLetter = () => {
         }`}>
           <FontAwesomeIcon icon={faExclamationCircle} className="text-red-500 mr-3" />
           <span className={theme === "dark" ? "text-red-300" : "text-red-800"}>
-            Failed to subscribe. Please try again.
+      Failed to subscribe. Please try again.
           </span>
         </div>
       )}

@@ -21,27 +21,41 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     const file = e.target.files[0];
     if (!file) return;
     setForm(f => ({ ...f, uploading: true }));
-    // TODO: Upload to Cloudinary and get URL
-    setTimeout(() => {
-      const url = URL.createObjectURL(file);
-      setForm(f => ({ ...f, profilePic: url, uploading: false }));
-      toast.success('Profile picture updated (demo)');
-    }, 1200);
+  
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'unsigned_preset'); 
+  
+    try {
+      const res = await fetch('https://api.cloudinary.com/v1_1/duprqhkbv/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      setForm(f => ({ ...f, profilePic: data.secure_url, uploading: false }));
+      toast.success('Profile picture updated!');
+    } catch (err) {
+      setForm(f => ({ ...f, uploading: false }));
+      toast.error('Failed to upload image');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setForm(f => ({ ...f, saving: true }));
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch('http://localhost:5000/api/admin/profile', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: form.name, profilePic: form.profilePic }),
+        body: JSON.stringify({ name: form.name, email: form.email, profilePic: form.profilePic }),
       });
       if (response.ok) {
-        onUpdate(form);
+        const updatedAdmin = await response.json();
+        onUpdate(updatedAdmin); // update context/state
         toast.success('Profile updated!');
       } else {
         toast.error('Failed to update profile');

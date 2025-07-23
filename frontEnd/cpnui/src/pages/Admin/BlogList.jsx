@@ -20,7 +20,8 @@ const BlogList = ({ token, onRefresh }) => {
   const [dateFilter, setDateFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const { data: posts = [], isLoading, isError, error, refetch } = useGetBlogsQuery();
+  const { data, isLoading, isError, error, refetch } = useGetBlogsQuery();
+  const posts = data?.blogs ?? [];
   const [deleteBlog] = useDeleteBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
 

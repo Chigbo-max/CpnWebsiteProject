@@ -20,7 +20,8 @@ const EventRegistrations = () => {
       try {
         const res = await fetch('/api/events');
         if (!res.ok) throw new Error('Failed to fetch events');
-        setEvents(await res.json());
+        const data = await res.json();
+        setEvents(data?.events ?? []);
       } catch (err) {
         toast.error(err.message);
       }
@@ -40,7 +41,8 @@ const EventRegistrations = () => {
         console.log(res)
 
       if (!res.ok) throw new Error('Failed to fetch registrations');
-      setRegistrations(await res.json());
+      const data = await res.json();
+      setRegistrations(Array.isArray(data) ? data : []);
     } catch (err) {
             console.error('Error fetching registrations:', err);
 

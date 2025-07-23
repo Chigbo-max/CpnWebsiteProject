@@ -23,7 +23,7 @@ const EnrolleeManagement = ({ token }) => {
 
   const fetchEnrollees = async () => {
     setLoading(true);
-    let url = 'http://localhost:5000/api/admin/enrollments';
+    let url = 'http://localhost:5000/api/enrollments/admin/enrollments';
     if (startDate && endDate) {
       url += `?startDate=${startDate}&endDate=${endDate}`;
     }
@@ -44,7 +44,7 @@ const EnrolleeManagement = ({ token }) => {
     e.preventDefault();
     setBroadcastStatus(null);
     try {
-      const res = await fetch('http://localhost:5000/api/admin/enrollments/broadcast', {
+      const res = await fetch('http://localhost:5000/api/enrollments/admin/enrollments/broadcast', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,22 +66,6 @@ const EnrolleeManagement = ({ token }) => {
     }
   };
 
-  // Editor commands (copied from Newsletter)
-  const underlineCommand = {
-    name: 'underline',
-    icon: <u>U</u>,
-    execute: (editor) => {
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const selected = value.substring(selection.start, selection.end);
-      const after = value.substring(selection.end);
-      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
-      if (!selected) {
-        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
-      }
-    }
-  };
   const colorCommand = {
     name: 'color',
     icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
@@ -113,7 +97,7 @@ const EnrolleeManagement = ({ token }) => {
         <button onClick={fetchEnrollees} className="bg-amber-600 text-white px-4 py-2 rounded mt-6 md:mt-0">Filter</button>
       </div>
       {loading ? (
-        <SimpleSpinner message="Loading admins..." />
+        <SimpleSpinner message="Loading enrollees..." />
       ) : (
         <div className="overflow-x-auto mb-8">
           <table className="min-w-full border rounded">
@@ -178,7 +162,7 @@ const EnrolleeManagement = ({ token }) => {
                   renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
                   onChange={({ text }) => setContent(text)}
                   view={{ menu: true, md: true, html: true }}
-                  commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+                  commands={['bold', 'italic', colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
                 />
               </div>
               <div className="flex gap-4 mt-4">

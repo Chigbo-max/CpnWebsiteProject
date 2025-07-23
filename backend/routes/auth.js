@@ -10,7 +10,7 @@ const mailer = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
-const { renderNewsletterTemplate } = require('../services/NewsletterService');
+const { NewsletterServiceImpl } = require('../services/NewsletterService');
 const { v4: uuidv4 } = require('uuid');
 const { authenticateAdmin } = require('../middleware/auth');
 
@@ -61,7 +61,7 @@ router.post('/forgot-password', async (req, res) => {
           from: process.env.EMAIL_USER,
           to: admin.email,
           subject: 'CPN Password Reset Request',
-          html: renderNewsletterTemplate({
+          html: NewsletterServiceImpl.renderNewsletterTemplate({
             name: admin.username,
             content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>If you requested a password reset, click <a href="${resetLink}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
           })
@@ -104,7 +104,7 @@ router.post('/reset-password', async (req, res) => {
         from: process.env.EMAIL_USER,
         to: admin.email,
         subject: 'CPN Password Reset Notification',
-        html: renderNewsletterTemplate({
+        html: NewsletterServiceImpl.renderNewsletterTemplate({
           name: admin.username,
           content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your password was just reset. If you did not request this, please contact support immediately.</p>`
         })

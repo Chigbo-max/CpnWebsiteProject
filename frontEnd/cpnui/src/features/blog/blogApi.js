@@ -2,15 +2,16 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const blogApi = createApi({
   reducerPath: 'blogApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: '/api',
+   }),
   tagTypes: ['Blog'],
   endpoints: (builder) => ({
     getBlogs: builder.query({
       query: () => '/blog',
-      providesTags: (result = [], error, arg) =>
-        result
+      providesTags: (result) =>
+        result && Array.isArray(result.blogs)
           ? [
-              ...result.map(({ id }) => ({ type: 'Blog', id })),
+              ...result.blogs.map(({ id }) => ({ type: 'Blog', id })),
               { type: 'Blog', id: 'LIST' },
             ]
           : [{ type: 'Blog', id: 'LIST' }],

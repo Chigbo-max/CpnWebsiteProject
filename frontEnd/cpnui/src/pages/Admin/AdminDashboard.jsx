@@ -30,16 +30,20 @@ function AdminDashboard() {
   const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
   const [monthlyCounts, setMonthlyCounts] = useState([]);
   const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
+  // Use environment variables for API and WebSocket URLs
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+  const wsUrl = import.meta.env.VITE_WS_URL;
+
   useEffect(() => {
     if (activeSection === 'dashboard' && token) {
       (async () => {
         const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/admin/enrollments', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/subscribers', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/blog', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/subscribers/monthly-counts', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/admin/enrollments/monthly-counts?months=60', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/events`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/api/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
         const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
@@ -55,19 +59,19 @@ function AdminDashboard() {
     // WebSocket for real-time updates
     let ws;
     if (activeSection === 'dashboard') {
-      ws = new window.WebSocket('ws://localhost:5000');
+      ws = new window.WebSocket(wsUrl);
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'dashboard-update') {
           // Refetch analytics data on any dashboard update
           (async () => {
             const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-              fetch('http://localhost:5000/api/admin/enrollments', { headers: { Authorization: `Bearer ${token}` } }),
-              fetch('http://localhost:5000/api/subscribers', { headers: { Authorization: `Bearer ${token}` } }),
-              fetch('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${token}` } }),
-              fetch('http://localhost:5000/api/blog', { headers: { Authorization: `Bearer ${token}` } }),
-              fetch('http://localhost:5000/api/subscribers/monthly-counts', { headers: { Authorization: `Bearer ${token}` } }),
-              fetch('http://localhost:5000/api/admin/enrollments/monthly-counts?months=60', { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/events`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/api/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
             ]);
             const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
             const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
@@ -126,7 +130,7 @@ function AdminDashboard() {
         },
         body: JSON.stringify(updatedData)
       });
-      
+
       if (response.ok) {
         const updatedAdmin = await response.json();
         // Update the admin context with new data
@@ -226,7 +230,7 @@ function AdminDashboard() {
               type="text"
               placeholder="Username"
               value={loginData.username}
-              onChange={(e) => setLoginData({...loginData, username: e.target.value})}
+              onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
               required
             />
@@ -234,7 +238,7 @@ function AdminDashboard() {
               type="password"
               placeholder="Password"
               value={loginData.password}
-              onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
               required
             />
@@ -434,10 +438,10 @@ function AdminDashboard() {
           </Suspense>
         )}
         {activeSection === 'blog-create' && (
-          <BlogCreate token={token} onSuccess={() => {}} />
+          <BlogCreate token={token} onSuccess={() => { }} />
         )}
         {activeSection === 'blog-list' && (
-          <BlogList token={token} onRefresh={() => {}} />
+          <BlogList token={token} onRefresh={() => { }} />
         )}
         {activeSection === 'inquiries' && (
           <ContactInquiries token={token} />

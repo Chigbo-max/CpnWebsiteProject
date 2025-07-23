@@ -14,7 +14,7 @@ const Subscribers = () => {
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState('add'); 
   const [modalData, setModalData] = useState({ name: '', email: '', id: null });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIds, setDeleteIds] = useState([]);
@@ -22,7 +22,10 @@ const Subscribers = () => {
   const [domainFilter, setDomainFilter] = useState('');
   const PER_PAGE = 10;
 
-  const { data: subscribers = [], isLoading, isError, error, refetch } = useGetSubscribersQuery();
+  const { data, isLoading, isError, error, refetch } = useGetSubscribersQuery();
+  console.log("data: ", data)
+  const subscribers = data?.subscribers ?? [];
+  console.log("subscribers", subscribers);
   const [addSubscriber] = useAddSubscriberMutation();
   const [updateSubscriber] = useUpdateSubscriberMutation();
   const [deleteSubscriber] = useDeleteSubscriberMutation();

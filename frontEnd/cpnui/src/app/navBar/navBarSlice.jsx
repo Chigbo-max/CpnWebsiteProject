@@ -4,6 +4,7 @@ const initialState ={
     dropDown: false,
     knowledgeHubDropDown: false,
     communityDropDown: false,
+    coursesDropDown: false,
     openLink: false,
 };
 
@@ -20,11 +21,14 @@ export const navBarSlice = createSlice({
         setCommunityDropDown: (state, action) => {
             state.communityDropDown = action.payload;
         },
+        setCoursesDropDown:(state, action)=>{
+            state.coursesDropDown = action.payload;
+        },
         setOpenLink: (state, action) =>{
             state.openLink = action.payload;
         }
     },
 });
 
-export const {setDropDown, setKnowledgeHubDropDown, setCommunityDropDown, setOpenLink} = navBarSlice.actions;
+export const {setDropDown, setKnowledgeHubDropDown, setCommunityDropDown, setCoursesDropDown, setOpenLink} = navBarSlice.actions;
 export default navBarSlice.reducer;

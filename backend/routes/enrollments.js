@@ -4,7 +4,6 @@ const db = require('../config/database');
 const nodemailer = require('nodemailer');
 const EnrollmentService = require('../services/EnrollmentService');
 const { authenticateAdmin } = require('../middleware/auth');
-const { broadcastDashboardUpdate } = require('../server');
 
 const mailer = nodemailer.createTransport({
   service: 'gmail',
@@ -25,7 +24,7 @@ router.post('/', async (req, res) => {
     }
     const enrollment = await enrollmentService.enroll({ course, name, email });
     // Broadcast dashboard update
-    broadcastDashboardUpdate({ entity: 'enrollment', action: 'create' });
+    req.app.get('broadcastDashboardUpdate')({ entity: 'enrollment', action: 'create' });
     res.status(201).json({ message: 'Enrollment successful', enrollment });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -58,7 +57,7 @@ router.post('/admin/enrollments/broadcast', authenticateAdmin, async (req, res) 
 });
 
 // Admin: Get monthly enrollment counts for dashboard analytics
-router.get('/admin/enrollments/monthly-counts', authenticateAdmin, async (req, res) => {
+router.get('/monthly-counts', authenticateAdmin, async (req, res) => {
   try {
     const months = parseInt(req.query.months, 10) || 60;
     const result = await enrollmentService.getMonthlyCounts(months);

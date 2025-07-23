@@ -7,13 +7,17 @@ export const subscriberApi = createApi({
   endpoints: (builder) => ({
     getSubscribers: builder.query({
       query: () => '/subscribers',
-      providesTags: (result = [], error, arg) =>
-        result
+      providesTags: (result, error, arg) => {
+        const list = Array.isArray(result)
+          ? result
+          : (result?.subscribers ?? []);
+        return list.length
           ? [
-              ...result.map(({ id }) => ({ type: 'Subscriber', id })),
+              ...list.map(({ id }) => ({ type: 'Subscriber', id })),
               { type: 'Subscriber', id: 'LIST' },
             ]
-          : [{ type: 'Subscriber', id: 'LIST' }],
+          : [{ type: 'Subscriber', id: 'LIST' }];
+      },
     }),
     addSubscriber: builder.mutation({
       query: (body) => ({

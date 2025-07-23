@@ -47,21 +47,6 @@ const Newsletter = ({ token }) => {
       reader.readAsDataURL(file);
     });
   };
-  const underlineCommand = {
-    name: 'underline',
-    icon: <u>U</u>,
-    execute: (editor) => {
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const selected = value.substring(selection.start, selection.end);
-      const after = value.substring(selection.end);
-      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
-      if (!selected) {
-        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
-      }
-    }
-  };
   const colorCommand = {
     name: 'color',
     icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
@@ -101,10 +86,9 @@ const Newsletter = ({ token }) => {
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
-            commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+            commands={['bold', 'italic', colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
-        {/* Button group using Tailwind */}
         <div className="flex gap-4 mt-4">
           <button
             type="button"

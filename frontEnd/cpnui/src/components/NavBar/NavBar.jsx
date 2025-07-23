@@ -5,26 +5,24 @@ import DropDown from "../DropDown/DropDown.jsx"
 import KnowledgeHubDropDown from "../../pages/knowledgeHub/KnowledgeHubDropDown.jsx"
 import { LiaAngleDownSolid } from "react-icons/lia";
 import { useDispatch, useSelector } from 'react-redux';
-import { setDropDown, setKnowledgeHubDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
+import { setDropDown, setKnowledgeHubDropDown, setCoursesDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
 import Switch from "../Switch.jsx"
 import CoursesDropDown from "../DropDown/CoursesDropDown/CoursesDropDown.jsx"
 import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import {faTimes } from '@fortawesome/free-solid-svg-icons';
-import clubhouse from "../../assets/clubhouse.svg"
+import {faTimes, faHome } from '@fortawesome/free-solid-svg-icons';
 
 const socialLinks = [
     { icon: faSpotify, url: "https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP", label: "Spotify" },
     { icon: faWhatsapp, url: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ", label: "WhatsApp" },
     { icon: faInstagram, url: "https://www.instagram.com/christianprofessionalsnetwork/", label: "Instagram" },
-    { icon: clubhouse, url: "https://www.clubhouse.com/house/christian-professionals-network", label: "Clubhouse" }
+    { icon: faHome, url: "https://www.clubhouse.com/house/christian-professionals-network", label: "Clubhouse" }
 ];
 
 function NavBar() {
     const dispatch = useDispatch();
-    const { dropDown, knowledgeHubDropDown, openLink } = useSelector((state) => state.navBar);
-    const [coursesDropdown, setCoursesDropdown] = useState(false);
+    const { dropDown, knowledgeHubDropDown, coursesDropDown, openLink } = useSelector((state) => state.navBar);
     const [mobileCoursesDropdown, setMobileCoursesDropdown] = useState(false);
     const [mobileKnowledgeHubDropdown, setMobileKnowledgeHubDropdown] = useState(false);
     const [mobileInsideCPNDropdown, setMobileInsideCPNDropdown] = useState(false);
@@ -73,7 +71,6 @@ function NavBar() {
                 </div>
                 
                 <div className="flex-1 flex justify-center">
-                    {/* Only show nav items inline on large screens */}
                     <ul className={"hidden lg:flex justify-around items-center list-none gap-4 sm:gap-6 lg:gap-8"}>
                         {navBarItems.map((item, index) => {
                             if (item.title === "Inside CPN") {
@@ -118,29 +115,18 @@ function NavBar() {
                                     <li 
                                         key={index} 
                                         className="relative group"
+                                        onMouseEnter={() => handleMouseEnter(setCoursesDropDown)}
+                                        onMouseLeave={() => handleMouseLeave(setCoursesDropDown)}
                                     >
-                                        <div
-                                            className="flex items-center gap-1 text-white text-sm lg:text-base font-medium cursor-pointer px-2 py-1 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
-                                            onMouseEnter={() => setCoursesDropdown(true)}
-                                            onMouseLeave={() => setCoursesDropdown(false)}
+                                        <Link 
+                                            to={item.path}
+                                            className="flex items-center gap-1 text-white text-sm lg:text-base font-medium px-2 py-1 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
                                         >
-                                            <Link 
-                                                to={item.path}
-                                                className="flex items-center gap-1"
-                                            >
-                                                <span>{item.title}</span>
-                                                <LiaAngleDownSolid className="text-xs" />
-                                            </Link>
-                                        </div>
-                                        {coursesDropdown && (
-                                            <div 
-                                                className="absolute left-0 top-full z-50"
-                                                onMouseEnter={() => setCoursesDropdown(true)}
-                                                onMouseLeave={() => setCoursesDropdown(false)}
-                                            >
-                                                <CoursesDropDown />
-                                            </div>
-                                        )}
+                                            <span>{item.title}</span>
+                                            <LiaAngleDownSolid className="text-xs" />
+                                        </Link>
+                                        <div className="absolute top-full left-0 w-full h-2 bg-transparent"></div>
+                                        {coursesDropDown && <CoursesDropDown/>}
                                     </li>
                                 )
                             }

@@ -15,7 +15,6 @@ const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const { InquiryServiceImpl } = require('../services/InquiryService');
 const { AdminServiceImpl } = require('../services/AdminService');
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
-const { broadcastDashboardUpdate } = require('../server');
 
 const blogService = new BlogServiceImpl(db);
 const subscriberService = new SubscriberServiceImpl(db);
@@ -35,7 +34,7 @@ router.get('/blog', authenticateAdmin, async (req, res, next) => {
     if (cached) return res.json(JSON.parse(cached));
     const posts = await blogService.getAll();
     await redisClient.setEx(cacheKey, 300, JSON.stringify(posts));
-    res.json(posts);
+    res.json({ blogs: posts });
   } catch (error) { next(error); }
 });
 // Blog post creation with multer for multipart/form-data
@@ -55,7 +54,7 @@ router.post('/blog', authenticateAdmin, upload.single('image'), async (req, res,
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
     // Broadcast dashboard update
-    broadcastDashboardUpdate({ entity: 'blog', action: 'create' });
+    req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'create' });
     res.status(201).json({ message: 'Blog post created successfully', post });
   } catch (err) {
     console.error('Error creating blog post:', err);
@@ -86,6 +85,7 @@ router.put('/blog/:id', authenticateAdmin, async (req, res, next) => {
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
+    req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'update' });
     res.json({ message: 'Blog post updated', post });
   } catch (error) {
     console.error('Error updating blog post:', error);
@@ -116,6 +116,7 @@ router.delete('/blog/:id', authenticateAdmin, async (req, res, next) => {
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
     await redisClient.del('admin:blog:posts');
     await redisClient.del('blog:posts');
+    req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'delete' });
     res.json({ message: 'Blog post deleted' });
   } catch (error) { next(error); }
 });
@@ -138,7 +139,7 @@ router.get('/subscribers', authenticateAdmin, async (req, res, next) => {
     if (cached) return res.json(JSON.parse(cached));
     const subs = await subscriberService.getAll();
     await redisClient.setEx(cacheKey, 300, JSON.stringify(subs));
-    res.json(subs);
+    res.json({ subscribers: subs });
   } catch (error) { next(error); }
 });
 router.post('/subscribers', authenticateAdmin, async (req, res, next) => {
@@ -155,6 +156,7 @@ router.put('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
     await redisClient.del('admin:subscribers:list');
     await redisClient.del('subscribers:list');
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'update' });
     res.json({ message: 'Subscriber updated', subscriber: sub });
   } catch (error) { next(error); }
 });
@@ -164,6 +166,7 @@ router.delete('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
     await redisClient.del('admin:subscribers:list');
     await redisClient.del('subscribers:list');
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'delete' });
     res.json({ message: 'Subscriber deleted' });
   } catch (error) { next(error); }
 });
@@ -194,7 +197,7 @@ router.put('/inquiries/:id', authenticateAdmin, async (req, res, next) => {
       from: process.env.EMAIL_USER,
       to: inquiry.email,
       subject: 'Response to your inquiry',
-      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
+      html: NewsletterServiceImpl.renderNewsletterTemplate({
         name: inquiry.name,
         content: `<p>${req.body.admin_response}</p><p>Thank you for contacting us!</p>`
       })
@@ -227,19 +230,12 @@ router.post('/newsletter', authenticateAdmin, async (req, res, next) => {
   }
 });
 
-router.put('/profile', authenticateAdmin, async (req, res, next) => {
+router.patch('/profile', authenticateAdmin, async (req, res) => {
   try {
-    const { username, email } = req.body;
-    if (!username || !email) {
-      return res.status(400).json({ message: 'Username and email are required' });
-    }
-    const updatedAdmin = await adminService.update(req.admin.id, { username, email });
-    if (!updatedAdmin) {
-      return res.status(404).json({ message: 'Admin not found' });
-    }
-    res.json(updatedAdmin);
+    const { name, email, profilePic } = req.body;
+    const updated = await adminService.updateProfile(req.admin.id, { username: name, email, profilePic });
+    res.json(updated);
   } catch (error) {
-    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }
 });
@@ -273,7 +269,7 @@ router.post('/admins', authenticateAdmin, requireSuperAdmin, async (req, res, ne
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Your CPN Admin Account',
-      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
+      html: NewsletterServiceImpl.renderNewsletterTemplate({
         name: username,
         content: `<p>Hello <b>${username.split(' ')[0]}</b>,<br>Your admin account has been created.<br><br><b>Username:</b> ${username}<br><b>Password:</b> ${password}</p><p>Please log in and change your password after your first login.</p>`
       })
@@ -301,7 +297,7 @@ router.post('/admins/:id/reset-password', authenticateAdmin, requireSuperAdmin, 
       from: process.env.EMAIL_USER,
       to: admin.email,
       subject: 'CPN Admin Password Reset',
-      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
+      html: NewsletterServiceImpl.renderNewsletterTemplate({
         name: admin.username,
         content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your new password is: <b>${newPassword}</b></p>`
       })

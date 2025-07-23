@@ -143,7 +143,6 @@ const BlogCreate = ({ token, onSuccess }) => {
     });
   };
 
-  // Image upload for Draft.js
   const handleRichTextImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -196,21 +195,6 @@ const BlogCreate = ({ token, onSuccess }) => {
   }
 
   // Custom toolbar commands for underline and color
-  const underlineCommand = {
-    name: 'underline',
-    icon: <u>U</u>,
-    execute: (editor) => {
-      const selection = editor.getSelection();
-      const value = editor.getMdValue();
-      const before = value.substring(0, selection.start);
-      const selected = value.substring(selection.start, selection.end);
-      const after = value.substring(selection.end);
-      editor.setText(before + `<u>${selected || 'underline'}</u>` + after);
-      if (!selected) {
-        editor.setSelection({ start: selection.start + 3, end: selection.start + 12 });
-      }
-    }
-  };
   const colorCommand = {
     name: 'color',
     icon: <span style={{ color: 'red', fontWeight: 'bold' }}>A</span>,
@@ -250,7 +234,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             onChange={({ text }) => setMarkdownValue(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
-            commands={['bold', 'italic', underlineCommand, colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
+            commands={['bold', 'italic', colorCommand, 'strikethrough', 'link', 'image', 'ordered-list', 'unordered-list', 'code', 'quote']}
           />
         </div>
         <div>

@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require('../config/database');
 const { ContactServiceImpl } = require('../services/ContactService');
 const contactService = new ContactServiceImpl(db);
-const { broadcastDashboardUpdate } = require('../server');
 
 // Submit contact form
 router.post('/submit', async (req, res) => {
@@ -24,7 +23,7 @@ router.post('/subscribe', async (req, res) => {
   try {
     const subscriber = await contactService.subscribeToNewsletter(req.body);
     // Broadcast dashboard update
-    broadcastDashboardUpdate({ entity: 'subscriber', action: 'create' });
+    req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'create' });
     res.status(201).json({
       message: 'Successfully subscribed to newsletter',
       subscriber

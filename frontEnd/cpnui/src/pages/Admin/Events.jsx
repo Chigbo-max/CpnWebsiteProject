@@ -15,7 +15,8 @@ const AdminEvents = () => {
   const { token } = useAdminAuth();
   const navigate = useNavigate();
 
-  const { data: events = [], isLoading, isError, error, refetch } = useGetEventsQuery();
+  const { data, isLoading, isError, error, refetch } = useGetEventsQuery();
+  const events = data?.events ?? [];
   const [deleteEvent] = useDeleteEventMutation();
 
   const handleDelete = async (event_id) => {

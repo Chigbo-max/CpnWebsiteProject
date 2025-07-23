@@ -41,6 +41,15 @@ class AdminServiceImpl extends IAdminService {
     );
     return result.rows[0];
   }
+
+  async updateProfile(id, updateData) {
+    const { username, email, profilePic } = updateData;
+    const result = await this.db.query(
+      'UPDATE admins SET username=$1, email=$2, profile_pic=$3 WHERE id=$4 RETURNING id, username, email, role, profile_pic, created_at',
+      [username, email, profilePic, id]
+    );
+    return result.rows[0];
+  }
 }
 
 module.exports = { IAdminService, AdminServiceImpl }; 

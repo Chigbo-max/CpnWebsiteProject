@@ -12,8 +12,6 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-RUN ls -l node_modules/.bin && cat package.json && cat package-lock.json
-
 # Build the application
 RUN npm run build
 

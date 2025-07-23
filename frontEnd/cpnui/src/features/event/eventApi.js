@@ -7,13 +7,17 @@ export const eventApi = createApi({
   endpoints: (builder) => ({
     getEvents: builder.query({
       query: () => '/events',
-      providesTags: (result = [], error, arg) =>
-        result
+      providesTags: (result, error, arg) => {
+        const list = Array.isArray(result)
+          ? result
+          : (result?.events ?? []);
+        return list.length
           ? [
-              ...result.map(({ event_id }) => ({ type: 'Event', id: event_id })),
-              { type: 'Event', id: 'LIST' },
-            ]
-          : [{ type: 'Event', id: 'LIST' }],
+            ...list.map(({ event_id }) => ({ type: 'Event', id: event_id })),
+            { type: 'Event', id: 'LIST' },
+          ]
+          : [{ type: 'Event', id: 'LIST' }];
+      },
     }),
     getEventById: builder.query({
       query: (event_id) => `/events/${event_id}`,

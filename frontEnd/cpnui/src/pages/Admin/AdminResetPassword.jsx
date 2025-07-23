@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useResetPasswordMutation } from '../../features/auth/authApi';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const AdminResetPassword = () => {
@@ -10,6 +10,7 @@ const AdminResetPassword = () => {
   const [confirm, setConfirm] = useState('');
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +38,15 @@ const AdminResetPassword = () => {
       toast.error(err?.data?.message || 'Reset failed. The link may be invalid or expired.');
     }
   };
+
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        navigate('/admin/login');
+      }, 2000); // 2 seconds delay
+      return () => clearTimeout(timer);
+    }
+  }, [submitted, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
