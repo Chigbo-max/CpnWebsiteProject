@@ -15,7 +15,7 @@ const Privacy = () => (
     <p className="mb-4">We implement reasonable security measures to protect your information from unauthorized access, disclosure, alteration, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure.</p>
     <h2 className="text-xl font-semibold mt-6 mb-2">6. Your Rights and Choices</h2>
     <p className="mb-4">You have the right to access, correct, update, or delete your personal information. To exercise these rights, please contact us at cprofessionalsnetwork@gmail.com. We will respond to your request in accordance with applicable laws.</p>
-    <h2 className="text-xl font-semibold mt-6 mb-2">7. Children's Privacy</h2>
+    <h2 className="text-xl font-semibold mt-6 mb-2">7. Children &apos;s Privacy</h2>
     <p className="mb-4">Our services are not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected such information, please contact us so we can take appropriate action.</p>
     <h2 className="text-xl font-semibold mt-6 mb-2">8. Changes to This Privacy Policy</h2>
     <p className="mb-4">We may update this Privacy Policy from time to time. We will notify users of any material changes by posting the new policy on this page with a new &quot;Last updated&quot; date. Continued use of our services after such changes constitutes acceptance of the revised policy.</p>

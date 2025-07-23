@@ -60,7 +60,7 @@ const EnrolleeManagement = ({ token }) => {
       } else {
         setBroadcastStatus({ type: 'error', message: data.error });
       }
-    } catch (err) {
+    } catch{
       setBroadcastStatus({ type: 'error', message: 'Network error. Please try again.' });
     }
   };

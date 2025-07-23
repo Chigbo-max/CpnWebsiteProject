@@ -97,7 +97,7 @@ const ContactInquiries = () => {
       const before = value.substring(0, selection.start);
       const selected = value.substring(selection.start, selection.end);
       const after = value.substring(selection.end);
-      editor.setText(before + `<span style=\"color:red\">${selected || 'color'}</span>` + after);
+      editor.setText(before + `<span style="color:red">${selected || 'color'}</span>` + after);
       if (!selected) {
         editor.setSelection({ start: selection.start + 22, end: selection.start + 27 });
       }
