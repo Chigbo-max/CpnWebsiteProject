@@ -234,7 +234,6 @@ router.patch('/profile', authenticateAdmin, async (req, res) => {
   try {
     const { username, email, profilePic } = req.body;
     const updated = await adminService.updateProfile(req.admin.id, { username, email, profilePic });
-    // Ensure the response uses profile_pic for consistency
     res.json({
       id: updated.id,
       username: updated.username,
@@ -248,7 +247,6 @@ router.patch('/profile', authenticateAdmin, async (req, res) => {
   }
 });
 
-// Add this endpoint for profile image uploads
 router.post('/upload-image', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No image file provided' });
@@ -261,7 +259,6 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
   }
 });
 
-// Endpoint to remove profile picture
 router.delete('/profile-picture', authenticateAdmin, async (req, res) => {
   try {
     const updated = await adminService.updateProfile(req.admin.id, { profilePic: null });

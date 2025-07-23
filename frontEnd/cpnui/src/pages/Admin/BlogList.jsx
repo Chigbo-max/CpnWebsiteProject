@@ -10,7 +10,7 @@ import {
   useUpdateBlogMutation,
 } from '../../features/blog/blogApi';
 
-const BlogList = ({ token, onRefresh }) => {
+const BlogList = ({ onRefresh }) => {
   const [viewPost, setViewPost] = useState(null);
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);

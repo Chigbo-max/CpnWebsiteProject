@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Cpn1 from '../../assets/dwd.jpeg';
 
 const faqs = [

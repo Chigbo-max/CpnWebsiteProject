@@ -69,19 +69,6 @@ function Home() {
       .slice(0, 3);
   }
 
-  // For Connect at our events: 1 past, 1 upcoming
-  let oneUpcoming = null;
-  let onePast = null;
-  if (Array.isArray(events) && events.length > 0) {
-    const now = new Date();
-    oneUpcoming = events
-      .filter(event => new Date(event.start_time) > now)
-      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0] || null;
-    onePast = events
-      .filter(event => new Date(event.start_time) <= now)
-      .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))[0] || null;
-  }
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((previousIndex) =>

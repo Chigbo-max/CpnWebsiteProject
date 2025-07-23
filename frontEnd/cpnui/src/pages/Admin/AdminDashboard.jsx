@@ -28,11 +28,10 @@ function AdminDashboard() {
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
-  // Analytics dashboard data
   const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
   const [monthlyCounts, setMonthlyCounts] = useState([]);
   const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
-  // Use environment variables for API and WebSocket URLs
+
   const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
   const wsUrl = import.meta.env.VITE_WS_URL;
 

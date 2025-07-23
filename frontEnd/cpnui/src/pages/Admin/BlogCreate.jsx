@@ -7,8 +7,6 @@ import ReactMarkdown from 'react-markdown';
 import "../../styles/react-mde-all.css";
 import { EditorState} from "draft-js";
 import "draft-js/dist/Draft.css";
-import { useRef } from "react";
-import { RichUtils, AtomicBlockUtils, ContentState} from 'draft-js';
 import { useCreateBlogMutation } from '../../features/blog/blogApi';
 
 const BlogCreate = ({ token, onSuccess }) => {
@@ -126,27 +124,6 @@ const BlogCreate = ({ token, onSuccess }) => {
       reader.readAsDataURL(file);
     });
   };
-
-  // Color picker for Draft.js
-  const applyColor = (color) => {
-    const newState = RichUtils.toggleInlineStyle(EditorState.getCurrentContent(), `COLOR-${color}`); 
-    // setRichTextState(newState); // This line was removed as per the edit hint
-  };
-  // Custom block renderer for images
-  const blockRendererFn = (block) => {
-    if (block.getType() === 'atomic') {
-      return {
-        component: ImageBlock,
-        editable: false,
-      };
-    }
-    return null;
-  };
-  function ImageBlock(props) {
-    const entity = props.contentState.getEntity(props.block.getEntityAt(0));
-    const { src } = entity.getData();
-    return <img src={src} alt="uploaded" style={{ maxWidth: '100%', margin: '12px 0' }} />;
-  }
 
   // Custom toolbar commands for underline and color
   const colorCommand = {

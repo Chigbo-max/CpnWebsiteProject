@@ -12,7 +12,6 @@ const AdminEvents = () => {
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
-  const { token } = useAdminAuth();
   const navigate = useNavigate();
 
   const { data, isLoading, isError, error, refetch } = useGetEventsQuery();

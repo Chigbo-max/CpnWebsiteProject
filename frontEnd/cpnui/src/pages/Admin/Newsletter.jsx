@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { useSendNewsletterMutation, useUploadImageMutation } from '../../features/newsletter/newsletterApi';
 
 const Newsletter = ({ token }) => {

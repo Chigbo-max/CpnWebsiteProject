@@ -5,7 +5,6 @@ import SimpleSpinner from '../../components/SimpleSpinner';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   useGetInquiriesQuery,
   useDeleteInquiryMutation,

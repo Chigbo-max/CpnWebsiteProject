@@ -22,7 +22,7 @@ const Subscribers = () => {
   const [domainFilter, setDomainFilter] = useState('');
   const PER_PAGE = 10;
 
-  const { data, isLoading, isError, error, refetch } = useGetSubscribersQuery();
+  const { data, isLoading, refetch } = useGetSubscribersQuery();
   console.log("data: ", data)
   const subscribers = useMemo(() => {
     return data?.subscribers ?? [];

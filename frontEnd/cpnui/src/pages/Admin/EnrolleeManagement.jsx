@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import SimpleSpinner from '../../components/SimpleSpinner';
 
 
