@@ -5,12 +5,10 @@ import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
 import "../../styles/react-mde-all.css";
-import { Editor, EditorState, convertToRaw } from "draft-js";
+import { EditorState} from "draft-js";
 import "draft-js/dist/Draft.css";
-import { useCallback, useRef } from "react";
-import { HexColorPicker } from 'react-colorful';
-import { Modifier, RichUtils, AtomicBlockUtils, ContentState, convertFromRaw } from 'draft-js';
-import remarkGfm from 'remark-gfm';
+import { useRef } from "react";
+import { RichUtils, AtomicBlockUtils, ContentState} from 'draft-js';
 import { useCreateBlogMutation } from '../../features/blog/blogApi';
 
 const BlogCreate = ({ token, onSuccess }) => {
@@ -23,9 +21,6 @@ const BlogCreate = ({ token, onSuccess }) => {
   const [slug, setSlug] = useState('');
   const [slugEdited, setSlugEdited] = useState(false);
   const [excerpt, setExcerpt] = useState('');
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [color, setColor] = useState('#000000');
-  const fileInputRef = useRef();
   const [showClearModal, setShowClearModal] = useState(false);
   const [tags, setTags] = useState('');
   const [error, setError] = useState(null);
@@ -38,7 +33,6 @@ const BlogCreate = ({ token, onSuccess }) => {
     slug: '',
     featuredImage: null
   });
-  const [previewImage, setPreviewImage] = useState(null);
   const [createBlog] = useCreateBlogMutation();
 
   const EXCERPT_MAX_LENGTH = 200;

@@ -12,7 +12,10 @@ const AdminProfile = () => {
   const handleLogout = async () => {
     try {
       await logout().unwrap();
-    } catch {}
+    } catch {
+      toast.error('Failed to log out. Please try again.');
+        return;
+    }
     clearAuth();
     toast.success('Logged out');
     navigate('/admin/login');

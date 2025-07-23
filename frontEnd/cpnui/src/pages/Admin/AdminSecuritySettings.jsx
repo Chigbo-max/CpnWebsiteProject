@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useAdminAuth } from '../../app/useAdminAuth';
 import { toast } from 'sonner';
 import { useChangePasswordMutation, useGetAuditLogQuery } from '../../features/auth/authApi';
 
 const AdminSecuritySettings = () => {
-  const { token } = useAdminAuth();
   const [current, setCurrent] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');

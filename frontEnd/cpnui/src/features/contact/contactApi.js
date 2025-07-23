@@ -17,7 +17,7 @@ export const contactApi = createApi({
   endpoints: (builder) => ({
     getInquiries: builder.query({
       query: () => '/admin/inquiries',
-      providesTags: (result = [], arg) =>
+      providesTags: (result = []) =>
         result
           ? [
             ...result.map(({ id, _id }) => ({ type: 'Contact', id: id || _id })),
@@ -30,7 +30,7 @@ export const contactApi = createApi({
         url: `/admin/inquiries/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (id) => [
         { type: 'Contact', id },
         { type: 'Contact', id: 'LIST' },
       ],
@@ -41,7 +41,7 @@ export const contactApi = createApi({
         method: 'PATCH',
         body: { status },
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: ({ id }) => [
         { type: 'Contact', id },
         { type: 'Contact', id: 'LIST' },
       ],
@@ -52,7 +52,7 @@ export const contactApi = createApi({
         method: 'PUT',
         body: { admin_response },
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: ( { id }) => [
         { type: 'Contact', id },
         { type: 'Contact', id: 'LIST' },
       ],
