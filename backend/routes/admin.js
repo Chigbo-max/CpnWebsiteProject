@@ -261,7 +261,6 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
 
 router.delete('/profile-picture', authenticateAdmin, async (req, res) => {
   try {
-    // Fetch current admin's username and email
     const adminRow = await db.query('SELECT username, email FROM admins WHERE id = $1', [req.admin.id]);
     const admin = adminRow.rows[0];
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
