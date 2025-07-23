@@ -103,7 +103,6 @@ function Events() {
 
           {/* Upcoming Events Section */}
           <section className="mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-gray-900 text-center">Upcoming Events</h2>
             {isLoading ? (
               <SimpleSpinner message="Loading events..." />
             ) : isError ? (
@@ -144,6 +143,7 @@ function Events() {
                       )}
                       <div className="p-6">
                         <div className="flex items-center gap-2 mb-3">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${new Date(ev.end_time) < new Date() ? 'bg-gray-400 text-white' : 'bg-amber-600 text-white'}`}>{new Date(ev.end_time) < new Date() ? 'Past Event' : 'Upcoming Event'}</span>
                           <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                             ev.event_type === 'virtual' 
                               ? 'bg-blue-100 text-blue-800' 
@@ -235,11 +235,13 @@ function Events() {
                     )}
                     <div className="p-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gray-400 text-white">Past Event</span>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                          ev.event_type === 'virtual' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
                           {ev.event_type === 'virtual' ? 'Virtual' : 'Physical'}
-                        </span>
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
-                          Ended
                         </span>
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 mb-3">{ev.title}</h3>

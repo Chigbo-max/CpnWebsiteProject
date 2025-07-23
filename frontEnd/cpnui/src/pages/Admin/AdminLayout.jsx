@@ -41,7 +41,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
-      <aside className={`fixed z-30 inset-y-0 left-0 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col`}>
+      <aside className={`fixed z-30 inset-y-0 left-0 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col max-h-screen overflow-y-auto`}>
         <div className="flex flex-col items-center pt-12 pb-8 border-b border-gray-800">
           <img
             src={admin?.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=128'}
@@ -51,7 +51,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
           <h2 className="text-base font-semibold leading-tight truncate max-w-[90%] text-center">{admin?.username || 'Admin'}</h2>
           <p className="text-xs text-gray-400 truncate max-w-[90%] text-center">{admin?.email}</p>
         </div>
-        <nav className="flex-1 mt-6">
+        <nav className="flex-1 mt-6 overflow-y-auto">
           {sidebarLinks
             .filter(link => link.id !== 'admin-management' || admin?.role === 'superadmin')
             .map(link => (

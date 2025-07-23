@@ -33,7 +33,23 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       });
       const data = await res.json();
       setForm(f => ({ ...f, profilePic: data.secure_url, uploading: false }));
-      toast.success('Profile picture updated!');
+      // Instantly update profile on server as soon as image is uploaded
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('http://localhost:5000/api/admin/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: form.name, email: form.email, profilePic: data.secure_url }),
+      });
+      if (response.ok) {
+        const updatedAdmin = await response.json();
+        onUpdate(updatedAdmin); // update context/state instantly
+        toast.success('Profile picture updated!');
+      } else {
+        toast.error('Failed to update profile picture');
+      }
     } catch (err) {
       setForm(f => ({ ...f, uploading: false }));
       toast.error('Failed to upload image');

@@ -9,12 +9,13 @@ import Cpn2 from "../../assets/cpnevent2.jpg";
 import Cpn3 from "../../assets/cpnevent3.jpg";
 import Bookshelf from "../../assets/bookshelf.jpeg";
 
-import Features from "../../components/Features/Features";
+import Features from "../../components/HomeAbout/Features";
 import LatestRelease from "../../components/LatestRelease/LatestRelease";
 import Courses from "../../components/Courses/Courses";
 import FreeContent from "../../components/FreeContent/FreeContent";
 import NewAndPastEvents from "../../components/NewAndPastEvents/NewAndPastEvents";
 import UpcomingEvents from "../../components/UpcomingEvents/UpcomingEvents";
+import { useGetEventsQuery } from '../../features/event/eventApi';
 
 const slides = [
   {
@@ -57,6 +58,31 @@ const slides = [
 
 function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { data: eventsData = {}, isLoading: eventsLoading, isError: eventsError } = useGetEventsQuery();
+  const events = Array.isArray(eventsData) ? eventsData : (eventsData.events ?? []);
+
+  // Get up to 3 latest upcoming events
+  let upcomingEvents = [];
+  if (Array.isArray(events) && events.length > 0) {
+    const now = new Date();
+    upcomingEvents = events
+      .filter(event => new Date(event.start_time) > now)
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+      .slice(0, 3);
+  }
+
+  // For Connect at our events: 1 past, 1 upcoming
+  let oneUpcoming = null;
+  let onePast = null;
+  if (Array.isArray(events) && events.length > 0) {
+    const now = new Date();
+    oneUpcoming = events
+      .filter(event => new Date(event.start_time) > now)
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0] || null;
+    onePast = events
+      .filter(event => new Date(event.start_time) <= now)
+      .sort((a, b) => new Date(b.start_time) - new Date(a.start_time))[0] || null;
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -299,14 +325,57 @@ function Home() {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
         {/* Events Section */}
         <section className="mb-24 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">Upcoming Events</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <div className="w-full text-center mb-8 px-4 sm:px-6 lg:px-8">
+            <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">EVENTS</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
+                Connect at <span className="text-amber-600">Our Events</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mt-4">
               Join us for transformative events designed to equip and inspire Kingdom professionals.
             </p>
           </div>
-          
-          <UpcomingEvents />
+          {/* Show up to 3 real upcoming events */}
+          {eventsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : eventsError ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Unable to load upcoming events.</p>
+            </div>
+          ) : upcomingEvents.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No upcoming events at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {upcomingEvents.map((event, idx) => (
+                <div key={event.event_id} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                  <div className={`h-48 bg-gradient-to-br ${idx % 2 === 0 ? 'from-amber-400 to-amber-600' : 'from-gray-800 to-gray-900'} flex items-center justify-center`}>
+                    <FontAwesomeIcon icon={faCalendarAlt} className="text-6xl text-white" />
+                  </div>
+                  <div className="p-6">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white mb-2">Upcoming Event</span>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{event.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{new Date(event.start_time).toLocaleDateString()}</span>
+                      <Link to={`/events/${event.event_id}`} className="text-amber-600 font-semibold hover:text-amber-700">Learn More</Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Spotify Embed Section */}
@@ -333,7 +402,6 @@ function Home() {
         <LatestRelease/>
         <Courses/>
         <FreeContent/>
-        <NewAndPastEvents/>
       </div>
     </div>
   )

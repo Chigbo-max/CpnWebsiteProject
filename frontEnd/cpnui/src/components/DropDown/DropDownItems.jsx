@@ -14,7 +14,7 @@ export const dropDownItems = [
 
     {
         "title": "The Team",
-        "path": "/InsideCPN/theTeam",
+        "path": "/InsideCPN/team",
         "cName": "drop_down_item"
     }
 ]

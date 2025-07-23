@@ -5,8 +5,8 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { useGetEventByIdQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
 
 const EventDetail = () => {
-  const { event_id } = useParams();
-  const { data: event, isLoading, isError } = useGetEventByIdQuery(event_id);
+  const { eventId } = useParams();
+  const { data: event, isLoading, isError } = useGetEventByIdQuery(eventId);
   const [registerForEvent, { isLoading: regLoading }] = useRegisterForEventMutation();
   const [registered, setRegistered] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
@@ -21,7 +21,7 @@ const EventDetail = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await registerForEvent({ event_id, ...form }).unwrap();
+      await registerForEvent({ event_id: eventId, ...form }).unwrap();
       setRegistered(true);
       toast.success('Registration successful! Check your email for details.');
     } catch (err) {
@@ -61,22 +61,12 @@ const EventDetail = () => {
         <div className="w-full text-center py-8 text-amber-600 text-xl font-semibold">Thank you for registering! Check your email for event details and your code.</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
-          <h3 className="text-2xl font-bold mb-2 text-gray-900">Register for this Event</h3>
-          <div>
-            <label className="block font-semibold mb-1">Name</label>
-            <input type="text" name="name" value={form.name} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="text" name="name" value={form.name} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" placeholder="Your Name" disabled={isPast} />
+            <input type="email" name="email" value={form.email} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" placeholder="Your Email" disabled={isPast} />
+            <input type="tel" name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" placeholder="Your Phone (optional)" disabled={isPast} />
           </div>
-          <div>
-            <label className="block font-semibold mb-1">Email</label>
-            <input type="email" name="email" value={form.email} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Phone</label>
-            <input type="tel" name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
-          </div>
-          <button type="submit" disabled={regLoading} className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50">
-            {regLoading ? 'Registering...' : 'Register'}
-          </button>
+          <button type="submit" className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50" disabled={isPast || regLoading}>{regLoading ? 'Registering...' : 'Register for Event'}</button>
         </form>
       )}
     </div>

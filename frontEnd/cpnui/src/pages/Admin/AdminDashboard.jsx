@@ -123,7 +123,7 @@ function AdminDashboard() {
   const handleProfileUpdate = async (updatedData) => {
     try {
       const response = await fetch('http://localhost:5000/api/admin/profile', {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -133,7 +133,6 @@ function AdminDashboard() {
 
       if (response.ok) {
         const updatedAdmin = await response.json();
-        // Update the admin context with new data
         login(token, updatedAdmin);
         toast.success('Profile updated successfully');
       } else {
@@ -149,7 +148,6 @@ function AdminDashboard() {
     setShowChangePassword(true);
   };
 
-  // Ensure only super admins can access admin management
   useEffect(() => {
     if (admin && admin.role !== 'superadmin' && activeSection === 'admin-management') {
       setActiveSection('profile');
