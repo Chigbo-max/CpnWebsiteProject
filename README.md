@@ -1,214 +1,120 @@
-# CPN Website Project
+Christian Professionals Network (CPN) Platform
 
-A comprehensive website for Christian Professionals Network with blog functionality, admin dashboard, and newsletter system.
+A full-stack web application for the Christian Professionals Network, featuring a modern React frontend, Node.js/Express backend, PostgreSQL, Redis, JWT authentication, real-time updates, and Cloudinary image uploads.
 
-## Features
 
-- **Frontend**: React with Vite, Tailwind CSS
-- **Backend**: Node.js with Express, PostgreSQL
-- **Blog System**: Create, read, and manage blog posts
-- **Admin Dashboard**: Manage blog posts, subscribers, and contact inquiries
-- **Newsletter System**: Send newsletters to subscribers
-- **Contact Form**: Submit inquiries and subscribe to newsletter
-- **Responsive Design**: Fully responsive across all devices
+Features
 
-## Project Structure
+User & Admin Authentication (JWT, secure sessions)
+Admin Dashboard: Analytics, blog, events, newsletter, enrollees, contact inquiries, and more
+Profile Management: Profile picture upload, update, and removal with Cloudinary integration
+Events: Create, edit, and manage events with image uploads
+Blog: Rich markdown editor, image uploads, and post management
+Newsletter: Compose and send newsletters to subscribers
+Contact Inquiries: Manage and respond to user inquiries
+Enrollee Management: View, filter, and broadcast to course enrollees
+Real-time Updates: WebSocket-powered dashboard refresh
+Responsive UI: Tailwind CSS, mobile-friendly, modern design
+Dockerized: Easy local and production deployment
 
-```
+
+Tech Stack
+
+Frontend: React, Redux Toolkit, React Router v6, Tailwind CSS, Framer Motion, Sonner (toasts), FontAwesome
+Backend: Node.js, Express.js, PostgreSQL, Redis, JWT, bcryptjs, Nodemailer, Cloudinary, ws (WebSocket)
+DevOps: Docker, Docker Compose, GitHub Actions (CI/CD)
+Other: Markdown parsing, custom markdown editor, image upload with backend signing
+
+
+Monorepo Structure
+
 CpnWebsiteProject/
-├── frontEnd/cpnui/          # React frontend
-├── backend/                 # Node.js backend
-│   ├── config/             # Database configuration
-│   ├── routes/             # API routes
-│   ├── middleware/         # Authentication middleware
-│   └── server.js           # Main server file
-└── cpnchatbotproj/         # Rasa chatbot (separate)
-```
+  backend/         # Node.js/Express API, PostgreSQL, Redis, WebSocket, Cloudinary
+  frontEnd/cpnui/  # React app, Tailwind, RTK Query, admin dashboard, public site
+  Docker-compose.yml
+  README.md
 
-## Setup Instructions
 
-### Prerequisites
+Local Development
+Prerequisites
+Node.js 18+
+Docker & Docker Compose
 
-- Node.js (v16 or higher)
-- PostgreSQL
-- npm or yarn
 
-### Backend Setup
+Environment Variables
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd CpnWebsiteProject/backend
-   ```
+Copy .env.example to .env in both backend/ and frontEnd/cpnui/
+Set your secrets (DB, JWT, Cloudinary, email, etc.)
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
 
-3. **Set up environment variables:**
-   Create a `.env` file in the backend directory with:
-   ```
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=postgres
-   DB_PASSWORD=your_password
-   DB_NAME=cpn_db
-   DB_PORT=5432
-   JWT_SECRET=your_jwt_secret_key_here
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_PASS=your_email_app_password
-   ```
+Start with Docker Compose
 
-4. **Set up PostgreSQL database:**
-   - Create a database named `cpn_db`
-   - Run the schema file:
-   ```bash
-   psql -U postgres -d cpn_db -f config/schema.sql
-   ```
+docker-compose up --build
 
-5. **Start the backend server:**
-   ```bash
-   npm run dev
-   ```
+Frontend: http://localhost
+Backend API: http://localhost:5000
+PostgreSQL: localhost:5433
+Redis: localhost:6379
 
-### Frontend Setup
 
-1. **Navigate to frontend directory:**
-   ```bash
-   cd CpnWebsiteProject/frontEnd/cpnui
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/login` - Admin login
-
-### Blog
-- `GET /api/blog` - Get all blog posts
-- `GET /api/blog/:slug` - Get single blog post
-
-### Contact
-- `POST /api/contact/submit` - Submit contact form
-- `POST /api/contact/subscribe` - Subscribe to newsletter
-
-### Admin (Protected)
-- `POST /api/admin/blog` - Create blog post
-- `GET /api/admin/inquiries` - Get contact inquiries
-- `PUT /api/admin/inquiries/:id` - Respond to inquiry
-- `GET /api/admin/subscribers` - Get all subscribers
-- `POST /api/admin/newsletter` - Send newsletter
-
-### Subscribers
-- `GET /api/subscribers` - Get all subscribers
-- `DELETE /api/subscribers/:email` - Unsubscribe
-
-## Default Admin Credentials
-
-- **Username**: admin
-- **Password**: password
-- **Email**: admin@cpn.com
-
-## Blog Posts
-
-The system comes with two sample blog posts:
-1. "How to be a Good Leader" - Leadership tips and guidance
-2. "Biblical Principles for Professional Excellence" - Faith-based professional development
-
-## Admin Dashboard
-
-Access the admin dashboard at `/admin` to:
-- Create and manage blog posts
-- View and respond to contact inquiries
-- Manage newsletter subscribers
-- Send newsletters to all subscribers
-
-## Features
-
-### Blog System
-- Responsive blog listing page
-- Individual blog post pages with full content
-- Admin can create new posts instantly
-- SEO-friendly URLs with slugs
-
-### Contact System
-- Contact form with validation
-- Newsletter subscription
-- Admin can view and respond to inquiries
-- Email notifications (configure in .env)
-
-### Newsletter System
-- Subscriber management
-- Bulk email sending
-- HTML email support
-- Unsubscribe functionality
-
-### Security
-- JWT authentication for admin routes
-- Password hashing with bcrypt
-- Protected admin endpoints
-- Input validation and sanitization
-
-## Development
-
-### Backend Development
-```bash
+Manual Start (for development)
+# Backend
 cd backend
-npm run dev  # Start with nodemon for auto-reload
-```
+npm install
+npm run dev
 
-### Frontend Development
-```bash
+# Frontend
 cd frontEnd/cpnui
-npm run dev  # Start Vite development server
-```
+npm install
+npm run dev
 
-## Production Deployment
+Running Tests & Lint
 
-1. **Backend:**
-   - Set up environment variables for production
-   - Use PM2 or similar for process management
-   - Configure reverse proxy (nginx)
+Lint:
+  cd frontEnd/cpnui
+  npm run lint
 
-2. **Frontend:**
-   - Build the project: `npm run build`
-   - Serve static files from a web server
-   - Configure API base URL for production
+Backend Tests:
+  cd backend
+  npm test
 
-## Troubleshooting
 
-### Database Connection Issues
-- Ensure PostgreSQL is running
-- Check database credentials in .env
-- Verify database exists and schema is loaded
+Deployment
 
-### Email Issues
-- Configure Gmail app password for EMAIL_PASS
-- Enable 2FA on Gmail account
-- Check email service configuration
+CI/CD:
+GitHub Actions runs lint/tests and builds/pushes Docker images on main branch.
+Production:
+Set all environment variables in your deployment environment or Docker secrets.
 
-### Frontend API Issues
-- Ensure backend server is running on port 5000
-- Check CORS configuration
-- Verify API endpoints are correct
 
-## Contributing
+Key Endpoints
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+Auth: /api/auth/login, /api/auth/forgot-password, /api/auth/reset-password
+Admin Profile: /api/admin/profile (PATCH), /api/admin/upload-image (POST), /api/admin/profile-picture (DELETE)
+Blog: /api/admin/blog, /api/admin/blog/upload-image
+Events: /api/events, /api/admin/events
+Newsletter: /api/admin/newsletter
+Enrollees: /api/enrollments/admin/enrollments, /api/enrollments/admin/enrollments/broadcast
+Contact: /api/contact/submit
 
-## License
 
-This project is licensed under the MIT License. 
+Notable Features
+
+Profile Picture: Upload, update, and remove profile picture (reverts to initials avatar if removed)
+WebSocket: Real-time dashboard updates for admins
+Markdown Editor: Custom commands, image upload, table/underline commands removed for stability
+Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
+Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
+
+
+Contributing
+
+1. Fork the repo
+2. Create your feature branch (git checkout -b feature/YourFeature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin feature/YourFeature)
+5. Open a pull request
+
+
+License
+MIT
