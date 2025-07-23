@@ -11,9 +11,12 @@ import { useGetBlogsQuery } from '../../features/blog/blogApi';
 function Blog() {
     const { data, isLoading, isError, error } = useGetBlogsQuery();
     console.log("data: ", data)
-    const blogPosts = data?.blogs ?? [];
-    console.log("blog posts: ", blogPosts)
-    blogPosts.forEach(post => console.log("status:", post.status));
+    const blogPosts = useMemo(() => {
+        const posts = data?.blogs ?? [];
+        console.log("blog posts: ", posts)
+        posts.forEach(post => console.log("status:", post.status));
+        return posts;
+    }, [data]);
     
     const serverDown = isError && (error?.message === 'Failed to fetch' || error?.message === 'NetworkError when attempting to fetch resource.');
 

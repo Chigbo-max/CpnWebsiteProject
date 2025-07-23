@@ -16,7 +16,9 @@ const AdminEvents = () => {
   const navigate = useNavigate();
 
   const { data, isLoading, isError, error, refetch } = useGetEventsQuery();
-  const events = data?.events ?? [];
+  const events = useMemo(() => {
+    return data?.events ?? [];
+  }, [data]);
   const [deleteEvent] = useDeleteEventMutation();
 
   const handleDelete = async (event_id) => {

@@ -17,7 +17,7 @@ export const contactApi = createApi({
   endpoints: (builder) => ({
     getInquiries: builder.query({
       query: () => '/admin/inquiries',
-      providesTags: (result = [], error, arg) =>
+      providesTags: (result = [], arg) =>
         result
           ? [
             ...result.map(({ id, _id }) => ({ type: 'Contact', id: id || _id })),

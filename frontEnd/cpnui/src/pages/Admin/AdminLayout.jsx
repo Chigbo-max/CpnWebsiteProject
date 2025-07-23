@@ -56,7 +56,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
       <aside className={`fixed z-30 inset-y-0 left-0 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col max-h-screen overflow-y-auto`}>
         <div className="flex flex-col items-center pt-12 pb-8 border-b border-gray-800">
           <img
-            src={admin?.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=128'}
+            src={admin?.profilePic || admin?.profile_pic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=128'}
             alt="Profile"
             className="w-20 h-20 rounded-full object-cover border-4 border-amber-500 mb-3 shadow-lg"
           />
@@ -98,7 +98,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
               onClick={() => setDropdownOpen((open) => !open)}
             >
               <img
-                src={admin?.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=64'}
+                src={admin?.profilePic || admin?.profile_pic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=64'}
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover border-2 border-amber-500"
               />

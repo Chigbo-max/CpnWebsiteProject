@@ -2,8 +2,9 @@ import { KnowledgeHubDropDownItems } from "./KnowledgeHubDropDownItems"
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setKnowledgeHubDropDown } from '../../app/navBar/navBarSlice'
+import PropTypes from 'prop-types';
 
-function KnowledgeHubDropDown() {
+function KnowledgeHubDropDown({ onItemClick }) {
     const dispatch = useDispatch();
 
     const handleMouseEnter = () => {
@@ -29,6 +30,7 @@ function KnowledgeHubDropDown() {
                         <Link 
                             to={item.path} 
                             className="text-white text-sm font-medium no-underline hover:text-amber-100 transition-colors duration-300 block px-2 py-1"
+                            onClick={onItemClick}
                         >
                             {item.title}
                         </Link>
@@ -38,6 +40,10 @@ function KnowledgeHubDropDown() {
         </div>
     )
 }
+
+KnowledgeHubDropDown.propTypes = {
+  onItemClick: PropTypes.func,
+};
 
 export default KnowledgeHubDropDown
 

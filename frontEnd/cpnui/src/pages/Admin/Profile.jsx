@@ -7,7 +7,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
   const [form, setForm] = useState({
     name: admin?.username || '',
     email: admin?.email || '',
-    profilePic: admin?.profilePic || '',
+    profilePic: admin?.profile_pic || '',
     uploading: false,
     saving: false,
   });
@@ -50,8 +50,8 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       });
       if (response.ok) {
         const updatedAdmin = await response.json();
-        onUpdate(updatedAdmin); // update context/state instantly
-        updateAdmin(updatedAdmin); // update context and localStorage for navbar/sidebar
+        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context/state instantly
+        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context and localStorage for navbar/sidebar
         toast.success('Profile picture updated!');
       } else {
         toast.error('Failed to update profile picture');
@@ -77,8 +77,8 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       });
       if (response.ok) {
         const updatedAdmin = await response.json();
-        onUpdate(updatedAdmin); // update context/state
-        updateAdmin(updatedAdmin); // update context and localStorage for navbar/sidebar
+        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context/state
+        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context and localStorage for navbar/sidebar
         toast.success('Profile updated!');
       } else {
         toast.error('Failed to update profile');

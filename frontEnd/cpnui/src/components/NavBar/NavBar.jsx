@@ -182,7 +182,7 @@ function NavBar() {
                                             </button>
                                             {mobileCoursesDropdown && (
                                                 <div className="pl-6 pt-2">
-                                                    <CoursesDropDown />
+                                                    <CoursesDropDown onItemClick={() => setMobileCoursesDropdown(false)} />
                                                 </div>
                                             )}
                                         </>
@@ -201,7 +201,7 @@ function NavBar() {
                                             </button>
                                             {mobileKnowledgeHubDropdown && (
                                                 <div className="pl-6 pt-2">
-                                                    <KnowledgeHubDropDown />
+                                                    <KnowledgeHubDropDown onItemClick={() => setMobileKnowledgeHubDropdown(false)} />
                                                 </div>
                                             )}
                                         </>
@@ -220,7 +220,7 @@ function NavBar() {
                                             </button>
                                             {mobileInsideCPNDropdown && (
                                                 <div className="pl-6 pt-2">
-                                                    <DropDown />
+                                                    <DropDown onItemClick={() => setMobileInsideCPNDropdown(false)} />
                                                 </div>
                                             )}
                                         </>

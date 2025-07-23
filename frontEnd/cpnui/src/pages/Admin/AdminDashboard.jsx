@@ -91,7 +91,7 @@ function AdminDashboard() {
     return () => {
       if (ws) ws.close();
     };
-  }, [activeSection, token]);
+  }, [activeSection, token, apiBaseUrl, wsUrl]);
 
   useEffect(() => {
     setIsLoggedIn(!!token);

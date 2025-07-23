@@ -49,20 +49,6 @@ export const AdminAuthProvider = ({ children }) => {
     setShouldRedirect(true);
   };
 
-  // Helper to handle API errors and auto-logout on 401/403
-  const handleAuthError = (error) => {
-    if (!error) return;
-    if (
-      error.status === 401 ||
-      error.status === 403 ||
-      error.message === 'Invalid token.' ||
-      error.message === 'jwt expired' ||
-      error.message === 'jwt malformed'
-    ) {
-      logout();
-    }
-  };
-
   return (
     <AdminAuthContext.Provider value={{ token, admin, login, logout, shouldRedirect, setShouldRedirect, updateAdmin }}>
       {children}

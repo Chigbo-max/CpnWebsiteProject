@@ -234,7 +234,15 @@ router.patch('/profile', authenticateAdmin, async (req, res) => {
   try {
     const { username, email, profilePic } = req.body;
     const updated = await adminService.updateProfile(req.admin.id, { username, email, profilePic });
-    res.json(updated);
+    // Ensure the response uses profile_pic for consistency
+    res.json({
+      id: updated.id,
+      username: updated.username,
+      email: updated.email,
+      role: updated.role,
+      profile_pic: updated.profile_pic,
+      created_at: updated.created_at
+    });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }

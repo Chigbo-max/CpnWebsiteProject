@@ -1,5 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
-import { setOpenLink } from "../app/navBar/navBarSlice";
+import PropTypes from 'prop-types';
 
 const Switch = ({ open, onClick }) => {
   // Remove redux usage from here, use props instead
@@ -27,6 +26,11 @@ const Switch = ({ open, onClick }) => {
       </button>
     </div>
   );
+};
+
+Switch.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
 };
 
 export default Switch;

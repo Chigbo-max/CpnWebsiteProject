@@ -13,7 +13,9 @@ function Events() {
   const PER_PAGE = 10;
 
   const { data, isLoading, isError, error } = useGetEventsQuery();
-  const events = data?.events ?? [];
+  const events = useMemo(() => {
+    return data?.events ?? [];
+  }, [data]);
 
   console.log("events: ", events)
 

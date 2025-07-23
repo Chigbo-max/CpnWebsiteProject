@@ -2,8 +2,9 @@ import {dropDownItems} from "./DropDownItems"
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setDropDown } from '../../app/navBar/navBarSlice'
+import PropTypes from 'prop-types';
 
-function DropDown() {
+function DropDown({ onItemClick }) {
   const dispatch = useDispatch();
 
   const handleMouseEnter = () => {
@@ -29,6 +30,7 @@ function DropDown() {
             <Link 
               to={item.path} 
               className="text-white text-sm font-medium no-underline hover:text-amber-100 transition-colors duration-300 block px-2 py-1"
+              onClick={onItemClick}
             >
               {item.title}
             </Link>
@@ -38,5 +40,9 @@ function DropDown() {
     </div>
   )
 }
+
+DropDown.propTypes = {
+  onItemClick: PropTypes.func,
+};
 
 export default DropDown

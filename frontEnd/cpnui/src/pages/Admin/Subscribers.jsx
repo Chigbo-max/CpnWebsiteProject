@@ -24,7 +24,9 @@ const Subscribers = () => {
 
   const { data, isLoading, isError, error, refetch } = useGetSubscribersQuery();
   console.log("data: ", data)
-  const subscribers = data?.subscribers ?? [];
+  const subscribers = useMemo(() => {
+    return data?.subscribers ?? [];
+  }, [data]);
   console.log("subscribers", subscribers);
   const [addSubscriber] = useAddSubscriberMutation();
   const [updateSubscriber] = useUpdateSubscriberMutation();

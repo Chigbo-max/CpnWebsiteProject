@@ -26,7 +26,9 @@ const ContactInquiries = () => {
   const [previewResponse, setPreviewResponse] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useGetInquiriesQuery();
-  const inquiries = Array.isArray(data) ? data : [];
+  const inquiries = useMemo(() => {
+    return Array.isArray(data) ? data : [];
+  }, [data]);
   const [deleteInquiry] = useDeleteInquiryMutation();
   const [updateInquiryStatus] = useUpdateInquiryStatusMutation();
   const [respondInquiry] = useRespondInquiryMutation();

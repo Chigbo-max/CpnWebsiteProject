@@ -21,7 +21,9 @@ const BlogList = ({ token, onRefresh }) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useGetBlogsQuery();
-  const posts = data?.blogs ?? [];
+  const posts = useMemo(() => {
+    return data?.blogs ?? [];
+  }, [data]);
   const [deleteBlog] = useDeleteBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
 
