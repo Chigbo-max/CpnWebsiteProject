@@ -17,7 +17,6 @@ function Events() {
     return data?.events ?? [];
   }, [data]);
 
-  console.log("events: ", events)
 
   const now = new Date();
   const filtered = useMemo(() => {
@@ -78,7 +77,6 @@ function Events() {
         </div>
       </section>
 
-      {/* Main Content */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
         <div className="max-w-7xl mx-auto">
           {/* Search and Filter Section */}
@@ -103,7 +101,6 @@ function Events() {
             </div>
           </div>
 
-          {/* Upcoming Events Section */}
           <section className="mb-16">
             {isLoading ? (
               <SimpleSpinner message="Loading events..." />
