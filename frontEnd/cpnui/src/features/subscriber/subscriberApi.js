@@ -7,7 +7,7 @@ export const subscriberApi = createApi({
   endpoints: (builder) => ({
     getSubscribers: builder.query({
       query: () => '/subscribers',
-      providesTags: (result, error, arg) => {
+      providesTags: (result) => {
         const list = Array.isArray(result)
           ? result
           : (result?.subscribers ?? []);

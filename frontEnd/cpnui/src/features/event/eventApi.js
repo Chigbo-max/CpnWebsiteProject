@@ -7,7 +7,7 @@ export const eventApi = createApi({
   endpoints: (builder) => ({
     getEvents: builder.query({
       query: () => '/events',
-      providesTags: (result, error, arg) => {
+      providesTags: (result) => {
         const list = Array.isArray(result)
           ? result
           : (result?.events ?? []);
@@ -21,7 +21,7 @@ export const eventApi = createApi({
     }),
     getEventById: builder.query({
       query: (event_id) => `/events/${event_id}`,
-      providesTags: (result, error, event_id) => [{ type: 'Event', id: event_id }],
+      providesTags: (result, event_id) => [{ type: 'Event', id: event_id }],
     }),
     registerForEvent: builder.mutation({
       query: ({ event_id, ...body }) => ({
@@ -44,7 +44,7 @@ export const eventApi = createApi({
         method: 'PUT',
         body: patch,
       }),
-      invalidatesTags: (result, error, { event_id }) => [
+      invalidatesTags: (result, { event_id }) => [
         { type: 'Event', id: event_id },
         { type: 'Event', id: 'LIST' },
       ],
@@ -54,7 +54,7 @@ export const eventApi = createApi({
         url: `/admin/events/${event_id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, event_id) => [
+      invalidatesTags: (result, event_id) => [
         { type: 'Event', id: event_id },
         { type: 'Event', id: 'LIST' },
       ],

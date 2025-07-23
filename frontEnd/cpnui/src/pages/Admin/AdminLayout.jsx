@@ -142,7 +142,9 @@ AdminLayout.propTypes = {
   admin: PropTypes.shape({
     username: PropTypes.string,
     email: PropTypes.string,
-    profilePic: PropTypes.string
+    profilePic: PropTypes.string,
+    profile_pic: PropTypes.string,
+    role: PropTypes.string,
   }).isRequired,
   onLogout: PropTypes.func.isRequired,
   activeSection: PropTypes.string.isRequired,
