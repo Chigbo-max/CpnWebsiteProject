@@ -117,6 +117,32 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     }
   };
 
+  const handleRemoveProfilePic = async () => {
+    setForm(f => ({ ...f, uploading: true }));
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('http://localhost:5000/api/admin/profile-picture', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const updatedAdmin = await response.json();
+        setForm(f => ({ ...f, profilePic: '', uploading: false }));
+        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
+        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
+        toast.success('Profile picture removed!');
+      } else {
+        setForm(f => ({ ...f, uploading: false }));
+        toast.error('Failed to remove profile picture');
+      }
+    } catch (err) {
+      setForm(f => ({ ...f, uploading: false }));
+      toast.error('Failed to remove profile picture');
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-900">My Profile</h2>
@@ -137,6 +163,16 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
               disabled={form.uploading}
             />
           </label>
+          {form.profilePic && (
+            <button
+              type="button"
+              className="mt-2 text-xs text-red-600 underline hover:text-red-800"
+              onClick={handleRemoveProfilePic}
+              disabled={form.uploading}
+            >
+              Remove Profile Picture
+            </button>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>

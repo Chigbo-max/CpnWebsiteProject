@@ -261,6 +261,23 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
   }
 });
 
+// Endpoint to remove profile picture
+router.delete('/profile-picture', authenticateAdmin, async (req, res) => {
+  try {
+    const updated = await adminService.updateProfile(req.admin.id, { profilePic: null });
+    res.json({
+      id: updated.id,
+      username: updated.username,
+      email: updated.email,
+      role: updated.role,
+      profile_pic: updated.profile_pic,
+      created_at: updated.created_at
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to remove profile picture', error: error.message });
+  }
+});
+
 // --- ADMIN MANAGEMENT (SUPER ADMIN ONLY) ---
 function requireSuperAdmin(req, res, next) {
   if (req.admin.role !== 'superadmin') {
