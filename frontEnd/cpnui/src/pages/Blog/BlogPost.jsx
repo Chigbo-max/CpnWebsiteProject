@@ -174,22 +174,22 @@ function BlogPost() {
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4" {...props} />,
-                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-gray-900 mb-3 mt-6" {...props} />,
-                                    h3: ({node, ...props}) => <h3 className="text-xl font-bold text-gray-900 mb-2 mt-5" {...props} />,
-                                    p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
-                                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
-                                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
-                                    li: ({node, ...props}) => <li className="text-gray-700" {...props} />,
-                                    strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                                    em: ({node, ...props}) => <em className="italic text-gray-800" {...props} />,
-                                    blockquote: ({node, ...props}) => (
+                                    h1: ({ ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4" {...props} />,
+                                    h2: ({ ...props}) => <h2 className="text-2xl font-bold text-gray-900 mb-3 mt-6" {...props} />,
+                                    h3: ({ ...props}) => <h3 className="text-xl font-bold text-gray-900 mb-2 mt-5" {...props} />,
+                                    p: ({ ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
+                                    ul: ({ ...props}) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
+                                    ol: ({ ...props}) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
+                                    li: ({ ...props}) => <li className="text-gray-700" {...props} />,
+                                    strong: ({ ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                                    em: ({ ...props}) => <em className="italic text-gray-800" {...props} />,
+                                    blockquote: ({ ...props}) => (
                                         <blockquote className="border-l-4 border-amber-500 pl-4 italic text-gray-600 mb-4" {...props} />
                                     ),
-                                    code: ({node, ...props}) => (
+                                    code: ({ ...props}) => (
                                         <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono" {...props} />
                                     ),
-                                    pre: ({node, ...props}) => (
+                                    pre: ({ ...props}) => (
                                         <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4" {...props} />
                                     )
                                 }}

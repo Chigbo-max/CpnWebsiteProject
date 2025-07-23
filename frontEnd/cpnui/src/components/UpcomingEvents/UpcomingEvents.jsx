@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faUsers, faBookOpen, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 function UpcomingEvents() {
-    const { data: events = [], isLoading, isError, error } = useGetEventsQuery();
+    const { data: events = [], isLoading, isError} = useGetEventsQuery();
     let upcomingEvents = [];
     if (events.length > 0) {
         const now = new Date();

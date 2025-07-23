@@ -43,7 +43,7 @@ const AdminResetPassword = () => {
     if (submitted) {
       const timer = setTimeout(() => {
         navigate('/admin/login');
-      }, 2000); // 2 seconds delay
+      }, 2000); 
       return () => clearTimeout(timer);
     }
   }, [submitted, navigate]);

@@ -56,7 +56,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       } else {
         toast.error('Failed to update profile picture');
       }
-    } catch (err) {
+    } catch {
       setForm(f => ({ ...f, uploading: false }));
       toast.error('Failed to upload image');
     }
@@ -137,7 +137,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
         setForm(f => ({ ...f, uploading: false }));
         toast.error('Failed to remove profile picture');
       }
-    } catch (err) {
+    } catch {
       setForm(f => ({ ...f, uploading: false }));
       toast.error('Failed to remove profile picture');
     }
