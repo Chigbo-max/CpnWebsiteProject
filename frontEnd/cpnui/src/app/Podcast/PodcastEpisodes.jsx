@@ -57,7 +57,7 @@ const PodcastEpisodes = () => {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4 mb-4">
-        <label className="text-gray-200 font-semibold">Episodes per page:</label>
+        <label className="text-gray-900 font-semibold">Episodes per page:</label>
         <select 
           value={episodesPerPage} 
           onChange={handlePageSizeChange}
@@ -98,7 +98,7 @@ const PodcastEpisodes = () => {
                   {episode.audio_preview_url ? (
                     <button 
                       onClick={() => handlePlayPause(episode.id)}
-                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'ring-2 ring-amber-400' : ''}`}
+                      className={`modernAmberBtn flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-white shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'ring-2 ring-amber-400' : ''}`}
                     >
                       <FontAwesomeIcon 
                         icon={playingId === episode.id ? faPause : faPlay} 
@@ -115,7 +115,7 @@ const PodcastEpisodes = () => {
                       href={episode.external_urls.spotify}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'bg-green-700 text-white' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                      className={`modernGreenBtn flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 text-sm`}
                     >
                       <FontAwesomeIcon icon={faSpotify} className="text-base" />
                       {playingId === episode.id ? "Play full episode on Spotify" : "Spotify"}

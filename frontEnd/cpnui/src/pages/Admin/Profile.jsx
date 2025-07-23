@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
+import { useAdminAuth } from '../../app/useAdminAuth';
 
 const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword }) => {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
   });
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
   const [changing, setChanging] = useState(false);
+  const { updateAdmin } = useAdminAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,29 +25,33 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     setForm(f => ({ ...f, uploading: true }));
   
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'unsigned_preset'); 
+    formData.append('image', file);
   
     try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/duprqhkbv/image/upload', {
+      // Upload image to backend, not directly to Cloudinary
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch('http://localhost:5000/api/admin/upload-image', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
         body: formData,
       });
       const data = await res.json();
-      setForm(f => ({ ...f, profilePic: data.secure_url, uploading: false }));
+      setForm(f => ({ ...f, profilePic: data.url, uploading: false }));
       // Instantly update profile on server as soon as image is uploaded
-      const token = localStorage.getItem('adminToken');
       const response = await fetch('http://localhost:5000/api/admin/profile', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: form.name, email: form.email, profilePic: data.secure_url }),
+        body: JSON.stringify({ username: form.name, email: form.email, profilePic: data.url }),
       });
       if (response.ok) {
         const updatedAdmin = await response.json();
         onUpdate(updatedAdmin); // update context/state instantly
+        updateAdmin(updatedAdmin); // update context and localStorage for navbar/sidebar
         toast.success('Profile picture updated!');
       } else {
         toast.error('Failed to update profile picture');
@@ -67,11 +73,12 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: form.name, email: form.email, profilePic: form.profilePic }),
+        body: JSON.stringify({ username: form.name, email: form.email, profilePic: form.profilePic }),
       });
       if (response.ok) {
         const updatedAdmin = await response.json();
         onUpdate(updatedAdmin); // update context/state
+        updateAdmin(updatedAdmin); // update context and localStorage for navbar/sidebar
         toast.success('Profile updated!');
       } else {
         toast.error('Failed to update profile');

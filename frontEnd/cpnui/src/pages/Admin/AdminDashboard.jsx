@@ -14,13 +14,15 @@ import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
+import { useNavigate } from 'react-router-dom';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
 import { ResponsiveLine } from '@nivo/line';
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsivePie } from '@nivo/pie';
 
 function AdminDashboard() {
-  const { token, admin, login, logout } = useAdminAuth();
+  const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
@@ -94,6 +96,13 @@ function AdminDashboard() {
   useEffect(() => {
     setIsLoggedIn(!!token);
   }, [token]);
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      navigate('/admin/login');
+      setShouldRedirect(false);
+    }
+  }, [shouldRedirect, navigate, setShouldRedirect]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

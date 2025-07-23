@@ -14,7 +14,7 @@ function Courses() {
                     Gather your church community or business network and dive into our courses designed to lay a biblical foundation for faith and work and tools for walking it out together
                 </p>
                 <button 
-                    onClick={() => navigate("/community")}
+                    onClick={() => navigate("/courses")}
                     className="bg-gray-900 hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50"
                 >
                     LEARN MORE &rarr;

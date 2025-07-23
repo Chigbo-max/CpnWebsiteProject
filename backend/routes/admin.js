@@ -232,11 +232,24 @@ router.post('/newsletter', authenticateAdmin, async (req, res, next) => {
 
 router.patch('/profile', authenticateAdmin, async (req, res) => {
   try {
-    const { name, email, profilePic } = req.body;
-    const updated = await adminService.updateProfile(req.admin.id, { username: name, email, profilePic });
+    const { username, email, profilePic } = req.body;
+    const updated = await adminService.updateProfile(req.admin.id, { username, email, profilePic });
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: 'Failed to update profile', error: error.message });
+  }
+});
+
+// Add this endpoint for profile image uploads
+router.post('/upload-image', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No image file provided' });
+    // Convert buffer to base64 data URI
+    const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    const url = await cloudinaryService.uploadImage(base64, 'profile-images');
+    res.json({ url });
+  } catch (err) {
+    res.status(500).json({ message: 'Image upload failed', error: err.message });
   }
 });
 

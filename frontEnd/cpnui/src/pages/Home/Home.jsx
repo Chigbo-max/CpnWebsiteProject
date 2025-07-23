@@ -13,8 +13,6 @@ import Features from "../../components/HomeAbout/Features";
 import LatestRelease from "../../components/LatestRelease/LatestRelease";
 import Courses from "../../components/Courses/Courses";
 import FreeContent from "../../components/FreeContent/FreeContent";
-import NewAndPastEvents from "../../components/NewAndPastEvents/NewAndPastEvents";
-import UpcomingEvents from "../../components/UpcomingEvents/UpcomingEvents";
 import { useGetEventsQuery } from '../../features/event/eventApi';
 
 const slides = [
@@ -360,9 +358,15 @@ function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {upcomingEvents.map((event, idx) => (
                 <div key={event.event_id} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
-                  <div className={`h-48 bg-gradient-to-br ${idx % 2 === 0 ? 'from-amber-400 to-amber-600' : 'from-gray-800 to-gray-900'} flex items-center justify-center`}>
-                    <FontAwesomeIcon icon={faCalendarAlt} className="text-6xl text-white" />
-                  </div>
+                  {event.image_url ? (
+                    <div className="h-48 w-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className={`h-48 bg-gradient-to-br ${idx % 2 === 0 ? 'from-amber-400 to-amber-600' : 'from-gray-800 to-gray-900'} flex items-center justify-center`}>
+                      <FontAwesomeIcon icon={faCalendarAlt} className="text-6xl text-white" />
+                    </div>
+                  )}
                   <div className="p-6">
                     <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white mb-2">Upcoming Event</span>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
@@ -377,18 +381,24 @@ function Home() {
             </div>
           )}
         </section>
+        {upcomingEvents.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <Link to="/events" className="inline-block px-8 py-3 bg-amber-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-amber-700 transition-all duration-300 border-2 border-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50">
+              View All Events
+            </Link>
+          </div>
+        )}
 
         {/* Spotify Embed Section */}
-        <section className="mb-16">
+        <section className="mb-16 mt-16">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Listen to Our Latest Podcast</h2>
             <p className="text-gray-600">Stay inspired with our weekly episodes on Spotify</p>
           </div>
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <iframe 
-              className="w-full h-96" 
+              className="w-full h-96 border-0 w-full" 
               src="https://open.spotify.com/embed/show/2vmyOcrq7cFcKBMepGbpZP?utm_source=generator" 
-              frameBorder="0" 
               allowFullScreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
               loading="lazy"
@@ -397,7 +407,6 @@ function Home() {
         </section>
       </div>
 
-      {/* Additional Components */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-amber-50">
         <LatestRelease/>
         <Courses/>

@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faUser, faSignOutAlt, faCog, faUsers, faEnvelope, faFileAlt, faCalendarAlt, faPlus, faList, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
+import { useAdminAuth } from '../../app/useAdminAuth';
+import { useNavigate } from 'react-router-dom';
 
 const sidebarLinks = [
   { id: 'dashboard', label: 'Dashboard', icon: faFileAlt },
@@ -22,6 +24,16 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { shouldRedirect, setShouldRedirect } = useAdminAuth();
+  const navigate = useNavigate();
+
+  // Global redirect on logout/token expiry
+  React.useEffect(() => {
+    if (shouldRedirect) {
+      navigate('/admin/login');
+      setShouldRedirect(false);
+    }
+  }, [shouldRedirect, navigate, setShouldRedirect]);
 
   // Close dropdown on outside click
   React.useEffect(() => {

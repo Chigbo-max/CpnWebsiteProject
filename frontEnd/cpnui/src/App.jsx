@@ -1,8 +1,6 @@
 import './App.css'
 import { RouterProvider } from 'react-router-dom'
 import router from "./router/route.jsx"
-import { Provider } from 'react-redux'
-import store from './app/store.jsx'
 import React from 'react';
 import ServerDown from './pages/Error/ServerDown';
 import NoInternet from './pages/Error/NoInternet';
@@ -11,7 +9,6 @@ import { Toaster } from 'sonner';
 import { AdminAuthProvider } from './app/AdminAuthContextProvider';
 
 function App() {
-  // Remove token logic from here; use context instead
   const [hasServerError, setHasServerError] = React.useState(false);
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
 
@@ -55,12 +52,10 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Provider store={store}>
         <AdminAuthProvider>
           <Toaster position="top-center" richColors />
           <RouterProvider router={router} />
         </AdminAuthProvider>
-      </Provider>
     </ErrorBoundary>
   );
 }

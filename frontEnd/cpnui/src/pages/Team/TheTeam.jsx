@@ -3,14 +3,14 @@ import commanager from "../../assets/commanager.jpeg";
 import contentlead from "../../assets/contentlead.jpeg";
 
 const team = [
-  { name: 'Chigbo Ezeokeke', role: 'Founder', img: ceo },
+  { name: 'Guy Ezeokeke', role: 'Founder', img: ceo },
   { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
   { name: 'Michael Aniakor', role: 'Content Lead', img: contentlead },
 ];
 
 function TheTeam() {
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 py-16 px-4 sm:px-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 mt-16 py-16 px-4 sm:px-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-10 text-center text-gray-900">The Team</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">

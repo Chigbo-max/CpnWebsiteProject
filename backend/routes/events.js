@@ -90,7 +90,7 @@ router.post('/:event_id/register', async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: `Registration Confirmed: ${event.title}`,
-      html: require('../services/NewsletterService').renderNewsletterTemplate({
+      html: require('../services/NewsletterService').NewsletterServiceImpl.renderNewsletterTemplate({
         name: name,
         content: `
           <h2 style='margin-top:0;'>Thank you for registering for <b>${event.title}</b>!</h2>

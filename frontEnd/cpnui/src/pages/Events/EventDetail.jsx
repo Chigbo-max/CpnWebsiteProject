@@ -33,7 +33,7 @@ const EventDetail = () => {
   if (isError || !event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8">
+    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8 mt-8 sm:mt-12">
       <div className="mb-8">
         {event.image_url && <img src={event.image_url} alt={event.title} className="w-full h-64 object-cover rounded-lg mb-4" />}
         <h2 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h2>

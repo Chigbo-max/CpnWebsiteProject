@@ -230,7 +230,7 @@ const BlogCreate = ({ token, onSuccess }) => {
           <MdEditor
             value={markdownValue}
             style={{ height: '400px' }}
-            renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+            renderHTML={text => <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
             onChange={({ text }) => setMarkdownValue(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}

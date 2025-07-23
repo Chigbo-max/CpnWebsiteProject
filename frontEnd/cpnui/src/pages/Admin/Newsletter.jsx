@@ -82,7 +82,7 @@ const Newsletter = ({ token }) => {
           <MdEditor
             value={content}
             style={{ height: '400px' }}
-            renderHTML={text => <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
+            renderHTML={text => <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{text}</ReactMarkdown>}
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleMdImageUpload}
             view={{ menu: true, md: true, html: true }}
@@ -120,7 +120,7 @@ const Newsletter = ({ token }) => {
             </button>
             <h2 className="text-xl font-bold mb-4">{subject}</h2>
             <div className="prose prose-amber max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ u: ({node, ...props}) => <u {...props} />, span: ({node, ...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
+              <ReactMarkdown components={{ span: ({node, ...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
             </div>
           </div>
         </div>
