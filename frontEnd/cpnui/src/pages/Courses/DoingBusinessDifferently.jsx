@@ -22,6 +22,8 @@ function DoingBusinessDifferently() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+
   const handleOpen = (e) => {
     e.preventDefault();
     setShowModal(true);
@@ -39,8 +41,9 @@ function DoingBusinessDifferently() {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+
     try {
-      const res = await fetch('http://localhost:5000/api/enrollments', {
+      const res = await fetch(`${apiBaseUrl}/api/enrollments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, course: 'Doing Business Differently (DBD)' })

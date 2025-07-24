@@ -45,7 +45,6 @@ function Blog() {
 
     return (
         <div className="w-full">
-            {/* Hero Section */}
             <section className="relative w-full min-h-[400px] sm:min-h-[500px] flex items-center justify-center text-center overflow-hidden">
                 <div
                     className="absolute inset-0 w-full h-full"
@@ -77,7 +76,6 @@ function Blog() {
                 </div>
             </section>
 
-            {/* Main Content */}
             <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
                 <div className="max-w-7xl mx-auto">
                     {publishedPosts.length === 0 ? (

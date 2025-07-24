@@ -106,7 +106,7 @@ function AdminDashboard() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)
@@ -130,7 +130,7 @@ function AdminDashboard() {
 
   const handleProfileUpdate = async (updatedData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/profile', {
+      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

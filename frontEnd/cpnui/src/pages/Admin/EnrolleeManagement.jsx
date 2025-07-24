@@ -20,9 +20,11 @@ const EnrolleeManagement = ({ token }) => {
   const [content, setContent] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+
   const fetchEnrollees = async () => {
     setLoading(true);
-    let url = 'http://localhost:5000/api/enrollments/admin/enrollments';
+    let url = `${apiBaseUrl}/api/enrollments/admin/enrollments`;
     if (startDate && endDate) {
       url += `?startDate=${startDate}&endDate=${endDate}`;
     }
@@ -43,7 +45,7 @@ const EnrolleeManagement = ({ token }) => {
     e.preventDefault();
     setBroadcastStatus(null);
     try {
-      const res = await fetch('http://localhost:5000/api/enrollments/admin/enrollments/broadcast', {
+      const res = await fetch(`${apiBaseUrl}/api/enrollments/admin/enrollments/broadcast`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

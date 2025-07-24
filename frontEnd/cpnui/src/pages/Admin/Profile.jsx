@@ -15,6 +15,9 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
   const [changing, setChanging] = useState(false);
   const { updateAdmin } = useAdminAuth();
 
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -30,7 +33,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     try {
       // Upload image to backend, not directly to Cloudinary
       const token = localStorage.getItem('adminToken');
-      const res = await fetch('http://localhost:5000/api/admin/upload-image', {
+      const res = await fetch(`${apiBaseUrl}/api/admin/upload-image`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -40,7 +43,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       const data = await res.json();
       setForm(f => ({ ...f, profilePic: data.url, uploading: false }));
       // Instantly update profile on server as soon as image is uploaded
-      const response = await fetch('http://localhost:5000/api/admin/profile', {
+      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +70,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     setForm(f => ({ ...f, saving: true }));
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/profile', {
+      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +80,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       });
       if (response.ok) {
         const updatedAdmin = await response.json();
-        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context/state
+        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); 
         updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context and localStorage for navbar/sidebar
         toast.success('Profile updated!');
       } else {
@@ -98,7 +101,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     }
     setChanging(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/change-password', {
+      const response = await fetch(`${apiBaseUrl}/api/admin/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.new }),
@@ -121,7 +124,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     setForm(f => ({ ...f, uploading: true }));
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/profile-picture', {
+      const response = await fetch(`${apiBaseUrl}/api/admin/profile-picture`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
