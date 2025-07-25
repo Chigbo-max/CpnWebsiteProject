@@ -25,4 +25,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 RUN npm install -g pg
 # Start the app
-CMD [""npm", "start", sh", "-c", "psql $DATABASE_URL < /app/config/schema.sql && node server.js"]
+CMD [""npm", "start", sh", "-c", "psql $DATABASE_URL < /backend/config/schema.sql && node server.js"]
