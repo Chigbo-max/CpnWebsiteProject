@@ -33,8 +33,8 @@ function AdminDashboard() {
   const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
 
   const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
-  const wsUrl = import.meta.env.VITE_WS_URL;
-
+const wsUrl = import.meta.env.VITE_WS_URL || 
+                `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
   useEffect(() => {
     if (activeSection === 'dashboard' && token) {
       (async () => {
