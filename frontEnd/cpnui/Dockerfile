@@ -1,76 +1,35 @@
+# Build stage
+FROM node:20 AS build
 
-# Use Node.js image
-FROM node:20
-
-# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-
+# Copy package files
 COPY package*.json ./
+
+# Install dependencies
 RUN npm ci
 
 # Copy source code
 COPY . .
 
-ENV VITE_BASE_API_URL=$VITE_BASE_API_URL
-ENV VITE_WS_URL=$VITE_WS_URL
-ENV VITE_SPOTIFY_CLIENT_ID=$VITE_SPOTIFY_CLIENT_ID
-ENV VITE_SPOTIFY_CLIENT_SECRET=$VITE_SPOTIFY_CLIENT_SECRET
-ENV VITE_SPOTIFY_REDIRECT_URI=$VITE_SPOTIFY_REDIRECT_URI
-
-# Build the app
+# Build the application
 RUN npm run build
 
-# Install `serve` globally to serve the production build
-RUN npm install -g serve
+# Production stage
+FROM nginx:alpine
 
-# Expose the port that `serve` will use
+# Copy built files from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port
 EXPOSE 80
 
-# Healthcheck (optional but useful)
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
-# Serve the app using `serve`
-CMD ["serve", "-s", "dist", "-l", "80"]
-
-
-
-
-
-# Build stage
-# FROM node:20 AS build
-
-# WORKDIR /app
-
-# Copy package files
-# COPY package*.json ./
-
-# Install dependencies
-# RUN npm ci
-
-# Copy source code
-# COPY . .
-
-# Build the application
-# RUN npm run build
-
-# Production stage
-# FROM nginx:alpine
-
-# Copy built files from build stage
-# COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration
-# COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port
-# EXPOSE 80
-
-# Health check
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  # CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
-
 # Start nginx
-# CMD ["-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"] 
