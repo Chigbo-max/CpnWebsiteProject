@@ -120,8 +120,8 @@ CREATE TABLE IF NOT EXISTS password_reset_audit (
 );
 
 -- Insert default admin
-INSERT INTO admins (username, email, password_hash) 
-VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
+INSERT INTO admins (username, email, password_hash, role) 
+VALUES ('Uju', 'chizzyaac@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin')
 ON CONFLICT (username) DO NOTHING;
 
 ALTER TABLE blog_posts ADD COLUMN content_type VARCHAR(20) DEFAULT 'markdown';
