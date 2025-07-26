@@ -10,11 +10,8 @@ import { useGetBlogsQuery } from '../../features/blog/blogApi';
 
 function Blog() {
     const { data, isLoading, isError, error } = useGetBlogsQuery();
-    console.log("data: ", data)
     const blogPosts = useMemo(() => {
         const posts = data?.blogs ?? [];
-        console.log("blog posts: ", posts)
-        posts.forEach(post => console.log("status:", post.status));
         return posts;
     }, [data]);
     
@@ -45,7 +42,6 @@ function Blog() {
 
     return (
         <div className="w-full">
-            {/* Hero Section */}
             <section className="relative w-full min-h-[400px] sm:min-h-[500px] flex items-center justify-center text-center overflow-hidden">
                 <div
                     className="absolute inset-0 w-full h-full"

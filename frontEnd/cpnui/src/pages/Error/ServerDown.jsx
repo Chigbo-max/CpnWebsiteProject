@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faServer, faRedo } from '@fortawesome/free-solid-svg-icons';
 
-// Usage: Render this component when a fetch/axios call fails due to server down (e.g., in catch block for network error)
 function ServerDown() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-4 py-16">
