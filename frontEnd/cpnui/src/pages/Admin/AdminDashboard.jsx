@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsivePie } from '@nivo/pie';
-import { useGetAnalyticsQuery, useGetMonthlySubscribersQuery, useGetMonthlyEnrolleesQuery } from './adminDashboardApi';
+import { useGetAnalyticsQuery, useGetMonthlySubscribersQuery, useGetMonthlyEnrolleesQuery } from '../../features/admin/adminDashboardApi';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
