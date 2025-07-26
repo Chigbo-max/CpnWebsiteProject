@@ -3,8 +3,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const eventApi = createApi({
   reducerPath: 'eventApi',
   baseQuery: fetchBaseQuery({ 
-      baseUrl: import.meta.env.VITE_BASE_API_URL,
-       prepareHeaders: (headers) => {
+    baseUrl: import.meta.env.VITE_BASE_API_URL,
+    prepareHeaders: (headers) => {
       const token = localStorage.getItem('adminToken');
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
@@ -12,8 +12,9 @@ export const eventApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Event'],
+  tagTypes: ['Event', 'EventRegistration'],
   endpoints: (builder) => ({
+    // Events endpoints
     getEvents: builder.query({
       query: () => '/events',
       providesTags: (result) => {
@@ -22,23 +23,50 @@ export const eventApi = createApi({
           : (result?.events ?? []);
         return list.length
           ? [
-            ...list.map(({ event_id }) => ({ type: 'Event', id: event_id })),
-            { type: 'Event', id: 'LIST' },
-          ]
+              ...list.map(({ event_id }) => ({ type: 'Event', id: event_id })),
+              { type: 'Event', id: 'LIST' },
+            ]
           : [{ type: 'Event', id: 'LIST' }];
       },
     }),
+    
     getEventById: builder.query({
       query: (event_id) => `/events/${event_id}`,
-      providesTags: (result, event_id) => [{ type: 'Event', id: event_id }],
+      providesTags: (result, error, event_id) => [{ type: 'Event', id: event_id }],
     }),
+
+    // Registration endpoints
+    getEventRegistrations: builder.query({
+      query: (event_id) => `/events/${event_id}/registrations`,
+      providesTags: (result, error, event_id) => [
+        { type: 'EventRegistration', id: event_id },
+        ...(result?.map(({ registration_id }) => ({ 
+          type: 'EventRegistration', 
+          id: registration_id 
+        })) || []
+      ),
+      ],
+    }),
+
+    getEventRegistrationsCSV: builder.query({
+      query: (event_id) => ({
+        url: `/events/${event_id}/registrations/csv`,
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
+
     registerForEvent: builder.mutation({
       query: ({ event_id, ...body }) => ({
         url: `/events/${event_id}/register`,
         method: 'POST',
         body,
       }),
+      invalidatesTags: (result, error, { event_id }) => [
+        { type: 'EventRegistration', id: event_id }
+      ],
     }),
+
+    // Admin-only endpoints
     createEvent: builder.mutation({
       query: (formData) => ({
         url: '/admin/events',
@@ -47,23 +75,25 @@ export const eventApi = createApi({
       }),
       invalidatesTags: [{ type: 'Event', id: 'LIST' }],
     }),
+
     updateEvent: builder.mutation({
       query: ({ event_id, ...patch }) => ({
         url: `/admin/events/${event_id}`,
         method: 'PUT',
         body: patch,
       }),
-      invalidatesTags: (result, { event_id }) => [
+      invalidatesTags: (result, error, { event_id }) => [
         { type: 'Event', id: event_id },
         { type: 'Event', id: 'LIST' },
       ],
     }),
+
     deleteEvent: builder.mutation({
       query: (event_id) => ({
         url: `/admin/events/${event_id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, event_id) => [
+      invalidatesTags: (result, error, event_id) => [
         { type: 'Event', id: event_id },
         { type: 'Event', id: 'LIST' },
       ],
@@ -74,8 +104,10 @@ export const eventApi = createApi({
 export const {
   useGetEventsQuery,
   useGetEventByIdQuery,
+  useGetEventRegistrationsQuery,
+  useLazyGetEventRegistrationsCSVQuery,
+  useRegisterForEventMutation,
   useCreateEventMutation,
   useUpdateEventMutation,
   useDeleteEventMutation,
-  useRegisterForEventMutation,
-} = eventApi; 
+} = eventApi;

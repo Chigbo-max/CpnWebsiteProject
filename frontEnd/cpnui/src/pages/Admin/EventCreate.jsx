@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../app/useAdminAuth';
 import{useCreateEventMutation} from '../../features/event/eventApi';
 
 const initialState = {
@@ -21,7 +20,6 @@ const EventCreate = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { token } = useAdminAuth();
   const [createEvent] = useCreateEventMutation();
 
   const handleChange = (e) => {

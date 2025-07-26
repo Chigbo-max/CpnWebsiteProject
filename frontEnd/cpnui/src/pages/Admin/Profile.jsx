@@ -2,21 +2,39 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import { useAdminAuth } from '../../app/useAdminAuth';
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useUploadProfileImageMutation,
+  useRemoveProfileImageMutation,
+  useChangePasswordMutation,
+} from '../../features/admin/profileApi';
 
-const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword }) => {
+const Profile = ({ showChangePassword, setShowChangePassword }) => {
+  const { currentAdmin: admin, updateAdmin } = useAdminAuth();
   const [form, setForm] = useState({
     name: admin?.username || '',
     email: admin?.email || '',
     profilePic: admin?.profile_pic || '',
-    uploading: false,
-    saving: false,
   });
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
-  const [changing, setChanging] = useState(false);
-  const { updateAdmin } = useAdminAuth();
 
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+  const { data: profileData } = useGetProfileQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [uploadImage, { isLoading: isUploading }] = useUploadProfileImageMutation();
+  const [removeImage, { isLoading: isRemoving }] = useRemoveProfileImageMutation();
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
+  // Sync form with latest profile data
+  useState(() => {
+    if (profileData) {
+      setForm({
+        name: profileData.username || '',
+        email: profileData.email || '',
+        profilePic: profileData.profile_pic || '',
+      });
+    }
+  }, [profileData]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,71 +43,37 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setForm(f => ({ ...f, uploading: true }));
-  
-    const formData = new FormData();
-    formData.append('image', file);
-  
+
     try {
-      // Upload image to backend, not directly to Cloudinary
-      const token = localStorage.getItem('adminToken');
-      const res = await fetch(`${apiBaseUrl}/admin/upload-image`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData,
-      });
-      const data = await res.json();
-      setForm(f => ({ ...f, profilePic: data.url, uploading: false }));
-      // Instantly update profile on server as soon as image is uploaded
-      const response = await fetch(`${apiBaseUrl}/admin/profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username: form.name, email: form.email, profilePic: data.url }),
-      });
-      if (response.ok) {
-        const updatedAdmin = await response.json();
-        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context/state instantly
-        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context and localStorage for navbar/sidebar
-        toast.success('Profile picture updated!');
-      } else {
-        toast.error('Failed to update profile picture');
-      }
-    } catch {
-      setForm(f => ({ ...f, uploading: false }));
-      toast.error('Failed to upload image');
+      const { url } = await uploadImage(file).unwrap();
+      
+      const updatedAdmin = await updateProfile({ 
+        username: form.name, 
+        email: form.email, 
+        profilePic: url 
+      }).unwrap();
+      
+      setForm(f => ({ ...f, profilePic: url }));
+      updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
+      toast.success('Profile picture updated!');
+    } catch (err) {
+      toast.error(err.data?.message || 'Failed to upload image');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setForm(f => ({ ...f, saving: true }));
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${apiBaseUrl}/admin/profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username: form.name, email: form.email, profilePic: form.profilePic }),
-      });
-      if (response.ok) {
-        const updatedAdmin = await response.json();
-        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); 
-        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic }); // update context and localStorage for navbar/sidebar
-        toast.success('Profile updated!');
-      } else {
-        toast.error('Failed to update profile');
-      }
-    } catch {
-      toast.error('Error updating profile');
-    } finally {
-      setForm(f => ({ ...f, saving: false }));
+      const updatedAdmin = await updateProfile({ 
+        username: form.name, 
+        email: form.email, 
+        profilePic: form.profilePic 
+      }).unwrap();
+      
+      updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
+      toast.success('Profile updated!');
+    } catch (err) {
+      toast.error(err.data?.message || 'Failed to update profile');
     }
   };
 
@@ -99,52 +83,33 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       toast.error('New passwords do not match');
       return;
     }
-    setChanging(true);
+
     try {
-      const response = await fetch(`${apiBaseUrl}/admin/change-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.new }),
-      });
-      if (response.ok) {
-        toast.success('Password changed successfully!');
-        setShowChangePassword(false);
-        setPasswords({ current: '', new: '', confirm: '' });
-      } else {
-        toast.error('Failed to change password');
-      }
-    } catch {
-      toast.error('Error changing password');
-    } finally {
-      setChanging(false);
+      await changePassword({ 
+        currentPassword: passwords.current, 
+        newPassword: passwords.new 
+      }).unwrap();
+      
+      toast.success('Password changed successfully!');
+      setShowChangePassword(false);
+      setPasswords({ current: '', new: '', confirm: '' });
+    } catch (err) {
+      toast.error(err.data?.message || 'Failed to change password');
     }
   };
 
   const handleRemoveProfilePic = async () => {
-    setForm(f => ({ ...f, uploading: true }));
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${apiBaseUrl}/admin/profile-picture`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const updatedAdmin = await response.json();
-        setForm(f => ({ ...f, profilePic: '', uploading: false }));
-        onUpdate({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
-        updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
-        toast.success('Profile picture removed!');
-      } else {
-        setForm(f => ({ ...f, uploading: false }));
-        toast.error('Failed to remove profile picture');
-      }
-    } catch {
-      setForm(f => ({ ...f, uploading: false }));
-      toast.error('Failed to remove profile picture');
+      const updatedAdmin = await removeImage().unwrap();
+      setForm(f => ({ ...f, profilePic: '' }));
+      updateAdmin({ ...updatedAdmin, profilePic: updatedAdmin.profile_pic });
+      toast.success('Profile picture removed!');
+    } catch (err) {
+      toast.error(err.data?.message || 'Failed to remove profile picture');
     }
   };
+
+  const isLoading = isUploading || isUpdating || isRemoving;
 
   return (
     <div className="w-full bg-white rounded-xl shadow-lg p-4 sm:p-8">
@@ -152,7 +117,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       <form onSubmit={handleSubmit} className="space-y-6 w-full">
         <div className="flex flex-col items-center gap-4">
           <img
-            src={form.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(form.name || 'Admin') + '&background=111827&color=fff&size=128'}
+            src={form.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(form.name || 'Admin')}&background=111827&color=fff&size=128`}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover border-4 border-amber-500"
           />
@@ -163,7 +128,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
               accept="image/*"
               className="block w-full text-sm text-gray-500 mt-2"
               onChange={handleImageChange}
-              disabled={form.uploading}
+              disabled={isLoading}
             />
           </label>
           {form.profilePic && (
@@ -171,7 +136,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
               type="button"
               className="mt-2 text-xs text-red-600 underline hover:text-red-800"
               onClick={handleRemoveProfilePic}
-              disabled={form.uploading}
+              disabled={isLoading}
             >
               Remove Profile Picture
             </button>
@@ -202,9 +167,9 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
         <button
           type="submit"
           className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
-          disabled={form.uploading || form.saving}
+          disabled={isLoading}
         >
-          {form.uploading ? 'Uploading...' : form.saving ? 'Saving...' : 'Save Changes'}
+          {isLoading ? 'Saving...' : 'Save Changes'}
         </button>
       </form>
       {showChangePassword && (
@@ -251,9 +216,9 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
               <button
                 type="submit"
                 className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
-                disabled={changing}
+                disabled={isChangingPassword}
               >
-                {changing ? 'Changing...' : 'Change Password'}
+                {isChangingPassword ? 'Changing...' : 'Change Password'}
               </button>
             </form>
           </div>
@@ -264,15 +229,8 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
 };
 
 Profile.propTypes = {
-  admin: PropTypes.shape({
-    username: PropTypes.string,
-    email: PropTypes.string,
-    profilePic: PropTypes.string,
-    profile_pic: PropTypes.string,
-  }),
-  onUpdate: PropTypes.func.isRequired,
   showChangePassword: PropTypes.bool.isRequired,
   setShowChangePassword: PropTypes.func.isRequired,
 };
 
-export default Profile; 
+export default Profile;

@@ -1,39 +1,41 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import {
+  useGetAdminsQuery,
+  useAddAdminMutation,
+  useDeleteAdminMutation,
+  useResetAdminPasswordMutation,
+} from '../../features/admin/adminManagementApi';
 
-const AdminManagement = ({ token, currentAdmin }) => {
-  const [admins, setAdmins] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const AdminManagement = ({ currentAdmin }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'admin' });
-  const [submitting, setSubmitting] = useState(false);
-  const [confirmModal, setConfirmModal] = useState({ open: false, type: '', admin: null });
+  const [form, setForm] = useState({ 
+    username: '', 
+    email: '', 
+    password: '', 
+    role: 'admin' 
+  });
+  const [confirmModal, setConfirmModal] = useState({ 
+    open: false, 
+    type: '', 
+    admin: null 
+  });
 
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+  // RTK Query hooks
+  const { 
+    data: admins = [], 
+    isLoading, 
+    isError, 
+    error 
+  } = useGetAdminsQuery(undefined, {
+    skip: !currentAdmin || currentAdmin.role !== 'superadmin',
+  });
 
-  const fetchAdmins = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${apiBaseUrl}/admin/admins`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch admins');
-      const data = await res.json();
-      setAdmins(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    fetchAdmins();
-  }, [fetchAdmins]);
+  const [addAdmin, { isLoading: isAdding }] = useAddAdminMutation();
+  const [deleteAdmin] = useDeleteAdminMutation();
+  const [resetPassword] = useResetAdminPasswordMutation();
 
   if (!currentAdmin || currentAdmin.role !== 'superadmin') {
     return (
@@ -46,63 +48,53 @@ const AdminManagement = ({ token, currentAdmin }) => {
     );
   }
 
-  const handleDelete = async (id) => {
-    setConfirmModal({ open: true, type: 'delete', admin: admins.find(admin => (admin.id || admin._id) === id) });
+  const handleDelete = (id) => {
+    setConfirmModal({ 
+      open: true, 
+      type: 'delete', 
+      admin: admins.find(admin => admin.id === id) 
+    });
   };
 
-  const handleResetPassword = async (id) => {
-    setConfirmModal({ open: true, type: 'reset', admin: admins.find(admin => (admin.id || admin._id) === id) });
+  const handleResetPassword = (id) => {
+    setConfirmModal({ 
+      open: true, 
+      type: 'reset', 
+      admin: admins.find(admin => admin.id === id) 
+    });
   };
 
   const confirmAction = async () => {
     if (!confirmModal.admin) return;
-    if (confirmModal.type === 'delete') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('Failed to delete admin');
-        toast.success('Admin deleted');
-        fetchAdmins();
-      } catch (err) {
-        toast.error(err.message);
+    
+    try {
+      if (confirmModal.type === 'delete') {
+        await deleteAdmin(confirmModal.admin.id).unwrap();
+        toast.success('Admin deleted successfully');
+      } else if (confirmModal.type === 'reset') {
+        await resetPassword(confirmModal.admin.id).unwrap();
+        toast.success('Password reset email sent');
       }
-    } else if (confirmModal.type === 'reset') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}/reset-password`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('Failed to reset password');
-        toast.success('Password reset. Email sent.');
-      } catch (err) {
-        toast.error(err.message);
-      }
+    } catch (err) {
+      toast.error(err.data?.message || 'An error occurred');
+    } finally {
+      setConfirmModal({ open: false, type: '', admin: null });
     }
+  };
+
+  const closeConfirmModal = () => {
     setConfirmModal({ open: false, type: '', admin: null });
   };
 
-  const closeConfirmModal = () => setConfirmModal({ open: false, type: '', admin: null });
-
   const handleAdd = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     try {
-      const res = await fetch(`${apiBaseUrl}/admin/admins`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form)
-      });
-      if (!res.ok) throw new Error('Failed to add admin');
-      toast.success('Admin added');
+      await addAdmin(form).unwrap();
+      toast.success('Admin added successfully');
       setModalOpen(false);
       setForm({ username: '', email: '', password: '', role: 'admin' });
-      fetchAdmins();
     } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSubmitting(false);
+      toast.error(err.data?.message || 'Failed to add admin');
     }
   };
 
@@ -117,10 +109,13 @@ const AdminManagement = ({ token, currentAdmin }) => {
           Add Admin
         </button>
       </div>
-      {loading ? (
+
+      {isLoading ? (
         <SimpleSpinner message="Loading admins..." />
-      ) : error ? (
-        <div className="text-center py-8 text-red-500">{error}</div>
+      ) : isError ? (
+        <div className="text-center py-8 text-red-500">
+          {error.data?.message || 'Failed to load admins'}
+        </div>
       ) : admins.length === 0 ? (
         <div className="text-center py-8 text-gray-500">No admins found.</div>
       ) : (
@@ -137,23 +132,25 @@ const AdminManagement = ({ token, currentAdmin }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {admins.map(admin => (
-                <tr key={admin.id || admin._id}>
+                <tr key={admin.id}>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{admin.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-blue-700">{admin.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-700">{admin.role}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">{admin.created_at ? new Date(admin.created_at).toLocaleDateString() : '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                    {admin.created_at ? new Date(admin.created_at).toLocaleDateString() : '-'}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                    {currentAdmin && (admin.id || admin._id) !== currentAdmin.id && (
+                    {admin.id !== currentAdmin.id && (
                       <>
                         <button
                           className="px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 text-xs font-semibold"
-                          onClick={() => handleDelete(admin.id || admin._id)}
+                          onClick={() => handleDelete(admin.id)}
                         >
                           Delete
                         </button>
                         <button
                           className="px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-semibold"
-                          onClick={() => handleResetPassword(admin.id || admin._id)}
+                          onClick={() => handleResetPassword(admin.id)}
                         >
                           Reset Password
                         </button>
@@ -166,7 +163,8 @@ const AdminManagement = ({ token, currentAdmin }) => {
           </table>
         </div>
       )}
-      {/* Modal for adding admin */}
+
+      {/* Add Admin Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative animate-fadeIn">
@@ -207,6 +205,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
                   required
+                  minLength={8}
                 />
               </div>
               <div>
@@ -223,16 +222,16 @@ const AdminManagement = ({ token, currentAdmin }) => {
               <div className="flex gap-4 mt-4">
                 <button
                   type="submit"
-                  className={`px-6 py-2 rounded-lg text-white bg-amber-500 hover:bg-amber-600 transition ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  disabled={submitting}
+                  className={`px-6 py-2 rounded-lg text-white bg-amber-500 hover:bg-amber-600 transition ${isAdding ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  disabled={isAdding}
                 >
-                  {submitting ? 'Adding...' : 'Add Admin'}
+                  {isAdding ? 'Adding...' : 'Add Admin'}
                 </button>
                 <button
                   type="button"
                   className="px-6 py-2 rounded-lg border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 transition"
                   onClick={() => setModalOpen(false)}
-                  disabled={submitting}
+                  disabled={isAdding}
                 >
                   Cancel
                 </button>
@@ -241,6 +240,8 @@ const AdminManagement = ({ token, currentAdmin }) => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
       {confirmModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative animate-fadeIn">
@@ -267,7 +268,11 @@ const AdminManagement = ({ token, currentAdmin }) => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 rounded text-white font-semibold ${confirmModal.type === 'delete' ? 'bg-red-500 hover:bg-red-600' : 'bg-amber-500 hover:bg-amber-600'}`}
+                className={`px-4 py-2 rounded text-white font-semibold ${
+                  confirmModal.type === 'delete' 
+                    ? 'bg-red-500 hover:bg-red-600' 
+                    : 'bg-amber-500 hover:bg-amber-600'
+                }`}
                 onClick={confirmAction}
               >
                 {confirmModal.type === 'delete' ? 'Delete' : 'Reset Password'}
@@ -285,7 +290,6 @@ AdminManagement.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     role: PropTypes.string.isRequired,
   }).isRequired,
-  token: PropTypes.string.isRequired,
 };
 
-export default AdminManagement; 
+export default AdminManagement;

@@ -1,5 +1,17 @@
 import { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
+import { ResponsiveBar, ResponsivePie } from '@nivo/bar';
+import {
+  useGetEnrolleesCountQuery,
+  useGetSubscribersCountQuery,
+  useGetEventsCountQuery,
+  useGetBlogsCountQuery,
+  useGetMonthlySubscriberCountsQuery,
+  useGetMonthlyEnrolleeCountsQuery,
+  useAdminLoginMutation,
+} from './adminDashboardApi';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import AdminLayout from './AdminLayout';
 import Profile from './Profile';
@@ -14,11 +26,6 @@ import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
-import { useNavigate } from 'react-router-dom';
-import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
-import { ResponsiveLine } from '@nivo/line';
-import { ResponsiveBar } from '@nivo/bar';
-import { ResponsivePie } from '@nivo/pie';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
@@ -26,75 +33,54 @@ function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
-  const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
-  const [monthlyCounts, setMonthlyCounts] = useState([]);
-  const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
+  // RTK Query hooks
+  const { data: enrolleesCount = 0 } = useGetEnrolleesCountQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const { data: subscribersCount = 0 } = useGetSubscribersCountQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const { data: eventsCount = 0 } = useGetEventsCountQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const { data: blogsCount = 0 } = useGetBlogsCountQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const { data: monthlyCounts = [] } = useGetMonthlySubscriberCountsQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const { data: enrolleeMonthlyCounts = [] } = useGetMonthlyEnrolleeCountsQuery(undefined, {
+    skip: activeSection !== 'dashboard' || !token,
+  });
+  const [adminLogin] = useAdminLoginMutation();
 
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
-const wsUrl = import.meta.env.VITE_WS_URL || 
-                `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+  const analytics = {
+    enrollees: enrolleesCount,
+    subscribers: subscribersCount,
+    events: eventsCount,
+    blogs: blogsCount,
+  };
+
+  // WebSocket for real-time updates
   useEffect(() => {
-    if (activeSection === 'dashboard' && token) {
-      (async () => {
-        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-          fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-        const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
-        const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
-        const events = (await eventsRes.json()).events?.length || 0;
-        const blogs = (await blogsRes.json()).blogs?.length || 0;
-        setAnalytics({ enrollees, subscribers, events, blogs });
-        const monthly = (await monthlyCountsRes.json()).data || [];
-        setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
-        const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
-      })();
-    }
-    // WebSocket for real-time updates
+    const wsUrl = import.meta.env.VITE_WS_URL || 
+                  `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+    
     let ws;
-    if (activeSection === 'dashboard') {
+    if (activeSection === 'dashboard' && token) {
       ws = new window.WebSocket(wsUrl);
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'dashboard-update') {
-          // Refetch analytics data on any dashboard update
-          (async () => {
-            const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-              fetch(`${apiBaseUrl}/api/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/api/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/api/events`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/api/blog`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/api/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/api/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
-            ]);
-            const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
-            const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
-            const events = (await eventsRes.json()).events?.length || 0;
-            const blogs = (await blogsRes.json()).blogs?.length || 0;
-            setAnalytics({ enrollees, subscribers, events, blogs });
-            const monthly = (await monthlyCountsRes.json()).data || [];
-            setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
-            const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
-          })();
+          toast.info('Dashboard data updated');
         }
       };
     }
     return () => {
       if (ws) ws.close();
     };
-  }, [activeSection, token, apiBaseUrl, wsUrl]);
-
-  useEffect(() => {
-    setIsLoggedIn(!!token);
-  }, [token]);
+  }, [activeSection, token]);
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -106,50 +92,20 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        login(data.token, data.admin);
-        setIsLoggedIn(true);
-      } else {
-        toast.error('Login failed');
-      }
-    } catch {
-      toast.error('Login error');
+      const { token, admin } = await adminLogin(loginData).unwrap();
+      login(token, admin);
+    } catch (err) {
+      toast.error(err.data?.message || 'Login failed');
     }
   };
 
   const handleLogout = () => {
     logout();
-    setIsLoggedIn(false);
   };
 
-  const handleProfileUpdate = async (updatedData) => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedData)
-      });
-
-      if (response.ok) {
-        const updatedAdmin = await response.json();
-        login(token, updatedAdmin);
-        toast.success('Profile updated successfully');
-      } else {
-        toast.error('Failed to update profile');
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Error updating profile');
-    }
+  const handleProfileUpdate = (updatedAdmin) => {
+    login(token, updatedAdmin);
+    toast.success('Profile updated successfully');
   };
 
   const handleShowChangePassword = () => {
@@ -163,70 +119,35 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
     }
   }, [admin, activeSection]);
 
-  // Prepare Nivo data for subscribers
-  const nivoSubscribersData = [
-    {
-      id: 'Subscribers',
-      color: 'hsl(34, 70%, 50%)',
-      data: monthlyCounts.map(m => ({ x: m.name, y: m.count }))
-    }
-  ];
-  // Prepare Nivo data for enrolled students (real data for 5 years)
-  const nivoEnrolleesData = [
-    {
-      id: 'Enrolled Students',
-      color: 'hsl(210, 70%, 50%)',
-      data: enrolleeMonthlyCounts.map(m => ({ x: m.name, y: m.count }))
-    }
-  ];
+  // Prepare Nivo data for subscribers bar chart
+  const subscriberBarData = monthlyCounts.map(m => ({
+    month: m.name,
+    subscribers: m.count
+  }));
+
+  // Prepare Nivo data for enrollees bar chart
+  const enrolleeBarData = enrolleeMonthlyCounts.map(m => ({
+    month: m.name,
+    enrollees: m.count
+  }));
+
   // Prepare Nivo bar chart data (compare all analytics)
-  const barData = [
-    {
-      category: 'Enrollees',
-      count: analytics.enrollees,
-    },
-    {
-      category: 'Subscribers',
-      count: analytics.subscribers,
-    },
-    {
-      category: 'Events',
-      count: analytics.events,
-    },
-    {
-      category: 'Blogs',
-      count: analytics.blogs,
-    },
-  ];
-  // Prepare Nivo pie chart data (distribution)
-  const pieData = [
-    {
-      id: 'Enrollees',
-      label: 'Enrollees',
-      value: analytics.enrollees,
-      color: 'hsl(210, 70%, 50%)',
-    },
-    {
-      id: 'Subscribers',
-      label: 'Subscribers',
-      value: analytics.subscribers,
-      color: 'hsl(34, 70%, 50%)',
-    },
-    {
-      id: 'Events',
-      label: 'Events',
-      value: analytics.events,
-      color: 'hsl(120, 70%, 50%)',
-    },
-    {
-      id: 'Blogs',
-      label: 'Blogs',
-      value: analytics.blogs,
-      color: 'hsl(10, 70%, 50%)',
-    },
+  const overviewBarData = [
+    { category: 'Enrollees', count: analytics.enrollees },
+    { category: 'Subscribers', count: analytics.subscribers },
+    { category: 'Events', count: analytics.events },
+    { category: 'Blogs', count: analytics.blogs },
   ];
 
-  if (!isLoggedIn) {
+  // Prepare Nivo pie chart data (distribution)
+  const pieData = [
+    { id: 'Enrollees', label: 'Enrollees', value: analytics.enrollees, color: 'hsl(210, 70%, 50%)' },
+    { id: 'Subscribers', label: 'Subscribers', value: analytics.subscribers, color: 'hsl(34, 70%, 50%)' },
+    { id: 'Events', label: 'Events', value: analytics.events, color: 'hsl(120, 70%, 50%)' },
+    { id: 'Blogs', label: 'Blogs', value: analytics.blogs, color: 'hsl(10, 70%, 50%)' },
+  ];
+
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
@@ -272,204 +193,197 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
         {activeSection === 'dashboard' && (
           <div className="w-full min-h-[60vh] flex flex-col items-center justify-center">
             <h2 className="text-3xl font-bold mb-8 text-gray-900">Admin Analytics Dashboard</h2>
+            
+            {/* Analytics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mb-12">
-              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-                <FaUserGraduate className="text-5xl text-amber-600 mb-4" />
-                <div className="text-4xl font-bold text-gray-900">{analytics.enrollees}</div>
-                <div className="text-lg text-gray-600 mt-2">Enrolled Students</div>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-                <FaUsers className="text-5xl text-amber-600 mb-4" />
-                <div className="text-4xl font-bold text-gray-900">{analytics.subscribers}</div>
-                <div className="text-lg text-gray-600 mt-2">Subscribers</div>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-                <FaCalendarAlt className="text-5xl text-amber-600 mb-4" />
-                <div className="text-4xl font-bold text-gray-900">{analytics.events}</div>
-                <div className="text-lg text-gray-600 mt-2">Events</div>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-                <FaFileAlt className="text-5xl text-amber-600 mb-4" />
-                <div className="text-4xl font-bold text-gray-900">{analytics.blogs}</div>
-                <div className="text-lg text-gray-600 mt-2">Blogs</div>
-              </div>
+              {[
+                { icon: <FaUserGraduate className="text-5xl text-amber-600 mb-4" />, 
+                  value: analytics.enrollees, label: 'Enrolled Students' },
+                { icon: <FaUsers className="text-5xl text-amber-600 mb-4" />, 
+                  value: analytics.subscribers, label: 'Subscribers' },
+                { icon: <FaCalendarAlt className="text-5xl text-amber-600 mb-4" />, 
+                  value: analytics.events, label: 'Events' },
+                { icon: <FaFileAlt className="text-5xl text-amber-600 mb-4" />, 
+                  value: analytics.blogs, label: 'Blogs' },
+              ].map((card, index) => (
+                <div key={index} className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+                  {card.icon}
+                  <div className="text-4xl font-bold text-gray-900">{card.value}</div>
+                  <div className="text-lg text-gray-600 mt-2">{card.label}</div>
+                </div>
+              ))}
             </div>
-            {/* Modern Bar Chart */}
-            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Overview Comparison (Bar Chart)</h3>
-              <div style={{ height: 300 }}>
-                {barData.every(d => d.count === 0) ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
-                ) : (
+
+            {/* Charts */}
+            {[
+              { 
+                title: 'Overview Comparison', 
+                chart: (
                   <ResponsiveBar
-                    data={barData}
-                    keys={["count"]}
+                    data={overviewBarData}
+                    keys={['count']}
                     indexBy="category"
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
                     padding={0.3}
                     colors={{ scheme: 'nivo' }}
-                    axisBottom={{ legend: 'Category', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
-                    axisLeft={{ legend: 'Count', legendOffset: -50, legendPosition: 'middle' }}
-                    enableLabel={false}
-                    tooltip={({ id, value, color }) => (
-                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
-                        <strong>{id}:</strong> {value}
-                      </div>
-                    )}
-                    theme={{
-                      axis: {
-                        ticks: { text: { fontSize: 12, fill: '#333' } },
-                        legend: { text: { fontSize: 14, fill: '#222' } }
-                      },
-                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    axisBottom={{
+                      tickRotation: -45,
+                      legend: 'Category',
+                      legendPosition: 'middle',
+                      legendOffset: 40,
                     }}
+                    axisLeft={{
+                      legend: 'Count',
+                      legendPosition: 'middle',
+                      legendOffset: -50,
+                    }}
+                    labelSkipWidth={12}
+                    labelSkipHeight={12}
+                    labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+                    animate={true}
                   />
-                )}
-              </div>
-            </div>
-            {/* Modern Pie Chart */}
-            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Distribution (Pie Chart)</h3>
-              <div style={{ height: 300 }}>
-                {pieData.every(d => d.value === 0) ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
-                ) : (
-                  <ResponsivePie
-                    data={pieData}
+                ),
+                data: overviewBarData
+              },
+              { 
+                title: 'Distribution', 
+                chart: <ResponsivePie data={pieData} {...pieChartConfig} />,
+                data: pieData
+              },
+              { 
+                title: 'Subscribers Per Month (Last 12 Months)', 
+                chart: (
+                  <ResponsiveBar
+                    data={subscriberBarData}
+                    keys={['subscribers']}
+                    indexBy="month"
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    innerRadius={0.5}
-                    padAngle={1}
-                    cornerRadius={5}
-                    activeOuterRadiusOffset={8}
-                    colors={{ scheme: 'nivo' }}
-                    borderWidth={1}
-                    borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-                    arcLinkLabelsSkipAngle={10}
-                    arcLinkLabelsTextColor="#333"
-                    arcLinkLabelsThickness={2}
-                    arcLinkLabelsColor={{ from: 'color' }}
-                    arcLabelsSkipAngle={10}
-                    arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
-                    tooltip={({ datum }) => (
-                      <div style={{ color: datum.color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
-                        <strong>{datum.label}:</strong> {datum.value}
-                      </div>
-                    )}
-                  />
-                )}
-              </div>
-            </div>
-            {/* Modernized Line Charts with error/empty state handling */}
-            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
-              <div style={{ height: 300 }}>
-                {nivoSubscribersData[0].data.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
-                ) : (
-                  <ResponsiveLine
-                    data={nivoSubscribersData}
-                    margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    xScale={{ type: 'point' }}
-                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
-                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
-                    axisLeft={{ legend: 'Subscribers', legendOffset: -50, legendPosition: 'middle' }}
+                    padding={0.3}
                     colors={{ scheme: 'category10' }}
-                    pointSize={12}
-                    pointColor={{ theme: 'background' }}
-                    pointBorderWidth={3}
-                    pointBorderColor={{ from: 'serieColor' }}
-                    pointLabelYOffset={-12}
-                    useMesh={true}
-                    enableSlices="x"
-                    enableArea={true}
-                    areaOpacity={0.15}
-                    theme={{
-                      axis: {
-                        ticks: { text: { fontSize: 12, fill: '#333' } },
-                        legend: { text: { fontSize: 14, fill: '#222' } }
-                      },
-                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    axisBottom={{
+                      tickRotation: -45,
+                      legend: 'Month',
+                      legendPosition: 'middle',
+                      legendOffset: 40,
                     }}
+                    axisLeft={{
+                      legend: 'Subscribers',
+                      legendPosition: 'middle',
+                      legendOffset: -50,
+                    }}
+                    labelSkipWidth={12}
+                    labelSkipHeight={12}
+                    animate={true}
                   />
-                )}
-              </div>
-            </div>
-            <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Enrolled Students Per Month (Last 5 Years)</h3>
-              <div style={{ height: 300 }}>
-                {nivoEnrolleesData[0].data.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
-                ) : (
-                  <ResponsiveLine
-                    data={nivoEnrolleesData}
+                ),
+                data: subscriberBarData
+              },
+              { 
+                title: 'Enrolled Students Per Month (Last 5 Years)', 
+                chart: (
+                  <ResponsiveBar
+                    data={enrolleeBarData}
+                    keys={['enrollees']}
+                    indexBy="month"
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    xScale={{ type: 'point' }}
-                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
-                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
-                    axisLeft={{ legend: 'Enrolled Students', legendOffset: -50, legendPosition: 'middle' }}
+                    padding={0.3}
                     colors={{ scheme: 'category10' }}
-                    pointSize={12}
-                    pointColor={{ theme: 'background' }}
-                    pointBorderWidth={3}
-                    pointBorderColor={{ from: 'serieColor' }}
-                    pointLabelYOffset={-12}
-                    useMesh={true}
-                    enableSlices="x"
-                    enableArea={true}
-                    areaOpacity={0.15}
-                    theme={{
-                      axis: {
-                        ticks: { text: { fontSize: 12, fill: '#333' } },
-                        legend: { text: { fontSize: 14, fill: '#222' } }
-                      },
-                      grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+                    axisBottom={{
+                      tickRotation: -45,
+                      legend: 'Month',
+                      legendPosition: 'middle',
+                      legendOffset: 40,
                     }}
+                    axisLeft={{
+                      legend: 'Enrollees',
+                      legendPosition: 'middle',
+                      legendOffset: -50,
+                    }}
+                    labelSkipWidth={12}
+                    labelSkipHeight={12}
+                    animate={true}
                   />
-                )}
+                ),
+                data: enrolleeBarData
+              },
+            ].map((chart, index) => (
+              <div key={index} className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">{chart.title}</h3>
+                <div style={{ height: 300 }}>
+                  {chart.data.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
+                  ) : (
+                    chart.chart
+                  )}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         )}
+
+        {/* Other Sections */}
         {activeSection === 'profile' && (
-          <Profile admin={admin} onUpdate={handleProfileUpdate} showChangePassword={showChangePassword} setShowChangePassword={setShowChangePassword} />
+          <Profile showChangePassword={showChangePassword} setShowChangePassword={setShowChangePassword} />
         )}
         {activeSection === 'subscribers' && (
           <Suspense fallback={<SimpleSpinner message="Loading Subscribers..." />}>
-            <Subscribers token={token} />
+            <Subscribers />
           </Suspense>
         )}
         {activeSection === 'newsletter' && (
           <Suspense fallback={<SimpleSpinner message="Loading Newsletter..." />}>
-            <Newsletter token={token} />
+            <Newsletter />
           </Suspense>
         )}
-        {activeSection === 'blog-create' && (
-          <BlogCreate token={token} onSuccess={() => { }} />
-        )}
-        {activeSection === 'blog-list' && (
-          <BlogList token={token} onRefresh={() => { }} />
-        )}
-        {activeSection === 'inquiries' && (
-          <ContactInquiries token={token} />
-        )}
+        {activeSection === 'blog-create' && <BlogCreate />}
+        {activeSection === 'blog-list' && <BlogList />}
+        {activeSection === 'inquiries' && <ContactInquiries />}
         {activeSection === 'admin-management' && admin?.role === 'superadmin' && (
-          <AdminManagement token={token} currentAdmin={admin} />
+          <AdminManagement currentAdmin={admin} />
         )}
-        {activeSection === 'events' && (
-          <AdminEvents />
-        )}
-        {activeSection === 'create-event' && (
-          <EventCreate />
-        )}
-        {activeSection === 'event-registrations' && (
-          <EventRegistrations />
-        )}
-        {activeSection === 'enrollees' && (
-          <EnrolleeManagement token={token} />
-        )}
+        {activeSection === 'events' && <AdminEvents />}
+        {activeSection === 'create-event' && <EventCreate />}
+        {activeSection === 'event-registrations' && <EventRegistrations />}
+        {activeSection === 'enrollees' && <EnrolleeManagement />}
       </div>
     </AdminLayout>
   );
 }
 
-export default AdminDashboard; 
+// Pie chart configuration
+const pieChartConfig = {
+  margin: { top: 30, right: 40, bottom: 60, left: 60 },
+  innerRadius: 0.5,
+  padAngle: 1,
+  cornerRadius: 5,
+  activeOuterRadiusOffset: 8,
+  colors: { scheme: 'nivo' },
+  borderWidth: 1,
+  borderColor: { from: 'color', modifiers: [['darker', 0.2]] },
+  arcLinkLabelsSkipAngle: 10,
+  arcLinkLabelsTextColor: "#333",
+  arcLinkLabelsThickness: 2,
+  arcLinkLabelsColor: { from: 'color' },
+  arcLabelsSkipAngle: 10,
+  arcLabelsTextColor: { from: 'color', modifiers: [['darker', 2]] },
+  tooltip: ({ datum }) => (
+    <div style={{ 
+      color: datum.color, 
+      padding: 8, 
+      background: '#fff', 
+      borderRadius: 4, 
+      boxShadow: '0 2px 8px #0001' 
+    }}>
+      <strong>{datum.label}:</strong> {datum.value}
+    </div>
+  ),
+  theme: {
+    axis: {
+      ticks: { text: { fontSize: 12, fill: '#333' } },
+      legend: { text: { fontSize: 14, fill: '#222' } }
+    },
+    grid: { line: { stroke: '#eee', strokeWidth: 1 } }
+  }
+};
+
+export default AdminDashboard;
