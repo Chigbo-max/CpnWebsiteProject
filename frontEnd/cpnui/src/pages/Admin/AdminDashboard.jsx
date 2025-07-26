@@ -16,9 +16,9 @@ import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
 import { useNavigate } from 'react-router-dom';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
+import { ResponsiveLine } from '@nivo/line';
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsivePie } from '@nivo/pie';
-import { useGetAnalyticsQuery, useGetMonthlySubscribersQuery, useGetMonthlyEnrolleesQuery } from '../../features/admin/adminDashboardApi';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
@@ -28,40 +28,69 @@ function AdminDashboard() {
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
-  // RTK Query hooks
-  const { data: analyticsData, refetch: refetchAnalytics } = useGetAnalyticsQuery(undefined, {
-    skip: activeSection !== 'dashboard' || !token,
-  });
-  const { data: monthlySubscribers } = useGetMonthlySubscribersQuery(undefined, {
-    skip: activeSection !== 'dashboard' || !token,
-  });
-  const { data: monthlyEnrollees } = useGetMonthlyEnrolleesQuery(undefined, {
-    skip: activeSection !== 'dashboard' || !token,
-  });
+  const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
+  const [monthlyCounts, setMonthlyCounts] = useState([]);
+  const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
 
-  const analytics = analyticsData || { enrollees: 0, subscribers: 0, events: 0, blogs: 0 };
-  const monthlyCounts = monthlySubscribers?.data || [];
-  const enrolleeMonthlyCounts = monthlyEnrollees?.data || [];
-
-  const wsUrl = import.meta.env.VITE_WS_URL;
-  const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
-
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+const wsUrl = import.meta.env.VITE_WS_URL || 
+                `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
   useEffect(() => {
+    if (activeSection === 'dashboard' && token) {
+      (async () => {
+        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
+          fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+        const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+        const events = (await eventsRes.json()).events?.length || 0;
+        const blogs = (await blogsRes.json()).blogs?.length || 0;
+        setAnalytics({ enrollees, subscribers, events, blogs });
+        const monthly = (await monthlyCountsRes.json()).data || [];
+        setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+        const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+      })();
+    }
     // WebSocket for real-time updates
     let ws;
-    if (activeSection === 'dashboard' && token) {
+    if (activeSection === 'dashboard') {
       ws = new window.WebSocket(wsUrl);
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'dashboard-update') {
-          refetchAnalytics();
+          // Refetch analytics data on any dashboard update
+          (async () => {
+            const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
+              fetch(`${apiBaseUrl}/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+              fetch(`${apiBaseUrl}/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+            ]);
+            const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+            const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+            const events = (await eventsRes.json()).events?.length || 0;
+            const blogs = (await blogsRes.json()).blogs?.length || 0;
+            setAnalytics({ enrollees, subscribers, events, blogs });
+            const monthly = (await monthlyCountsRes.json()).data || [];
+            setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+            const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+          })();
         }
       };
     }
     return () => {
       if (ws) ws.close();
     };
-  }, [activeSection, token, wsUrl, refetchAnalytics]);
+  }, [activeSection, token, apiBaseUrl, wsUrl]);
 
   useEffect(() => {
     setIsLoggedIn(!!token);
@@ -77,7 +106,7 @@ function AdminDashboard() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${baseApiUrl}/auth/login`, {
+      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)
@@ -101,7 +130,7 @@ function AdminDashboard() {
 
   const handleProfileUpdate = async (updatedData) => {
     try {
-      const response = await fetch(`${baseApiUrl}/admin/profile`, {
+      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -134,18 +163,22 @@ function AdminDashboard() {
     }
   }, [admin, activeSection]);
 
-  // Prepare Nivo bar chart data for subscribers
-  const subscribersBarData = monthlyCounts.map(m => ({
-    month: `${m.year}-${String(m.month).padStart(2, '0')}`,
-    subscribers: Number(m.count)
-  }));
-
-  // Prepare Nivo bar chart data for enrolled students
-  const enrolleesBarData = enrolleeMonthlyCounts.map(m => ({
-    month: `${m.year}-${String(m.month).padStart(2, '0')}`,
-    enrollees: Number(m.count)
-  }));
-
+  // Prepare Nivo data for subscribers
+  const nivoSubscribersData = [
+    {
+      id: 'Subscribers',
+      color: 'hsl(34, 70%, 50%)',
+      data: monthlyCounts.map(m => ({ x: m.name, y: m.count }))
+    }
+  ];
+  // Prepare Nivo data for enrolled students (real data for 5 years)
+  const nivoEnrolleesData = [
+    {
+      id: 'Enrolled Students',
+      color: 'hsl(210, 70%, 50%)',
+      data: enrolleeMonthlyCounts.map(m => ({ x: m.name, y: m.count }))
+    }
+  ];
   // Prepare Nivo bar chart data (compare all analytics)
   const barData = [
     {
@@ -165,7 +198,6 @@ function AdminDashboard() {
       count: analytics.blogs,
     },
   ];
-
   // Prepare Nivo pie chart data (distribution)
   const pieData = [
     {
@@ -262,10 +294,9 @@ function AdminDashboard() {
                 <div className="text-lg text-gray-600 mt-2">Blogs</div>
               </div>
             </div>
-            
-            {/* Overview Comparison Bar Chart */}
+            {/* Modern Bar Chart */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Overview Comparison</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Overview Comparison (Bar Chart)</h3>
               <div style={{ height: 300 }}>
                 {barData.every(d => d.count === 0) ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
@@ -277,17 +308,8 @@ function AdminDashboard() {
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
                     padding={0.3}
                     colors={{ scheme: 'nivo' }}
-                    axisBottom={{ 
-                      legend: 'Category', 
-                      legendOffset: 40, 
-                      legendPosition: 'middle', 
-                      tickRotation: -45 
-                    }}
-                    axisLeft={{ 
-                      legend: 'Count', 
-                      legendOffset: -50, 
-                      legendPosition: 'middle' 
-                    }}
+                    axisBottom={{ legend: 'Category', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Count', legendOffset: -50, legendPosition: 'middle' }}
                     enableLabel={false}
                     tooltip={({ id, value, color }) => (
                       <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
@@ -305,10 +327,9 @@ function AdminDashboard() {
                 )}
               </div>
             </div>
-
-            {/* Distribution Pie Chart */}
+            {/* Modern Pie Chart */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Distribution</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Distribution (Pie Chart)</h3>
               <div style={{ height: 300 }}>
                 {pieData.every(d => d.value === 0) ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
@@ -338,38 +359,30 @@ function AdminDashboard() {
                 )}
               </div>
             </div>
-
-            {/* Subscribers Per Month Bar Chart */}
+            {/* Modernized Line Charts with error/empty state handling */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
               <div style={{ height: 300 }}>
-                {subscribersBarData.length === 0 ? (
+                {nivoSubscribersData[0].data.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
                 ) : (
-                  <ResponsiveBar
-                    data={subscribersBarData}
-                    keys={['subscribers']}
-                    indexBy="month"
+                  <ResponsiveLine
+                    data={nivoSubscribersData}
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    padding={0.3}
+                    xScale={{ type: 'point' }}
+                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
+                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Subscribers', legendOffset: -50, legendPosition: 'middle' }}
                     colors={{ scheme: 'category10' }}
-                    axisBottom={{ 
-                      legend: 'Month', 
-                      legendOffset: 40, 
-                      legendPosition: 'middle', 
-                      tickRotation: -45 
-                    }}
-                    axisLeft={{ 
-                      legend: 'Subscribers', 
-                      legendOffset: -50, 
-                      legendPosition: 'middle' 
-                    }}
-                    enableLabel={false}
-                    tooltip={({ id, value, color }) => (
-                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
-                        <strong>{id}:</strong> {value}
-                      </div>
-                    )}
+                    pointSize={12}
+                    pointColor={{ theme: 'background' }}
+                    pointBorderWidth={3}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    pointLabelYOffset={-12}
+                    useMesh={true}
+                    enableSlices="x"
+                    enableArea={true}
+                    areaOpacity={0.15}
                     theme={{
                       axis: {
                         ticks: { text: { fontSize: 12, fill: '#333' } },
@@ -381,38 +394,29 @@ function AdminDashboard() {
                 )}
               </div>
             </div>
-
-            {/* Enrolled Students Per Month Bar Chart */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Enrolled Students Per Month</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Enrolled Students Per Month (Last 5 Years)</h3>
               <div style={{ height: 300 }}>
-                {enrolleesBarData.length === 0 ? (
+                {nivoEnrolleesData[0].data.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
                 ) : (
-                  <ResponsiveBar
-                    data={enrolleesBarData}
-                    keys={['enrollees']}
-                    indexBy="month"
+                  <ResponsiveLine
+                    data={nivoEnrolleesData}
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    padding={0.3}
+                    xScale={{ type: 'point' }}
+                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
+                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
+                    axisLeft={{ legend: 'Enrolled Students', legendOffset: -50, legendPosition: 'middle' }}
                     colors={{ scheme: 'category10' }}
-                    axisBottom={{ 
-                      legend: 'Month', 
-                      legendOffset: 40, 
-                      legendPosition: 'middle', 
-                      tickRotation: -45 
-                    }}
-                    axisLeft={{ 
-                      legend: 'Enrolled Students', 
-                      legendOffset: -50, 
-                      legendPosition: 'middle' 
-                    }}
-                    enableLabel={false}
-                    tooltip={({ id, value, color }) => (
-                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
-                        <strong>{id}:</strong> {value}
-                      </div>
-                    )}
+                    pointSize={12}
+                    pointColor={{ theme: 'background' }}
+                    pointBorderWidth={3}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    pointLabelYOffset={-12}
+                    useMesh={true}
+                    enableSlices="x"
+                    enableArea={true}
+                    areaOpacity={0.15}
                     theme={{
                       axis: {
                         ticks: { text: { fontSize: 12, fill: '#333' } },
