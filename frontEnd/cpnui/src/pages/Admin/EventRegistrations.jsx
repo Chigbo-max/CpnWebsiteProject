@@ -13,14 +13,12 @@ const EventRegistrations = () => {
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
 
-  // Fetch events
   const { 
     data: eventsData, 
     isLoading: eventsLoading, 
     error: eventsError 
   } = useGetEventsQuery();
 
-  // Fetch registrations
   const { 
     data: registrations = [], 
     isLoading: registrationsLoading, 
@@ -30,10 +28,8 @@ const EventRegistrations = () => {
     skip: !eventId,
   });
 
-  // CSV download
   const [downloadCSV, { isLoading: csvLoading }] = useLazyGetEventRegistrationsCSVQuery();
 
-  // Error handling
   React.useEffect(() => {
     if (eventsError) toast.error(eventsError.message || 'Failed to load events');
     if (registrationsError) toast.error(registrationsError.message || 'Failed to load registrations');
@@ -54,17 +50,15 @@ const EventRegistrations = () => {
         a.remove();
         window.URL.revokeObjectURL(url);
       }
-    } catch (err) {
+    } catch{
       toast.error('Failed to download CSV');
     }
   };
 
-  // Filter events by search
   const filteredEvents = (eventsData?.events || []).filter(ev =>
     ev.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Filter registrations by search
   const filteredRegistrations = React.useMemo(() => {
     if (!search) return registrations;
     return registrations.filter(reg =>
@@ -75,7 +69,6 @@ const EventRegistrations = () => {
     );
   }, [search, registrations]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredRegistrations.length / PER_PAGE);
   const paginatedRegistrations = React.useMemo(() => {
     const start = (page - 1) * PER_PAGE;

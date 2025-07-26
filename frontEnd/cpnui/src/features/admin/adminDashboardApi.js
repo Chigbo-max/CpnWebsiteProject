@@ -1,11 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const baseUrl = import.meta.env.VITE_BASE_API_URL;
+
 export const adminDashboardApi = createApi({
   reducerPath: 'adminDashboardApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_API_URL,
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('adminToken');
+    baseUrl,
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.token;
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -13,61 +15,49 @@ export const adminDashboardApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getDashboardAnalytics: builder.query({
+    getAnalytics: builder.query({
       query: () => ({
-        url: '/admin/dashboard/analytics',
+        url: '/api/admin/analytics',
         method: 'GET',
       }),
+      transformResponse: (response) => ({
+        enrollees: response.enrollments?.length || 0,
+        subscribers: response.subscribers?.length || 0,
+        events: response.events?.length || 0,
+        blogs: response.blogs?.length || 0,
+      }),
     }),
-    getEnrolleesCount: builder.query({
-      query: () => '/enrollments/admin/enrollments',
-      transformResponse: (response) => response.enrollments?.length || 0,
+    getMonthlySubscribers: builder.query({
+      query: () => ({
+        url: '/api/subscribers/monthly-counts',
+        method: 'GET',
+      }),
+      transformResponse: (response) => ({
+        data: response.data.map(m => ({
+          year: m.year,
+          month: m.month,
+          count: Number(m.count)
+        }))
+      }),
     }),
-    getSubscribersCount: builder.query({
-      query: () => '/subscribers',
-      transformResponse: (response) => response.subscribers?.length || 0,
-    }),
-    getEventsCount: builder.query({
-      query: () => '/events',
-      transformResponse: (response) => response.events?.length || 0,
-    }),
-    getBlogsCount: builder.query({
-      query: () => '/blog',
-      transformResponse: (response) => response.blogs?.length || 0,
-    }),
-    getMonthlySubscriberCounts: builder.query({
-      query: () => '/subscribers/monthly-counts',
-      transformResponse: (response) => 
-        response.data?.map(m => ({ 
-          name: `${m.year}-${String(m.month).padStart(2, '0')}`, 
-          count: Number(m.count) 
-        })) || [],
-    }),
-    getMonthlyEnrolleeCounts: builder.query({
-      query: () => '/enrollments/monthly-counts?months=60',
-      transformResponse: (response) => 
-        response.data?.map(m => ({ 
-          name: `${m.year}-${String(m.month).padStart(2, '0')}`, 
-          count: Number(m.count) 
-        })) || [],
-    }),
-    adminLogin: builder.mutation({
-      query: (credentials) => ({
-        url: '/auth/login',
-        method: 'POST',
-        body: credentials,
+    getMonthlyEnrollees: builder.query({
+      query: () => ({
+        url: '/api/enrollments/monthly-counts?months=60',
+        method: 'GET',
+      }),
+      transformResponse: (response) => ({
+        data: response.data.map(m => ({
+          year: m.year,
+          month: m.month,
+          count: Number(m.count)
+        }))
       }),
     }),
   }),
 });
 
 export const {
-  useGetDashboardAnalyticsQuery,
-  useGetEnrolleesCountQuery,
-  useGetSubscribersCountQuery,
-  useGetEventsCountQuery,
-  useGetBlogsCountQuery,
-  useGetMonthlySubscriberCountsQuery,
-  useGetMonthlyEnrolleeCountsQuery,
-  useAdminLoginMutation,
+  useGetAnalyticsQuery,
+  useGetMonthlySubscribersQuery,
+  useGetMonthlyEnrolleesQuery,
 } = adminDashboardApi;
