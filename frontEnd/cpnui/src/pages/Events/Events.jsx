@@ -18,7 +18,6 @@ function Events() {
   }, [data]);
 
 
-  const now = new Date();
   const filtered = useMemo(() => {
     let data = events;
     if (search) {
@@ -33,8 +32,16 @@ function Events() {
     return data;
   }, [search, typeFilter, events]);
 
-  const upcoming = filtered.filter(ev => new Date(ev.end_time) >= now);
-  const past = filtered.filter(ev => new Date(ev.end_time) < now);
+  const now = new Date();
+  const upcoming = filtered.filter(ev => {
+  const endTime = new Date(ev.end_time);
+  //compare dates
+  return endTime >= now || endTime.toDateString() === now.toDateString();
+  });
+  const past = filtered.filter(ev => {
+  const endTime = new Date(ev.end_time);
+  return endTime < now && endTime.toDateString() !== now.toDateString();
+  });
 
   // Pagination for upcoming events
   const totalPages = Math.ceil(upcoming.length / PER_PAGE);

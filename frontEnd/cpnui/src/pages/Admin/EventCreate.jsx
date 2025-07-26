@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import{useCreateEventMutation} from '../../features/event/eventApi';
+import { useCreateEventMutation } from '../../features/event/eventApi';
 
 const initialState = {
   title: '',
@@ -36,54 +36,47 @@ const EventCreate = () => {
     setForm(f => ({ ...f, event_type: e.target.value, location_address: '', location_map_url: '', virtual_link: '' }));
   };
 
-  
-  
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!form.title || !form.start_time || !form.end_time) {
-    toast.error('Please fill all required fields');
-    return;
-  }
 
-  setLoading(true);
-  
-  try {
-    let imageBase64 = null;
-    if (form.image) {
-      imageBase64 = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result;
-          resolve(result.split(',')[1]); 
-        };
-        reader.readAsDataURL(form.image);
-      });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.title || !form.start_time || !form.end_time) {
+      toast.error('Please fill all required fields');
+      return;
     }
 
-    const payload = {
-      title: form.title,
-      description: form.description,
-      start_time: form.start_time,
-      end_time: form.end_time,
-      event_type: form.event_type,
-      location_address: form.event_type === 'physical' ? form.location_address : null,
-      location_map_url: form.event_type === 'physical' ? form.location_map_url : null,
-      virtual_link: form.event_type === 'virtual' ? form.virtual_link : null,
-      image: imageBase64
-    };
+    setLoading(true);
 
-    await createEvent(payload).unwrap();
-    toast.success('Event created successfully!');
-    navigate('/admin/events');
-    
-  } catch (err) {
-    console.error('Event creation error:', err);
-    toast.error(err.data?.message || err.message || 'Failed to create event');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('start_time', form.start_time);
+      formData.append('end_time', form.end_time);
+      formData.append('event_type', form.event_type);
+
+      if (form.event_type === 'physical') {
+        formData.append('location_address', form.location_address);
+        formData.append('location_map_url', form.location_map_url);
+      } else {
+        formData.append('virtual_link', form.virtual_link);
+      }
+
+      if (form.image) {
+        formData.append('image', form.image);
+      }
+
+      await createEvent(formData).unwrap();
+      toast.success('Event created successfully!');
+      navigate('/admin/events');
+    } catch (err) {
+      console.error('Event creation error:', err);
+      toast.error(err.data?.message || err.message || 'Failed to create event');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 

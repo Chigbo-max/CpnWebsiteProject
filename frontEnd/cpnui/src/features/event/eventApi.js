@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const eventApi = createApi({
   reducerPath: 'eventApi',
-  baseQuery: fetchBaseQuery({ 
+  baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_API_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('adminToken');
@@ -23,13 +23,13 @@ export const eventApi = createApi({
           : (result?.events ?? []);
         return list.length
           ? [
-              ...list.map(({ event_id }) => ({ type: 'Event', id: event_id })),
-              { type: 'Event', id: 'LIST' },
-            ]
+            ...list.map(({ event_id }) => ({ type: 'Event', id: event_id })),
+            { type: 'Event', id: 'LIST' },
+          ]
           : [{ type: 'Event', id: 'LIST' }];
       },
     }),
-    
+
     getEventById: builder.query({
       query: (event_id) => `/events/${event_id}`,
       providesTags: (result, error, event_id) => [{ type: 'Event', id: event_id }],
@@ -40,11 +40,11 @@ export const eventApi = createApi({
       query: (event_id) => `/events/${event_id}/registrations`,
       providesTags: (result, error, event_id) => [
         { type: 'EventRegistration', id: event_id },
-        ...(result?.map(({ registration_id }) => ({ 
-          type: 'EventRegistration', 
-          id: registration_id 
+        ...(result?.map(({ registration_id }) => ({
+          type: 'EventRegistration',
+          id: registration_id
         })) || []
-      ),
+        ),
       ],
     }),
 
@@ -72,6 +72,9 @@ export const eventApi = createApi({
         url: '/admin/events',
         method: 'POST',
         body: formData,
+        headers: {
+        },
+        formData: true
       }),
       invalidatesTags: [{ type: 'Event', id: 'LIST' }],
     }),

@@ -31,27 +31,43 @@ const cloudinaryService = new CloudinaryServiceImpl();
 
 
 
-router.post('/events', authenticateAdmin, async (req, res) => {
+router.post('/events', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
     let image_url = null;
-    if (req.body.image) {
-      image_url = await cloudinaryService.uploadImage(req.body.image);
+    
+    // Handle image upload similar to blog route
+    if (req.file) {
+      const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      image_url = await cloudinaryService.uploadImage(base64, 'event-images');
       console.log('Image uploaded:', image_url);
     }
+
     const event = await eventService.createEvent({
       ...req.body,
       image_url,
       created_by: req.admin.id
     });
-    console.log('Event created:', event);
-    // Invalidate events list cache
+
+    // Invalidate cache
     await redisClient.del('events:list');
-    // Broadcast dashboard update
     req.app.get('broadcastDashboardUpdate')({ entity: 'event', action: 'create' });
+    
     res.status(201).json(event);
   } catch (err) {
-    console.error('Error creating event:', err); // <-- Add this line
-    res.status(500).json({ message: err.message });
+    console.error('Error creating event:', err);
+    
+    // Enhanced error handling like blog route
+    if (err.code === '23505') {
+      return res.status(400).json({ 
+        message: 'Database constraint violation',
+        error: 'DATABASE_ERROR'
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Failed to create event',
+      error: err.message 
+    });
   }
 });
 
