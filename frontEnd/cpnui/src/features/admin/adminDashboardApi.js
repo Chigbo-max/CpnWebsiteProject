@@ -17,7 +17,7 @@ export const adminDashboardApi = createApi({
   endpoints: (builder) => ({
     getAnalytics: builder.query({
       query: () => ({
-        url: '/api/admin/analytics',
+        url: '/admin/analytics',
         method: 'GET',
       }),
       transformResponse: (response) => ({
@@ -29,7 +29,7 @@ export const adminDashboardApi = createApi({
     }),
     getMonthlySubscribers: builder.query({
       query: () => ({
-        url: '/api/subscribers/monthly-counts',
+        url: '/subscribers/monthly-counts',
         method: 'GET',
       }),
       transformResponse: (response) => ({
@@ -42,7 +42,7 @@ export const adminDashboardApi = createApi({
     }),
     getMonthlyEnrollees: builder.query({
       query: () => ({
-        url: '/api/enrollments/monthly-counts?months=60',
+        url: '/enrollments/monthly-counts?months=60',
         method: 'GET',
       }),
       transformResponse: (response) => ({
