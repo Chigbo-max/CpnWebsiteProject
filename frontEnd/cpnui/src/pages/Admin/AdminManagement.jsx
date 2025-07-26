@@ -12,15 +12,11 @@ const AdminManagement = ({ token, currentAdmin }) => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmModal, setConfirmModal] = useState({ open: false, type: '', admin: null });
 
-
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
-
-
   const fetchAdmins = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/admin/admins`, {
+      const res = await fetch('http://localhost:5000/api/admin/admins', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch admins');
@@ -60,7 +56,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
     if (!confirmModal.admin) return;
     if (confirmModal.type === 'delete') {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}`, {
+        const res = await fetch(`http://localhost:5000/api/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -72,7 +68,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
       }
     } else if (confirmModal.type === 'reset') {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}/reset-password`, {
+        const res = await fetch(`http://localhost:5000/api/admin/admins/${confirmModal.admin.id || confirmModal.admin._id}/reset-password`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -91,7 +87,7 @@ const AdminManagement = ({ token, currentAdmin }) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/admin/admins`, {
+      const res = await fetch('http://localhost:5000/api/admin/admins', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(form)

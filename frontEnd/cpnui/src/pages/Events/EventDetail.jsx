@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetEventQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
 import LoadingSpinner from '../../components/LoadingSpinner';

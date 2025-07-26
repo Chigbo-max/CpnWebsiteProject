@@ -2,37 +2,30 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const blogApi = createApi({
   reducerPath: 'blogApi',
-  baseQuery: fetchBaseQuery({ 
+  baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api',
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+   }),
   tagTypes: ['Blog'],
   endpoints: (builder) => ({
     getBlogs: builder.query({
       query: () => '/blog',
-      providesTags: (result = []) =>
-        result
+      providesTags: (result) =>
+        result && Array.isArray(result.blogs)
           ? [
-            ...result.map(({ id, _id }) => ({ type: 'Blog', id: id || _id })),
-            { type: 'Blog', id: 'LIST' },
-          ]
+              ...result.blogs.map(({ id }) => ({ type: 'Blog', id })),
+              { type: 'Blog', id: 'LIST' },
+            ]
           : [{ type: 'Blog', id: 'LIST' }],
     }),
-    getBlog: builder.query({
-      query: (id) => `/blog/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Blog', id }],
+    getBlogBySlug: builder.query({
+      query: (slug) => `/blog/${slug}`,
+      providesTags: (result, error, slug) => [{ type: 'Blog', id: slug }],
     }),
     createBlog: builder.mutation({
-      query: (body) => ({
+      query: (formData) => ({
         url: '/admin/blog',
         method: 'POST',
-        body,
+        body: formData,
       }),
       invalidatesTags: [{ type: 'Blog', id: 'LIST' }],
     }),
@@ -57,21 +50,13 @@ export const blogApi = createApi({
         { type: 'Blog', id: 'LIST' },
       ],
     }),
-    uploadImage: builder.mutation({
-      query: ({ image }) => ({
-        url: '/admin/blog/upload-image',
-        method: 'POST',
-        body: { image },
-      }),
-    }),
   }),
 });
 
 export const {
   useGetBlogsQuery,
-  useGetBlogQuery,
+  useGetBlogBySlugQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
-  useUploadImageMutation,
 } = blogApi; 
