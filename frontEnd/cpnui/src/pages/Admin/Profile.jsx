@@ -11,12 +11,15 @@ import {
 } from '../../features/admin/profileApi';
 
 const Profile = ({ showChangePassword, setShowChangePassword }) => {
+
+  
   const { currentAdmin: admin, updateAdmin } = useAdminAuth();
-  const [form, setForm] = useState({
-    name: admin?.username || '',
-    email: admin?.email || '',
-    profilePic: admin?.profile_pic || '',
+   const [form, setForm] = useState({
+    name: profileData?.username || admin?.username || '',
+    email: profileData?.email || admin?.email || '',
+    profilePic: profileData?.profile_pic || admin?.profile_pic || '',
   });
+
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
 
   const { data: profileData } = useGetProfileQuery();
@@ -26,7 +29,7 @@ const Profile = ({ showChangePassword, setShowChangePassword }) => {
   const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   // Sync form with latest profile data
-  useState(() => {
+  useEffect(() => {
     if (profileData) {
       setForm({
         name: profileData.username || '',

@@ -39,39 +39,53 @@ const EventCreate = () => {
   
   
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // Prepare form data
-      let imageBase64 = null;
-      if (form.image) {
+  e.preventDefault();
+  
+  if (!form.title || !form.start_time || !form.end_time) {
+    toast.error('Please fill all required fields');
+    return;
+  }
+
+  setLoading(true);
+  
+  try {
+    let imageBase64 = null;
+    if (form.image) {
+      imageBase64 = await new Promise((resolve) => {
         const reader = new FileReader();
-        imageBase64 = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(form.image);
-        });
-      }
-      const payload = {
-        ...form,
-        image: imageBase64,
-      };
-      const res = await createEvent(payload).unwrap();
-      if (!res.ok) throw new Error((await res.json()).message || 'Failed to create event');
-      toast.success('Event created!');
-      navigate('/admin');
-    } catch (err) {
-      if (err?.data?.message) {
-        toast.error(err.data.message);
-      } else if (err?.message) {
-        toast.error(err.message);
-      } else {
-        toast.error('Error creating event');
-      }
-    } finally {
-      setLoading(false);
+        reader.onload = () => {
+          const result = reader.result;
+          resolve(result.split(',')[1]); 
+        };
+        reader.readAsDataURL(form.image);
+      });
     }
-  };
+
+    const payload = {
+      title: form.title,
+      description: form.description,
+      start_time: form.start_time,
+      end_time: form.end_time,
+      event_type: form.event_type,
+      location_address: form.event_type === 'physical' ? form.location_address : null,
+      location_map_url: form.event_type === 'physical' ? form.location_map_url : null,
+      virtual_link: form.event_type === 'virtual' ? form.virtual_link : null,
+      image: imageBase64
+    };
+
+    await createEvent(payload).unwrap();
+    toast.success('Event created successfully!');
+    navigate('/admin/events');
+    
+  } catch (err) {
+    console.error('Event creation error:', err);
+    toast.error(err.data?.message || err.message || 'Failed to create event');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8">
