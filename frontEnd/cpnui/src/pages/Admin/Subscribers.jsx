@@ -27,7 +27,6 @@ const Subscribers = () => {
   const subscribers = useMemo(() => {
     return data?.subscribers ?? [];
   }, [data]);
-  console.log("subscribers", subscribers);
   const [addSubscriber] = useAddSubscriberMutation();
   const [updateSubscriber] = useUpdateSubscriberMutation();
   const [deleteSubscriber] = useDeleteSubscriberMutation();

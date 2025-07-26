@@ -14,11 +14,13 @@ const EventRegistrations = () => {
   const [page, setPage] = useState(1);
   const PER_PAGE = 10;
 
+  const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
+
   useEffect(() => {
     // Fetch all events for dropdown
     const fetchEvents = async () => {
       try {
-        const res = await fetch('/events');
+        const res = await fetch(`${baseApiUrl}/events`);
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         setEvents(data?.events ?? []);
