@@ -1,99 +1,76 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetEventQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
+import { toast } from 'sonner';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorDisplay from '../../components/ErrorDisplay';
+import { useGetEventByIdQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
 
-function EventDetail() {
-    const { eventId } = useParams();
-    const { data: event, isLoading, isError } = useGetEventQuery(eventId);
-    const [registerForEvent, { isLoading: isRegistering }] = useRegisterForEventMutation();
+const EventDetail = () => {
+  const { eventId } = useParams();
+  const { data: event, isLoading, isError } = useGetEventByIdQuery(eventId);
+  const [registerForEvent, { isLoading: regLoading }] = useRegisterForEventMutation();
+  const [registered, setRegistered] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '' });
 
-    if (isLoading) {
-        return <LoadingSpinner />;
+  const isPast = event && new Date(event.end_time) < new Date();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await registerForEvent({ event_id: eventId, ...form }).unwrap();
+      setRegistered(true);
+      toast.success('Registration successful! Check your email for details.');
+    } catch (err) {
+      toast.error(err?.data?.message || 'Registration failed');
     }
+  };
 
-    if (isError) {
-        return <ErrorDisplay error={{ message: 'Event not found' }} />;
-    }
+  if (isLoading) return <LoadingSpinner message="Loading event..." />;
+  if (isError || !event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
-    if (!event) {
-        return <ErrorDisplay error={{ message: 'Event not found' }} />;
-    }
-
-    const handleRegister = async () => {
-        try {
-            await registerForEvent({
-                event_id: event.id,
-                name: 'User Name', // You might want to get this from user context
-                email: 'user@example.com', // You might want to get this from user context
-                phone: '1234567890' // You might want to get this from user context
-            }).unwrap();
-            alert('Successfully registered for event!');
-        } catch (error) {
-            alert('Failed to register for event: ' + error.message);
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-4xl mx-auto px-4">
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                    {event.image && (
-                        <div className="w-full h-64 md:h-96 relative">
-                            <img
-                                src={event.image}
-                                alt={event.title}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    )}
-                    
-                    <div className="p-6 md:p-8">
-                        <header className="mb-6">
-                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                {event.title}
-                            </h1>
-                            <div className="flex flex-wrap gap-4 text-gray-600">
-                                <div className="flex items-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span>{new Date(event.date).toLocaleDateString()}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>{event.time}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>{event.location}</span>
-                                </div>
-                            </div>
-                        </header>
-
-                        <div className="prose prose-lg max-w-none mb-8">
-                            <div dangerouslySetInnerHTML={{ __html: event.description }} />
-                        </div>
-
-                        <div className="border-t pt-6">
-                            <button
-                                onClick={handleRegister}
-                                disabled={isRegistering}
-                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-                            >
-                                {isRegistering ? 'Registering...' : 'Register for Event'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 my-8 mt-8 sm:mt-12">
+      <div className="mb-8">
+        {event.image_url && <img src={event.image_url} alt={event.title} className="w-full h-64 object-cover rounded-lg mb-4" />}
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h2>
+        <div className="text-gray-600 mb-2">{new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}</div>
+        <div className="mb-2">
+          <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${isPast ? 'bg-gray-400 text-white' : 'bg-amber-600 text-white'}`}>{isPast ? 'Past Event' : 'Upcoming Event'}</span>
         </div>
-    );
-}
+        <div className="text-lg text-gray-700 mb-4">{event.description}</div>
+        {event.event_type === 'physical' ? (
+          <div className="mb-2">
+            <div className="font-semibold">Location:</div>
+            <div>{event.location_address}</div>
+            {event.location_map_url && <a href={event.location_map_url} target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">View on Google Maps</a>}
+          </div>
+        ) : (
+          <div className="mb-2">
+            <div className="font-semibold">Virtual Meeting Link:</div>
+            <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">{event.virtual_link}</a>
+          </div>
+        )}
+      </div>
+      {isPast ? (
+        <div className="w-full text-center py-8 text-gray-500 text-xl font-semibold">Registration Closed</div>
+      ) : registered ? (
+        <div className="w-full text-center py-8 text-amber-600 text-xl font-semibold">Thank you for registering! Check your email for event details and your code.</div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="text" name="name" value={form.name} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" placeholder="Your Name" disabled={isPast} />
+            <input type="email" name="email" value={form.email} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" placeholder="Your Email" disabled={isPast} />
+            <input type="tel" name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" placeholder="Your Phone (optional)" disabled={isPast} />
+          </div>
+          <button type="submit" className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50" disabled={isPast || regLoading}>{regLoading ? 'Registering...' : 'Register for Event'}</button>
+        </form>
+      )}
+    </div>
+  );
+};
 
 export default EventDetail; 
