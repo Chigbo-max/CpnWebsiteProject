@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../app/useAdminAuth';
+import{useCreateEventMutation} from '../../features/event/eventApi';
 
 const initialState = {
   title: '',
@@ -21,6 +22,7 @@ const EventCreate = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { token } = useAdminAuth();
+  const [createEvent] = useCreateEventMutation();
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -36,6 +38,8 @@ const EventCreate = () => {
     setForm(f => ({ ...f, event_type: e.target.value, location_address: '', location_map_url: '', virtual_link: '' }));
   };
 
+  
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -54,14 +58,7 @@ const EventCreate = () => {
         ...form,
         image: imageBase64,
       };
-      const res = await fetch('/api/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await createEvent(payload).unwrap();
       if (!res.ok) throw new Error((await res.json()).message || 'Failed to create event');
       toast.success('Event created!');
       navigate('/admin');

@@ -23,7 +23,6 @@ const Subscribers = () => {
   const PER_PAGE = 10;
 
   const { data, isLoading, refetch } = useGetSubscribersQuery();
-  console.log("data: ", data)
   const subscribers = useMemo(() => {
     return data?.subscribers ?? [];
   }, [data]);
@@ -31,7 +30,6 @@ const Subscribers = () => {
   const [updateSubscriber] = useUpdateSubscriberMutation();
   const [deleteSubscriber] = useDeleteSubscriberMutation();
 
-  // Filtered subscribers
   const filtered = useMemo(() => {
     let data = subscribers;
     if (search) {
@@ -97,7 +95,6 @@ const Subscribers = () => {
     }
   };
 
-  // Delete
   const openDeleteModal = (ids) => {
     setDeleteIds(Array.isArray(ids) ? ids : [ids]);
     setShowDeleteModal(true);
