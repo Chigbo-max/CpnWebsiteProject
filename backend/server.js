@@ -12,7 +12,6 @@ const app = express();
 // Enhanced CORS configuration
 const allowedOrigins = [
   'https://christianprofessionalsnetwork.onrender.com',
-  'https://cpnwebsiteproject.onrender.com',
   'http://localhost:5173'
 ];
 
