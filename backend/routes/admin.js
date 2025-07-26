@@ -230,6 +230,17 @@ router.post('/newsletter', authenticateAdmin, async (req, res, next) => {
   }
 });
 
+
+
+router.get('/profile', authenticateAdmin, async (req, res) => {
+  try {
+    const admin = await adminService.getProfile(req.admin.id);
+    res.json(admin);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to get profile', error: error.message });
+  }
+});
+
 router.patch('/profile', authenticateAdmin, async (req, res) => {
   try {
     const { username, email, profilePic } = req.body;

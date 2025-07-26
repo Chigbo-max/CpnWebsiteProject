@@ -5,6 +5,7 @@ class IAdminService {
   delete(id) { throw new Error('Not implemented'); }
   updatePassword(id, password_hash) { throw new Error('Not implemented'); }
   update(id, updateData) { throw new Error('Not implemented'); }
+  getProfile(adminId) {throw new Error('Not implemented'); }
 }
 
 // AdminServiceImpl implements IAdminService
@@ -50,6 +51,14 @@ class AdminServiceImpl extends IAdminService {
     );
     return result.rows[0];
   }
+
+  async getProfile(adminId) {
+  const result = await this.db.query(
+    'SELECT id, username, email, role, profile_pic, created_at FROM admins WHERE id = $1',
+    [adminId]
+  );
+  return result.rows[0];
+}
 }
 
 module.exports = { IAdminService, AdminServiceImpl }; 

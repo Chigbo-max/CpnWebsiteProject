@@ -16,7 +16,6 @@ import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
 import { useNavigate } from 'react-router-dom';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
-import { ResponsiveLine } from '@nivo/line';
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsivePie } from '@nivo/pie';
 
@@ -52,9 +51,9 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
         const blogs = (await blogsRes.json()).blogs?.length || 0;
         setAnalytics({ enrollees, subscribers, events, blogs });
         const monthly = (await monthlyCountsRes.json()).data || [];
-        setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+        setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
         const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
       })();
     }
     // WebSocket for real-time updates
@@ -80,9 +79,9 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
             const blogs = (await blogsRes.json()).blogs?.length || 0;
             setAnalytics({ enrollees, subscribers, events, blogs });
             const monthly = (await monthlyCountsRes.json()).data || [];
-            setMonthlyCounts(monthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+            setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
             const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ name: `${m.year}-${String(m.month).padStart(2, '0')}`, count: Number(m.count) })));
+            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
           })();
         }
       };
@@ -106,7 +105,7 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+      const response = await fetch(`${apiBaseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)
@@ -130,7 +129,7 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
 
   const handleProfileUpdate = async (updatedData) => {
     try {
-      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
+      const response = await fetch(`${apiBaseUrl}/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -163,22 +162,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
     }
   }, [admin, activeSection]);
 
-  // Prepare Nivo data for subscribers
-  const nivoSubscribersData = [
-    {
-      id: 'Subscribers',
-      color: 'hsl(34, 70%, 50%)',
-      data: monthlyCounts.map(m => ({ x: m.name, y: m.count }))
-    }
-  ];
-  // Prepare Nivo data for enrolled students (real data for 5 years)
-  const nivoEnrolleesData = [
-    {
-      id: 'Enrolled Students',
-      color: 'hsl(210, 70%, 50%)',
-      data: enrolleeMonthlyCounts.map(m => ({ x: m.name, y: m.count }))
-    }
-  ];
   // Prepare Nivo bar chart data (compare all analytics)
   const barData = [
     {
@@ -359,30 +342,37 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
                 )}
               </div>
             </div>
-            {/* Modernized Line Charts with error/empty state handling */}
+            {/* Subscribers Bar Chart */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
               <h3 className="text-xl font-bold mb-4 text-gray-900">Subscribers Per Month (Last 12 Months)</h3>
               <div style={{ height: 300 }}>
-                {nivoSubscribersData[0].data.length === 0 ? (
+                {monthlyCounts.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
                 ) : (
-                  <ResponsiveLine
-                    data={nivoSubscribersData}
+                  <ResponsiveBar
+                    data={monthlyCounts.slice(-12)}
+                    keys={['subscribers']}
+                    indexBy="month"
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    xScale={{ type: 'point' }}
-                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
-                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
-                    axisLeft={{ legend: 'Subscribers', legendOffset: -50, legendPosition: 'middle' }}
+                    padding={0.3}
                     colors={{ scheme: 'category10' }}
-                    pointSize={12}
-                    pointColor={{ theme: 'background' }}
-                    pointBorderWidth={3}
-                    pointBorderColor={{ from: 'serieColor' }}
-                    pointLabelYOffset={-12}
-                    useMesh={true}
-                    enableSlices="x"
-                    enableArea={true}
-                    areaOpacity={0.15}
+                    axisBottom={{
+                      legend: 'Month',
+                      legendOffset: 40,
+                      legendPosition: 'middle',
+                      tickRotation: -45
+                    }}
+                    axisLeft={{
+                      legend: 'Subscribers',
+                      legendOffset: -50,
+                      legendPosition: 'middle'
+                    }}
+                    enableLabel={false}
+                    tooltip={({ value, color }) => (
+                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
+                        <strong>Subscribers:</strong> {value}
+                      </div>
+                    )}
                     theme={{
                       axis: {
                         ticks: { text: { fontSize: 12, fill: '#333' } },
@@ -394,29 +384,37 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
                 )}
               </div>
             </div>
+            {/* Enrollees Bar Chart */}
             <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8 mt-8">
               <h3 className="text-xl font-bold mb-4 text-gray-900">Enrolled Students Per Month (Last 5 Years)</h3>
               <div style={{ height: 300 }}>
-                {nivoEnrolleesData[0].data.length === 0 ? (
+                {enrolleeMonthlyCounts.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400">No data available</div>
                 ) : (
-                  <ResponsiveLine
-                    data={nivoEnrolleesData}
+                  <ResponsiveBar
+                    data={enrolleeMonthlyCounts}
+                    keys={['enrollees']}
+                    indexBy="month"
                     margin={{ top: 30, right: 40, bottom: 60, left: 60 }}
-                    xScale={{ type: 'point' }}
-                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
-                    axisBottom={{ legend: 'Month', legendOffset: 40, legendPosition: 'middle', tickRotation: -45 }}
-                    axisLeft={{ legend: 'Enrolled Students', legendOffset: -50, legendPosition: 'middle' }}
+                    padding={0.3}
                     colors={{ scheme: 'category10' }}
-                    pointSize={12}
-                    pointColor={{ theme: 'background' }}
-                    pointBorderWidth={3}
-                    pointBorderColor={{ from: 'serieColor' }}
-                    pointLabelYOffset={-12}
-                    useMesh={true}
-                    enableSlices="x"
-                    enableArea={true}
-                    areaOpacity={0.15}
+                    axisBottom={{
+                      legend: 'Month',
+                      legendOffset: 40,
+                      legendPosition: 'middle',
+                      tickRotation: -45
+                    }}
+                    axisLeft={{
+                      legend: 'Enrolled Students',
+                      legendOffset: -50,
+                      legendPosition: 'middle'
+                    }}
+                    enableLabel={false}
+                    tooltip={({ value, color }) => (
+                      <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
+                        <strong>Enrollees:</strong> {value}
+                      </div>
+                    )}
                     theme={{
                       axis: {
                         ticks: { text: { fontSize: 12, fill: '#333' } },

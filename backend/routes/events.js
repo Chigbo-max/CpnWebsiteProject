@@ -37,6 +37,8 @@ router.post('/', authenticateAdmin, async (req, res) => {
   }
 });
 
+
+
 // GET /api/events
 router.get('/', async (req, res) => {
   const cacheKey = 'events:list';
