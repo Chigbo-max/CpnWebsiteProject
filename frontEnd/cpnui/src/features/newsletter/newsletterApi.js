@@ -56,6 +56,20 @@ export const newsletterApi = createApi({
         { type: 'Newsletter', id: 'LIST' },
       ],
     }),
+    subscribeNewsletter: builder.mutation({
+      query: (body) => ({
+        url: '/contact/subscribe',
+        method: 'POST',
+        body,
+      }),
+    }),
+    uploadImage: builder.mutation({
+      query: ({ image }) => ({
+        url: '/admin/blog/upload-image',
+        method: 'POST',
+        body: { image },
+      }),
+    }),
   }),
 });
 
@@ -65,4 +79,6 @@ export const {
   useUpdateNewsletterMutation,
   useDeleteNewsletterMutation,
   useSendNewsletterMutation,
+  useSubscribeNewsletterMutation,
+  useUploadImageMutation,
 } = newsletterApi; 
