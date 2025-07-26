@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const contactApi = createApi({
   reducerPath: 'contactApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api',
+    baseUrl: import.meta.env.VITE_BASE_API_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('adminToken');
       if (token) {

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const eventApi = createApi({
   reducerPath: 'eventApi',
   baseQuery: fetchBaseQuery({ 
-      baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api',
+      baseUrl: import.meta.env.VITE_BASE_API_URL,
   }),
   tagTypes: ['Event'],
   endpoints: (builder) => ({

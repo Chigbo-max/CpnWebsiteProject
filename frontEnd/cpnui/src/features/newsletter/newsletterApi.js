@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const newsletterApi = createApi({
   reducerPath: 'newsletterApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api',
+    baseUrl: import.meta.env.VITE_BASE_API_URL,
   }),
   endpoints: (builder) => ({
     subscribeNewsletter: builder.mutation({

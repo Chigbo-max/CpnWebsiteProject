@@ -39,12 +39,12 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
     if (activeSection === 'dashboard' && token) {
       (async () => {
         const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-          fetch(`${apiBaseUrl}/api/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/api/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/api/events`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/api/blog`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/api/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/api/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
         const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
