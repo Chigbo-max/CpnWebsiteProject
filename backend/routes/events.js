@@ -12,31 +12,6 @@ console.log('Loaded events routes');
 const eventService = new EventServiceImpl(db);
 const cloudinaryService = new CloudinaryServiceImpl();
 
-// POST /api/events (admin only)
-router.post('/', authenticateAdmin, async (req, res) => {
-  try {
-    let image_url = null;
-    if (req.body.image) {
-      image_url = await cloudinaryService.uploadImage(req.body.image);
-      console.log('Image uploaded:', image_url);
-    }
-    const event = await eventService.createEvent({
-      ...req.body,
-      image_url,
-      created_by: req.admin.id
-    });
-    console.log('Event created:', event);
-    // Invalidate events list cache
-    await redisClient.del('events:list');
-    // Broadcast dashboard update
-    req.app.get('broadcastDashboardUpdate')({ entity: 'event', action: 'create' });
-    res.status(201).json(event);
-  } catch (err) {
-    console.error('Error creating event:', err); // <-- Add this line
-    res.status(500).json({ message: err.message });
-  }
-});
-
 
 
 // GET /api/events

@@ -15,17 +15,45 @@ const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const { InquiryServiceImpl } = require('../services/InquiryService');
 const { AdminServiceImpl } = require('../services/AdminService');
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
+const { EventServiceImpl } = require('../services/EventService');
 
 const blogService = new BlogServiceImpl(db);
 const subscriberService = new SubscriberServiceImpl(db);
 const inquiryService = new InquiryServiceImpl(db);
 const adminService = new AdminServiceImpl(db);
+const eventService = new EventServiceImpl(db);
 const mailer = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 const newsletterService = new NewsletterServiceImpl(db, mailer);
 const cloudinaryService = new CloudinaryServiceImpl();
+
+
+
+router.post('/events', authenticateAdmin, async (req, res) => {
+  try {
+    let image_url = null;
+    if (req.body.image) {
+      image_url = await cloudinaryService.uploadImage(req.body.image);
+      console.log('Image uploaded:', image_url);
+    }
+    const event = await eventService.createEvent({
+      ...req.body,
+      image_url,
+      created_by: req.admin.id
+    });
+    console.log('Event created:', event);
+    // Invalidate events list cache
+    await redisClient.del('events:list');
+    // Broadcast dashboard update
+    req.app.get('broadcastDashboardUpdate')({ entity: 'event', action: 'create' });
+    res.status(201).json(event);
+  } catch (err) {
+    console.error('Error creating event:', err); // <-- Add this line
+    res.status(500).json({ message: err.message });
+  }
+});
 
 router.get('/blog', authenticateAdmin, async (req, res, next) => {
   try {
