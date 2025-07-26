@@ -2,39 +2,67 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const newsletterApi = createApi({
   reducerPath: 'newsletterApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api' 
+  }),
+  tagTypes: ['Newsletter'],
   endpoints: (builder) => ({
-    subscribeNewsletter: builder.mutation({
+    getNewsletters: builder.query({
+      query: () => '/admin/newsletters',
+      providesTags: (result = []) =>
+        result
+          ? [
+            ...result.map(({ id, _id }) => ({ type: 'Newsletter', id: id || _id })),
+            { type: 'Newsletter', id: 'LIST' },
+          ]
+          : [{ type: 'Newsletter', id: 'LIST' }],
+    }),
+    createNewsletter: builder.mutation({
       query: (body) => ({
-        url: '/contact/subscribe',
+        url: '/admin/newsletters',
         method: 'POST',
         body,
       }),
+      invalidatesTags: [{ type: 'Newsletter', id: 'LIST' }],
+    }),
+    updateNewsletter: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `/admin/newsletters/${id}`,
+        method: 'PUT',
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Newsletter', id },
+        { type: 'Newsletter', id: 'LIST' },
+      ],
+    }),
+    deleteNewsletter: builder.mutation({
+      query: (id) => ({
+        url: `/admin/newsletters/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Newsletter', id },
+        { type: 'Newsletter', id: 'LIST' },
+      ],
     }),
     sendNewsletter: builder.mutation({
-      query: ({ subject, content, token }) => ({
-        url: '/admin/newsletter',
+      query: (id) => ({
+        url: `/admin/newsletters/${id}/send`,
         method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        body: { subject, content },
       }),
-    }),
-    uploadImage: builder.mutation({
-      query: ({ image, token }) => ({
-        url: '/admin/blog/upload-image',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ image }),
-      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Newsletter', id },
+        { type: 'Newsletter', id: 'LIST' },
+      ],
     }),
   }),
 });
 
 export const {
-  useSubscribeNewsletterMutation,
+  useGetNewslettersQuery,
+  useCreateNewsletterMutation,
+  useUpdateNewsletterMutation,
+  useDeleteNewsletterMutation,
   useSendNewsletterMutation,
-  useUploadImageMutation,
 } = newsletterApi; 

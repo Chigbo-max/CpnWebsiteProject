@@ -2,7 +2,9 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const subscriberApi = createApi({
   reducerPath: 'subscriberApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: import.meta.env.VITE_BASE_API_URL || 'https://cpnwebsiteproject.onrender.com/api' 
+  }),
   tagTypes: ['Subscriber'],
   endpoints: (builder) => ({
     getSubscribers: builder.query({
