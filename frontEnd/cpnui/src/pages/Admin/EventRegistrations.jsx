@@ -18,7 +18,7 @@ const EventRegistrations = () => {
     // Fetch all events for dropdown
     const fetchEvents = async () => {
       try {
-        const res = await fetch('/api/events');
+        const res = await fetch('/events');
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         setEvents(data?.events ?? []);
@@ -33,7 +33,7 @@ const EventRegistrations = () => {
     if (!eventId) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/registrations`, {
+      const res = await fetch(`/events/${eventId}/registrations`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -55,7 +55,7 @@ const EventRegistrations = () => {
   const handleDownloadCSV = async () => {
     setCsvLoading(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/registrations/csv`, {
+      const res = await fetch(`/events/${eventId}/registrations/csv`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

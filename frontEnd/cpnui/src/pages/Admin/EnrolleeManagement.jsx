@@ -24,7 +24,7 @@ const EnrolleeManagement = ({ token }) => {
 
   const fetchEnrollees = async () => {
     setLoading(true);
-    let url = `${apiBaseUrl}/api/enrollments/admin/enrollments`;
+    let url = `${apiBaseUrl}/enrollments/admin/enrollments`;
     if (startDate && endDate) {
       url += `?startDate=${startDate}&endDate=${endDate}`;
     }
@@ -45,7 +45,7 @@ const EnrolleeManagement = ({ token }) => {
     e.preventDefault();
     setBroadcastStatus(null);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/enrollments/admin/enrollments/broadcast`, {
+      const res = await fetch(`${apiBaseUrl}/enrollments/admin/enrollments/broadcast`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -33,7 +33,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     try {
       // Upload image to backend, not directly to Cloudinary
       const token = localStorage.getItem('adminToken');
-      const res = await fetch(`${apiBaseUrl}/api/admin/upload-image`, {
+      const res = await fetch(`${apiBaseUrl}/admin/upload-image`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -43,7 +43,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
       const data = await res.json();
       setForm(f => ({ ...f, profilePic: data.url, uploading: false }));
       // Instantly update profile on server as soon as image is uploaded
-      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
+      const response = await fetch(`${apiBaseUrl}/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     setForm(f => ({ ...f, saving: true }));
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${apiBaseUrl}/api/admin/profile`, {
+      const response = await fetch(`${apiBaseUrl}/admin/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     }
     setChanging(true);
     try {
-      const response = await fetch(`${apiBaseUrl}/api/admin/change-password`, {
+      const response = await fetch(`${apiBaseUrl}/admin/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.new }),
@@ -124,7 +124,7 @@ const Profile = ({ admin, onUpdate, showChangePassword, setShowChangePassword })
     setForm(f => ({ ...f, uploading: true }));
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${apiBaseUrl}/api/admin/profile-picture`, {
+      const response = await fetch(`${apiBaseUrl}/admin/profile-picture`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
