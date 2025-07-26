@@ -6,8 +6,8 @@ export const adminDashboardApi = createApi({
   reducerPath: 'adminDashboardApi',
   baseQuery: fetchBaseQuery({
     baseUrl,
-    prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth.token;
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('adminToken');
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
