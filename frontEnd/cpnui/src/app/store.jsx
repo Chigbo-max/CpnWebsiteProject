@@ -9,6 +9,7 @@ import { authApi } from '../features/auth/authApi';
 import { newsletterApi } from '../features/newsletter/newsletterApi';
 import { adminManagementApi } from '../features/admin/adminManagementApi';
 import { profileApi } from '../features/admin/profileApi';
+import { enrollmentApi } from '../features/admin/enrollmentApi';
 
 const store = configureStore({
     reducer: {
@@ -22,10 +23,10 @@ const store = configureStore({
       [newsletterApi.reducerPath]: newsletterApi.reducer,
       [adminManagementApi.reducerPath]: adminManagementApi.reducer,
       [profileApi.reducerPath]: profileApi.reducer,
-
+      [enrollmentApi.reducerPath]: enrollmentApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(blogApi.middleware, eventApi.middleware, subscriberApi.middleware, contactApi.middleware, authApi.middleware, newsletterApi.middleware, adminManagementApi.middleware, profileApi.middleware),
+      getDefaultMiddleware().concat(blogApi.middleware, eventApi.middleware, subscriberApi.middleware, contactApi.middleware, authApi.middleware, newsletterApi.middleware, adminManagementApi.middleware, profileApi.middleware, enrollmentApi.middleware),
 })
 
 export default store;

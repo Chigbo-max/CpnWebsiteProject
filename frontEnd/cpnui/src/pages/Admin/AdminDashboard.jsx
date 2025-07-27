@@ -37,23 +37,38 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
   useEffect(() => {
     if (activeSection === 'dashboard' && token) {
       (async () => {
-        const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-          fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-        const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
-        const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
-        const events = (await eventsRes.json()).events?.length || 0;
-        const blogs = (await blogsRes.json()).blogs?.length || 0;
-        setAnalytics({ enrollees, subscribers, events, blogs });
-        const monthly = (await monthlyCountsRes.json()).data || [];
-        setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
-        const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-        setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
+        try {
+          const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
+            fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+          ]);
+          
+          // Check if all responses are ok
+          const responses = [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes];
+          const hasError = responses.some(res => !res.ok);
+          
+          if (hasError) {
+            console.error('Some API calls failed in dashboard');
+            return;
+          }
+          
+          const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+          const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+          const events = (await eventsRes.json()).events?.length || 0;
+          const blogs = (await blogsRes.json()).blogs?.length || 0;
+          setAnalytics({ enrollees, subscribers, events, blogs });
+          const monthly = (await monthlyCountsRes.json()).data || [];
+          setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
+          const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+          setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
+        } catch (error) {
+          console.error('Error fetching dashboard data:', error);
+          // Don't show toast for dashboard data fetch errors as they're not critical
+        }
       })();
     }
     // WebSocket for real-time updates
@@ -65,23 +80,37 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
         if (data.type === 'dashboard-update') {
           // Refetch analytics data on any dashboard update
           (async () => {
-            const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-              fetch(`${apiBaseUrl}/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-              fetch(`${apiBaseUrl}/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
-            ]);
-            const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
-            const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
-            const events = (await eventsRes.json()).events?.length || 0;
-            const blogs = (await blogsRes.json()).blogs?.length || 0;
-            setAnalytics({ enrollees, subscribers, events, blogs });
-            const monthly = (await monthlyCountsRes.json()).data || [];
-            setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
-            const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
-            setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
+            try {
+              const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
+                fetch(`${apiBaseUrl}/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+              ]);
+              
+              // Check if all responses are ok
+              const responses = [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes];
+              const hasError = responses.some(res => !res.ok);
+              
+              if (hasError) {
+                console.error('Some API calls failed in dashboard update');
+                return;
+              }
+              
+              const enrollees = (await enrolleesRes.json()).enrollments?.length || 0;
+              const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
+              const events = (await eventsRes.json()).events?.length || 0;
+              const blogs = (await blogsRes.json()).blogs?.length || 0;
+              setAnalytics({ enrollees, subscribers, events, blogs });
+              const monthly = (await monthlyCountsRes.json()).data || [];
+              setMonthlyCounts(monthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })));
+              const enrolleeMonthly = (await enrolleeMonthlyCountsRes.json()).data || [];
+              setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
+            } catch (error) {
+              console.error('Error updating dashboard data:', error);
+            }
           })();
         }
       };

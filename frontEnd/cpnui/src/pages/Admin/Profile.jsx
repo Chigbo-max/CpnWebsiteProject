@@ -11,18 +11,17 @@ import {
 } from '../../features/admin/profileApi';
 
 const Profile = ({ showChangePassword, setShowChangePassword }) => {
-
-  
   const { currentAdmin: admin, updateAdmin } = useAdminAuth();
-   const [form, setForm] = useState({
-    name: profileData?.username || admin?.username || '',
-    email: profileData?.email || admin?.email || '',
-    profilePic: profileData?.profile_pic || admin?.profile_pic || '',
+  const { data: profileData } = useGetProfileQuery();
+  
+  const [form, setForm] = useState({
+    name: admin?.username || '',
+    email: admin?.email || '',
+    profilePic: admin?.profile_pic || '',
   });
 
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
 
-  const { data: profileData } = useGetProfileQuery();
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [uploadImage, { isLoading: isUploading }] = useUploadProfileImageMutation();
   const [removeImage, { isLoading: isRemoving }] = useRemoveProfileImageMutation();

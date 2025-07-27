@@ -56,7 +56,6 @@ router.post('/events', authenticateAdmin, upload.single('image'), async (req, re
   } catch (err) {
     console.error('Error creating event:', err);
     
-    // Enhanced error handling like blog route
     if (err.code === '23505') {
       return res.status(400).json({ 
         message: 'Database constraint violation',

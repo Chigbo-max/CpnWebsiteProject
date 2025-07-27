@@ -93,7 +93,7 @@ export const eventApi = createApi({
 
     deleteEvent: builder.mutation({
       query: (event_id) => ({
-        url: `/admin/events/${event_id}`,
+        url: `/events/${event_id}`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, event_id) => [

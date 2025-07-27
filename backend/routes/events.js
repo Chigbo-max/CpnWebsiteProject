@@ -6,13 +6,13 @@ const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
 const { authenticateAdmin } = require('../middleware/auth');
 const redisClient = require('../config/redisClient');
+const multer = require('multer');
+const upload = multer();
 
 console.log('Loaded events routes');
 
 const eventService = new EventServiceImpl(db);
 const cloudinaryService = new CloudinaryServiceImpl();
-
-
 
 // GET /api/events
 router.get('/', async (req, res) => {
@@ -36,6 +36,68 @@ router.get('/:event_id', async (req, res) => {
   if (!event) return res.status(404).json({ message: 'Event not found' });
   await redisClient.setEx(cacheKey, 300, JSON.stringify(event));
   res.json(event);
+});
+
+// PUT /api/events/:event_id (admin only)
+router.put('/:event_id', authenticateAdmin, async (req, res) => {
+  try {
+    const event_id = req.params.event_id;
+    const updates = req.body;
+    
+    // Handle image upload if provided
+    let image_url = updates.image_url;
+    if (updates.image && updates.image.startsWith('data:image')) {
+      image_url = await cloudinaryService.uploadImage(updates.image, 'event-images');
+    }
+    
+    // Prepare update data
+    const updateData = {
+      title: updates.title,
+      description: updates.description,
+      event_type: updates.event_type,
+      start_time: updates.start_time,
+      end_time: updates.end_time,
+      image_url: image_url || updates.image_url,
+      location_address: updates.location_address || null,
+      location_map_url: updates.location_map_url || null,
+      virtual_link: updates.virtual_link || null
+    };
+    
+    const updatedEvent = await eventService.updateEvent(event_id, updateData);
+    if (!updatedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    // Clear cache
+    await redisClient.del(`events:${event_id}`);
+    await redisClient.del('events:list');
+    
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ message: 'Failed to update event', error: error.message });
+  }
+});
+
+// DELETE /api/events/:event_id (admin only)
+router.delete('/:event_id', authenticateAdmin, async (req, res) => {
+  try {
+    const event_id = req.params.event_id;
+    const deleted = await eventService.deleteEvent(event_id);
+    
+    if (!deleted) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    // Clear cache
+    await redisClient.del(`events:${event_id}`);
+    await redisClient.del('events:list');
+    
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    res.status(500).json({ message: 'Failed to delete event', error: error.message });
+  }
 });
 
 // POST /api/events/:event_id/register

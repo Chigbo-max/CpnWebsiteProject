@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { 
@@ -31,8 +31,12 @@ const EventRegistrations = () => {
   const [downloadCSV, { isLoading: csvLoading }] = useLazyGetEventRegistrationsCSVQuery();
 
   React.useEffect(() => {
-    if (eventsError) toast.error(eventsError.message || 'Failed to load events');
-    if (registrationsError) toast.error(registrationsError.message || 'Failed to load registrations');
+    if (eventsError && eventsError.status !== 'FETCH_ERROR') {
+      toast.error(eventsError.message || 'Failed to load events');
+    }
+    if (registrationsError && registrationsError.status !== 'FETCH_ERROR') {
+      toast.error(registrationsError.message || 'Failed to load registrations');
+    }
   }, [eventsError, registrationsError]);
 
   const handleDownloadCSV = async () => {

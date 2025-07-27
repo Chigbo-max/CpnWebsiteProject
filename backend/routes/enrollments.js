@@ -42,6 +42,60 @@ router.get('/admin/enrollments', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Admin: Get enrollment by ID
+router.get('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req, res) => {
+  try {
+    const { enrollment_id } = req.params;
+    const enrollment = await enrollmentService.getEnrollmentById(enrollment_id);
+    
+    if (!enrollment) {
+      return res.status(404).json({ error: 'Enrollment not found' });
+    }
+    
+    res.json({ enrollment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Update enrollment
+router.put('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req, res) => {
+  try {
+    const { enrollment_id } = req.params;
+    const { course, name, email } = req.body;
+    
+    if (!course || !name || !email) {
+      return res.status(400).json({ error: 'Course, name, and email are required.' });
+    }
+    
+    const enrollment = await enrollmentService.updateEnrollment(enrollment_id, { course, name, email });
+    
+    if (!enrollment) {
+      return res.status(404).json({ error: 'Enrollment not found' });
+    }
+    
+    res.json({ message: 'Enrollment updated successfully', enrollment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Delete enrollment
+router.delete('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req, res) => {
+  try {
+    const { enrollment_id } = req.params;
+    const enrollment = await enrollmentService.deleteEnrollment(enrollment_id);
+    
+    if (!enrollment) {
+      return res.status(404).json({ error: 'Enrollment not found' });
+    }
+    
+    res.json({ message: 'Enrollment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin: Broadcast email to filtered enrollees
 router.post('/admin/enrollments/broadcast', authenticateAdmin, async (req, res) => {
   try {

@@ -42,6 +42,33 @@ class EnrollmentService {
     return result.rows;
   }
 
+  // Get enrollment by ID
+  async getEnrollmentById(enrollment_id) {
+    const result = await this.db.query(
+      'SELECT * FROM enrollments WHERE enrollment_id = $1',
+      [enrollment_id]
+    );
+    return result.rows[0] || null;
+  }
+
+  // Update enrollment
+  async updateEnrollment(enrollment_id, { course, name, email }) {
+    const result = await this.db.query(
+      'UPDATE enrollments SET course = $1, name = $2, email = $3 WHERE enrollment_id = $4 RETURNING *',
+      [course, name, email, enrollment_id]
+    );
+    return result.rows[0] || null;
+  }
+
+  // Delete enrollment
+  async deleteEnrollment(enrollment_id) {
+    const result = await this.db.query(
+      'DELETE FROM enrollments WHERE enrollment_id = $1 RETURNING *',
+      [enrollment_id]
+    );
+    return result.rows[0] || null;
+  }
+
   // Send broadcast email to filtered enrollees
   async broadcast({ subject, content, startDate, endDate }) {
     const enrollees = await this.listEnrollments({ startDate, endDate });

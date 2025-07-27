@@ -23,24 +23,29 @@ const EventEdit = () => {
   const [loading, setLoading] = useState(false);
   const { token } = useAdminAuth();
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
 
   useEffect(() => {
     const fetchEvent = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/events/${event_id}`);
-        if (!res.ok) throw new Error('Failed to fetch event');
+        const res = await fetch(`${apiBaseUrl}/events/${event_id}`);
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || `Failed to fetch event (${res.status})`);
+        }
         const data = await res.json();
         setForm({ ...data, image: null, image_url: data.image_url || '' });
         setImagePreview(data.image_url || null);
-      } catch {
-        toast.error('Error fetching event');
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        toast.error(error.message || 'Error fetching event');
       } finally {
         setLoading(false);
       }
     };
     fetchEvent();
-  }, [event_id]);
+  }, [event_id, apiBaseUrl]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -73,7 +78,7 @@ const EventEdit = () => {
         ...form,
         image: imageBase64,
       };
-      const res = await fetch(`/api/events/${event_id}`, {
+      const res = await fetch(`${apiBaseUrl}/events/${event_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +86,10 @@ const EventEdit = () => {
         },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error((await res.json()).message || 'Failed to update event');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to update event');
+      }
       toast.success('Event updated!');
       navigate('/admin/events');
     } catch (err) {
