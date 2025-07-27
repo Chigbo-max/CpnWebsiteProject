@@ -33,11 +33,9 @@ const EventDetail = () => {
   if (isError || !event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 py-8 sm:py-12 lg:py-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 mt-16 py-8 sm:py-12 lg:py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Event Details Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-          {/* Event Image */}
           {event.image_url && (
             <div className="w-full h-64 sm:h-80 lg:h-96 overflow-hidden">
               <img 
@@ -48,9 +46,7 @@ const EventDetail = () => {
             </div>
           )}
           
-          {/* Event Content */}
           <div className="p-6 sm:p-8 lg:p-10">
-            {/* Event Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
@@ -128,7 +124,6 @@ const EventDetail = () => {
           </div>
         </div>
 
-        {/* Registration Section */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6 sm:p-8 lg:p-10">
             {isPast ? (

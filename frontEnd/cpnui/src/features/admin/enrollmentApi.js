@@ -6,8 +6,8 @@ export const enrollmentApi = createApi({
   reducerPath: 'enrollmentApi',
   baseQuery: fetchBaseQuery({
     baseUrl: apiBaseUrl,
-    prepareHeaders: (headers, { getState }) => {
-      const token = getState().adminAuth.token;
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('adminToken');
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
       }
@@ -16,7 +16,6 @@ export const enrollmentApi = createApi({
   }),
   tagTypes: ['Enrollment'],
   endpoints: (builder) => ({
-    // Get enrollments with optional date filtering
     getEnrollments: builder.query({
       query: ({ startDate, endDate } = {}) => {
         let url = '/enrollments/admin/enrollments';
