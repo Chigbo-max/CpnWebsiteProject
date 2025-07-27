@@ -31,7 +31,7 @@ const socialLinks = [
 
 function NavBar() {
     const dispatch = useDispatch();
-    const { dropDown, ResourcesDropDown, coursesDropDown, openLink } = useSelector((state) => state.navBar);
+    const { dropDown, resourcesDropDown, coursesDropDown, openLink } = useSelector((state) => state.navBar);
     const [mobileCoursesDropdown, setMobileCoursesDropdown] = useState(false);
     const [mobileResourcesDropdown, setMobileResourcesDropdown] = useState(false);
     const [mobileInsideCPNDropdown, setMobileInsideCPNDropdown] = useState(false);
@@ -115,7 +115,7 @@ function NavBar() {
                                             <LiaAngleDownSolid className="text-xs" />
                                         </Link>
                                         <div className="absolute top-full left-0 w-full h-2 bg-transparent"></div>
-                                        {ResourcesDropDown && <ResourcesDropDown />}
+                                        {resourcesDropDown && <ResourcesDropDown />}
                                     </li>
                                 )
                             }
