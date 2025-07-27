@@ -26,11 +26,6 @@ const BlogList = ({ onRefresh }) => {
   const [deleteBlog] = useDeleteBlogMutation();
   const [updateBlog] = useUpdateBlogMutation();
   
-  // Handle authentication errors
-  if (error && handleAuthError(error)) {
-    return null; // Exit early if authentication error was handled
-  }
-
   const posts = useMemo(() => {
     return data?.blogs ?? [];
   }, [data]);
@@ -61,6 +56,11 @@ const BlogList = ({ onRefresh }) => {
     }
     return filtered;
   }, [posts, searchTerm, statusFilter, dateFilter]);
+  
+  // Handle authentication errors
+  if (error && handleAuthError(error)) {
+    return null; // Exit early if authentication error was handled
+  }
 
   const handleDelete = (id) => {
     setDeletePostId(id);

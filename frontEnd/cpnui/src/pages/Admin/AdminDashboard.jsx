@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { useAdminAuth } from '../../app/useAdminAuth';
