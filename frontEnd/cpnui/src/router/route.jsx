@@ -26,7 +26,7 @@ import AdminSecuritySettings from '../pages/Admin/AdminSecuritySettings';
 import Terms from '../pages/Legal/Terms';
 import Privacy from '../pages/Legal/Privacy';
 import DoingLeadershipDifferently from '../pages/Courses/DoingLeadershipDifferently.jsx';
-import DoingBusinessDifferently from '../pages/Courses/DoingBusinessDifferently.jsx';
+import DoingWorkDifferently from '../pages/Courses/DoingWorkDifferently.jsx';
 
 const BrowserRouter = createBrowserRouter(
     [{
