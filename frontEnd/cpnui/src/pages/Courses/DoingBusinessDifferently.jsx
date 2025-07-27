@@ -14,11 +14,20 @@ const faqs = [
     question: 'Can I take this course if I am not a business owner?',
     answer: 'Absolutely! The course is valuable for anyone interested in business from a biblical perspective.'
   },
+
+  {
+    question: 'Can I take the course anytime I want?',
+    answer: 'No, you cannot take the course anytime you want. The course is available occasionally but you can register for the next course and get notified when it is available.'
+  },
+  {
+    question: 'Can I take the course anytime I want?',
+    answer: 'No, you cannot take the course anytime you want. The course is available occasionally but you can register for the next course and get notified when it is available.'
+  }
 ];
 
 function DoingBusinessDifferently() {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '' });
+  const [form, setForm] = useState({ name: '', email: '', whatsapp: '' });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +40,7 @@ function DoingBusinessDifferently() {
   };
   const handleClose = () => {
     setShowModal(false);
-    setForm({ name: '', email: '' });
+    setForm({ name: '', email: '', whatsapp: '' });
     setStatus(null);
   };
   const handleChange = (e) => {
@@ -51,7 +60,7 @@ function DoingBusinessDifferently() {
       const data = await res.json();
       if (res.ok) {
         setStatus({ type: 'success', message: 'Enrollment successful! Check your email for confirmation.' });
-        setForm({ name: '', email: '' });
+        setForm({ name: '', email: '', whatsapp: '' });
       } else {
         setStatus({ type: 'error', message: data.error || data.message || 'Enrollment failed.' });
         console.log('Enrollment error:', data);
@@ -72,7 +81,7 @@ function DoingBusinessDifferently() {
             <span className="inline-block bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Free</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4">Doing Business Differently (DBD)</h1>
             <p className="text-lg text-gray-700 mb-4">Discover how to build and run businesses that honor God, create value, and impact society for good. Practical tools for Kingdom-minded entrepreneurs and professionals.</p>
-            <button onClick={handleOpen} className="inline-block px-8 py-3 bg-amber-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300">Enroll Now</button>
+            <button onClick={handleOpen} className="inline-block px-8 py-3 bg-amber-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300">Secure Your Spot Now!</button>
           </div>
         </div>
         <div className="mb-12">
@@ -96,7 +105,7 @@ function DoingBusinessDifferently() {
           </div>
         </div>
         <div id="enroll" className="text-center mt-8">
-          <button onClick={handleOpen} className="inline-block px-8 py-3 bg-amber-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300">Start Learning</button>
+          <button onClick={handleOpen} className="inline-block px-8 py-3 bg-amber-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300">Register Now!</button>
         </div>
       </div>
       {/* Enrollment Modal */}
@@ -108,6 +117,7 @@ function DoingBusinessDifferently() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <input type="text" name="name" placeholder="Your Name" value={form.name} onChange={handleChange} className="border rounded px-4 py-3" required />
               <input type="email" name="email" placeholder="Your Email" value={form.email} onChange={handleChange} className="border rounded px-4 py-3" required />
+              <input type="text" name="whatsapp" placeholder="WhatsApp Number" value={form.whatsapp} onChange={handleChange} className="border rounded px-4 py-3" required />
               <button type="submit" className="bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-all duration-300" disabled={loading}>{loading ? 'Enrolling...' : 'Submit'}</button>
               {status && <div className={`text-center ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{status.message}</div>}
             </form>

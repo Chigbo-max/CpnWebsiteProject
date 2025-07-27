@@ -1,31 +1,40 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { faHouse, faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute and for contact icons
+import { faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute and for contact icons
 import FooterLogo from "../../assets/ChristianProfessionalsNetwork.png";
 import { Link } from "react-router-dom";
+import clubhouseIcon from "../../assets/clubhouse.svg";
+
+
+
+
+const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
+const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
+const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
+const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
 
 const quickLinks = [
     { title: "Home", path: "/" },
     { title: "About Us", path: "/InsideCPN/about" },
     { title: "Courses", path: "/courses" },
-    { title: "Knowledge Hub", path: "/knowledgeHub" },
+    { title: "Resources", path: "/Resources" },
     { title: "Events", path: "/events" },
     { title: "Contact Us", path: "/contactUs" }
 ];
 
 const resources = [
-    { title: "Latest Podcast", path: "/knowledgeHub/listen" },
+    { title: "Latest Podcast", path: "/Resources/listen" },
     { title: "Blog Articles", path: "InsideCPN/blog" },
-    { title: "Leadership Resources", path: "/knowledgeHub" },
+    { title: "Leadership Resources", path: "/Resources" },
     { title: "Bible Study Series", path: "/events" },
-    { title: "Professional Development", path: "/knowledgeHub" }
+    { title: "Professional Development", path: "/Resources" }
 ];
 
 const socialLinks = [
-    { icon: faSpotify, url: "https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP", label: "Spotify" },
-    { icon: faWhatsapp, url: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ", label: "WhatsApp" },
-    { icon: faInstagram, url: "https://www.instagram.com/christianprofessionalsnetwork/", label: "Instagram" },
-    { icon: faHouse, url: "https://www.clubhouse.com/house/christian-professionals-network", label: "Clubhouse" }
+    { icon: faSpotify, url: podcastSource, label: "Spotify" },
+    { icon: faWhatsapp, url: whatsappLink, label: "WhatsApp" },
+    { icon: faInstagram, url: instagramLink, label: "Instagram" },
+    { icon: clubhouseIcon, url: clubhouseLink, label: "Clubhouse", isSvg: true }
 ];
 
 function Footer() {
@@ -57,7 +66,11 @@ function Footer() {
                                         className="bg-gray-800 hover:bg-amber-600 text-white p-2 sm:p-3 rounded-full transition-all duration-300 hover:scale-110"
                                         aria-label={social.label}
                                     >
+                                        {social.isSvg ? (
+                                            <img src={social.icon} alt={social.label} className="w-6 h-6" />
+                                        ) : (
                                         <FontAwesomeIcon icon={social.icon} className="text-sm sm:text-lg" />
+                                        )}
                                     </a>
                                 ))}
                             </div>

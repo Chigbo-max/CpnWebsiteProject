@@ -9,15 +9,15 @@ import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 const PodcastEpisodes = () => {
   const dispatch = useDispatch();
   const {
-    episodes,
-    searchQuery,
-    cachedEpisodes,
-    selectedTopic,
-    status,
-    error,
-    episodesPerPage,
-    currentPage,
-  } = useSelector((state) => state.podcasts);
+    episodes = [],
+    searchQuery = '',
+    cachedEpisodes = {},
+    selectedTopic = '',
+    status = 'idle',
+    error = '',
+    episodesPerPage = 12,
+    currentPage = 1,
+  } = useSelector((state) => state?.podcasts || {});
 
   const [playingId, setPlayingId] = useState(null);
 
@@ -36,7 +36,8 @@ const PodcastEpisodes = () => {
   const startIndex = (currentPage - 1) * episodesPerPage;
   const endIndex = startIndex + episodesPerPage;
 
-  const filteredEpisodes = (cachedEpisodes[currentPage] || episodes).filter((episode) => {
+  const episodeList = cachedEpisodes[currentPage] || episodes || [];
+  const filteredEpisodes = episodeList.filter((episode) => {
     const episodeName = episode.name?.toLowerCase() || "";
     const matchesSearch = searchQuery.length < 2 || episodeName.includes(searchQuery.toLowerCase());
     const matchesTopic = !selectedTopic || episodeName.includes(selectedTopic.toLowerCase());

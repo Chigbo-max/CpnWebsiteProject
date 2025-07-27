@@ -2,29 +2,38 @@ import { navBarItems } from '../../helpers/NavBarItems.jsx'
 import { Link } from "react-router-dom"
 import Logo from "../../assets/ChristianProfessionalsNetwork.png"
 import DropDown from "../DropDown/DropDown.jsx"
-import KnowledgeHubDropDown from "../../pages/knowledgeHub/KnowledgeHubDropDown.jsx"
+import ResourcesDropDown from "../../pages/Resources/ResourcesDropDown.jsx"
 import { LiaAngleDownSolid } from "react-icons/lia";
 import { useDispatch, useSelector } from 'react-redux';
-import { setDropDown, setKnowledgeHubDropDown, setCoursesDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
+import { setDropDown, setResourcesDropDown, setCoursesDropDown, setOpenLink } from '../../app/navBar/navBarSlice.jsx'
 import Switch from "../Switch.jsx"
 import CoursesDropDown from "../DropDown/CoursesDropDown/CoursesDropDown.jsx"
 import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import {faTimes, faHome } from '@fortawesome/free-solid-svg-icons';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
+import clubhouseIcon from "../../assets/clubhouse.svg";
+
+
+
+const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
+const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
+const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
+const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
+
 
 const socialLinks = [
-    { icon: faSpotify, url: "https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP", label: "Spotify" },
-    { icon: faWhatsapp, url: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ", label: "WhatsApp" },
-    { icon: faInstagram, url: "https://www.instagram.com/christianprofessionalsnetwork/", label: "Instagram" },
-    { icon: faHome, url: "https://www.clubhouse.com/house/christian-professionals-network", label: "Clubhouse" }
+    { icon: faSpotify, url: podcastSource, label: "Spotify" },
+    { icon: faWhatsapp, url: whatsappLink, label: "WhatsApp" },
+    { icon: faInstagram, url: instagramLink, label: "Instagram" },
+    { icon: clubhouseIcon, url: clubhouseLink, label: "Clubhouse", isSvg: true }
 ];
 
 function NavBar() {
     const dispatch = useDispatch();
-    const { dropDown, knowledgeHubDropDown, coursesDropDown, openLink } = useSelector((state) => state.navBar);
+    const { dropDown, ResourcesDropDown, coursesDropDown, openLink } = useSelector((state) => state.navBar);
     const [mobileCoursesDropdown, setMobileCoursesDropdown] = useState(false);
-    const [mobileKnowledgeHubDropdown, setMobileKnowledgeHubDropdown] = useState(false);
+    const [mobileResourcesDropdown, setMobileResourcesDropdown] = useState(false);
     const [mobileInsideCPNDropdown, setMobileInsideCPNDropdown] = useState(false);
     const [showFollowModal, setShowFollowModal] = useState(false);
     const mobileMenuRef = useRef(null);
@@ -34,17 +43,17 @@ function NavBar() {
       function handleClickOutside(event) {
         if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
           setMobileCoursesDropdown(false);
-          setMobileKnowledgeHubDropdown(false);
+          setMobileResourcesDropdown(false);
           setMobileInsideCPNDropdown(false);
         }
       }
-      if (mobileCoursesDropdown || mobileKnowledgeHubDropdown || mobileInsideCPNDropdown) {
+      if (mobileCoursesDropdown || mobileResourcesDropdown || mobileInsideCPNDropdown) {
         document.addEventListener('mousedown', handleClickOutside);
       } else {
         document.removeEventListener('mousedown', handleClickOutside);
       }
       return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [mobileCoursesDropdown, mobileKnowledgeHubDropdown, mobileInsideCPNDropdown]);
+    }, [mobileCoursesDropdown, mobileResourcesDropdown, mobileInsideCPNDropdown]);
 
     function toggleBar() {
         dispatch(setOpenLink(!openLink));
@@ -90,13 +99,13 @@ function NavBar() {
                                     </li>
                                 )
                             }
-                            if (item.title === "Knowledge Hub") {
+                            if (item.title === "Resources") {
                                 return (
                                     <li 
                                         key={index} 
                                         className="relative group"
-                                        onMouseEnter={() => handleMouseEnter(setKnowledgeHubDropDown)}
-                                        onMouseLeave={() => handleMouseLeave(setKnowledgeHubDropDown)}
+                                        onMouseEnter={() => handleMouseEnter(setResourcesDropDown)}
+                                        onMouseLeave={() => handleMouseLeave(setResourcesDropDown)}
                                     >
                                         <Link 
                                             to={item.path}
@@ -106,7 +115,7 @@ function NavBar() {
                                             <LiaAngleDownSolid className="text-xs" />
                                         </Link>
                                         <div className="absolute top-full left-0 w-full h-2 bg-transparent"></div>
-                                        {knowledgeHubDropDown && <KnowledgeHubDropDown />}
+                                        {ResourcesDropDown && <ResourcesDropDown />}
                                     </li>
                                 )
                             }
@@ -173,7 +182,7 @@ function NavBar() {
                                                 className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100 focus:outline-none"
                                                 onClick={() => {
                                                     setMobileCoursesDropdown((open) => !open);
-                                                    setMobileKnowledgeHubDropdown(false);
+                                                    setMobileResourcesDropdown(false);
                                                     setMobileInsideCPNDropdown(false);
                                                 }}
                                             >
@@ -186,12 +195,12 @@ function NavBar() {
                                                 </div>
                                             )}
                                         </>
-                                    ) : item.title === 'Knowledge Hub' ? (
+                                    ) : item.title === 'Resources' ? (
                                         <>
                                             <button
                                                 className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100 focus:outline-none"
                                                 onClick={() => {
-                                                    setMobileKnowledgeHubDropdown((open) => !open);
+                                                    setMobileResourcesDropdown((open) => !open);
                                                     setMobileCoursesDropdown(false);
                                                     setMobileInsideCPNDropdown(false);
                                                 }}
@@ -199,9 +208,9 @@ function NavBar() {
                                                 {item.title}
                                                 <LiaAngleDownSolid className="inline ml-2 text-xs" />
                                             </button>
-                                            {mobileKnowledgeHubDropdown && (
+                                            {mobileResourcesDropdown && (
                                                 <div className="pl-6 pt-2">
-                                                    <KnowledgeHubDropDown onItemClick={() => setMobileKnowledgeHubDropdown(false)} />
+                                                    <ResourcesDropDown onItemClick={() => setMobileResourcesDropdown(false)} />
                                                 </div>
                                             )}
                                         </>
@@ -212,7 +221,7 @@ function NavBar() {
                                                 onClick={() => {
                                                     setMobileInsideCPNDropdown((open) => !open);
                                                     setMobileCoursesDropdown(false);
-                                                    setMobileKnowledgeHubDropdown(false);
+                                                    setMobileResourcesDropdown(false);
                                                 }}
                                             >
                                                 {item.title}
@@ -263,7 +272,11 @@ function NavBar() {
                                     aria-label={social.label}
                                 >
                                     <span className="bg-gray-800 group-hover:bg-amber-600 text-white p-4 rounded-full transition-all duration-300 shadow-lg mb-2">
-                                        <FontAwesomeIcon icon={social.icon} className="text-2xl" />
+                                        {social.isSvg ? (
+                                            <img src={social.icon} alt={social.label} className="w-6 h-6" />
+                                        ) : (
+                                            <FontAwesomeIcon icon={social.icon} className="text-2xl" />
+                                        )}
                                     </span>
                                     <span className="text-xs text-gray-300 group-hover:text-amber-400 font-semibold">{social.label}</span>
                                 </a>

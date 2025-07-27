@@ -18,11 +18,11 @@ const enrollmentService = new EnrollmentService(db, mailer);
 // Public: Enroll in a course
 router.post('/', async (req, res) => {
   try {
-    const { course, name, email } = req.body;
+    const { course, name, email, whatsapp } = req.body;
     if (!course || !name || !email) {
       return res.status(400).json({ error: 'Course, name, and email are required.' });
     }
-    const enrollment = await enrollmentService.enroll({ course, name, email });
+    const enrollment = await enrollmentService.enroll({ course, name, email, whatsapp });
     // Broadcast dashboard update
     req.app.get('broadcastDashboardUpdate')({ entity: 'enrollment', action: 'create' });
     res.status(201).json({ message: 'Enrollment successful', enrollment });
@@ -62,13 +62,13 @@ router.get('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req, r
 router.put('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req, res) => {
   try {
     const { enrollment_id } = req.params;
-    const { course, name, email } = req.body;
+    const { course, name, email, whatsapp } = req.body;
     
     if (!course || !name || !email) {
       return res.status(400).json({ error: 'Course, name, and email are required.' });
     }
     
-    const enrollment = await enrollmentService.updateEnrollment(enrollment_id, { course, name, email });
+    const enrollment = await enrollmentService.updateEnrollment(enrollment_id, { course, name, email, whatsapp });
     
     if (!enrollment) {
       return res.status(404).json({ error: 'Enrollment not found' });

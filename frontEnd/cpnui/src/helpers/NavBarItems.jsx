@@ -12,8 +12,8 @@ export const navBarItems = [
     },
 
     {
-        "title": "Knowledge Hub",
-        "path": "/knowledgeHub",
+        "title": "Resources",
+        "path": "/Resources",
         "cName": "nav_bar_item"
     },
 

@@ -14,7 +14,7 @@ function FreeContent() {
                 
                 <div 
                   className="relative w-full sm:w-80 lg:w-96 xl:w-1/4 min-w-64 p-6 border border-gray-300 rounded-xl bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer group"
-                  onClick={() => navigate("knowledgeHub/read")}
+                  onClick={() => navigate("Resources/read")}
                 >
                     <FaBookOpen className="absolute top-6 left-6 text-3xl text-gray-900" />
                     <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 mt-12">Read</h3>
@@ -24,7 +24,7 @@ function FreeContent() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate("/knowledgeHub/read");
+                        navigate("/Resources/read");
                       }}
                       className="w-full bg-gray-900 hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-6 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
                     >
@@ -34,7 +34,7 @@ function FreeContent() {
 
                 <div 
                   className="relative w-full sm:w-80 lg:w-96 xl:w-1/4 min-w-64 p-6 border border-gray-300 rounded-xl bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer group"
-                  onClick={() => navigate("/knowledgeHub/listen")}
+                  onClick={() => navigate("/Resources/listen")}
                 >
                     <FaPodcast className="absolute top-6 left-6 text-3xl text-gray-900" />
                     <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 mt-12">Our Series</h3>
@@ -44,7 +44,7 @@ function FreeContent() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate("/knowledgeHub/listen");
+                        navigate("/Resources/listen");
                       }}
                       className="w-full bg-gray-900 hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-6 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
                     >

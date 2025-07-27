@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadphones, faBookOpen } from "@fortawesome/free-solid-svg-icons";
 
-function KnowledgeHub() {
+function Resources() {
   const navigate = useNavigate();
   return (
     <div className="w-full">
@@ -27,7 +27,7 @@ function KnowledgeHub() {
             transition={{ duration: 1, ease: "easeOut" }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-amber-400 mb-6"
           >
-            Knowledge Hub
+            Resources
           </motion.h1>
           <motion.p
             initial={{ x: "100vw", opacity: 0 }}
@@ -61,7 +61,7 @@ function KnowledgeHub() {
                   Leadership is a skill that can be learned. Here are some tips on how to be a good leader.
                 </p>
                 <button 
-                  onClick={() => navigate("/knowledgeHub/listen")}
+                  onClick={() => navigate("/Resources/listen")}
                   className="mb-6 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
                 >
                   LISTEN NOW &rarr;
@@ -102,4 +102,4 @@ function KnowledgeHub() {
   );
 }
 
-export default KnowledgeHub;
+export default Resources;

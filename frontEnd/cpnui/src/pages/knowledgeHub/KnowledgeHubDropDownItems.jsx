@@ -1,15 +1,15 @@
-export const KnowledgeHubDropDownItems = [
+export const ResourcesDropDownItems = [
     
     {
        "title": "Listen",
-       "path": "/knowledgeHub/listen",
-       "cName": "knowledgeHub_drop_down",
+       "path": "/Resources/listen",
+       "cName": "Resources_drop_down",
     },
 
     {
         "title": "Read",
-        "path": "/knowledgeHub/read",
-        "cName": "knowledgeHub_drop_down",
+        "path": "/Resources/read",
+        "cName": "Resources_drop_down",
     }
 
 

@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS enrollments (
     course VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    whatsapp VARCHAR(30),
     enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

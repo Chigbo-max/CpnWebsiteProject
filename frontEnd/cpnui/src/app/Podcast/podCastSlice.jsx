@@ -80,6 +80,8 @@ export const fetchPodcastSearch = createAsyncThunk(
   }
 );
 
+const podcastShowId = import.meta.env.VITE_SHOW_ID;
+
 const initialState = {
   episodes: [],
   searchedEpisodes: [],
@@ -88,7 +90,7 @@ const initialState = {
   selectedTopic: '',
   searchQuery: '',
   accessToken: null,
-  showId: '2vmyOcrq7cFcKBMepGbpZP',
+  showId: podcastShowId,
   status: 'idle',
   searchStatus: 'idle',
   error: null,

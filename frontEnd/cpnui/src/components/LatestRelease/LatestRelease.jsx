@@ -50,7 +50,7 @@ function LatestRelease() {
                                 Leadership is a skill that can be learned. Here are some tips on how to be a good leader.
                             </p>
                             <button 
-                              onClick={() => navigate("/knowledgeHub/listen")}
+                              onClick={() => navigate("/Resources/listen")}
                               className="mb-6 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
                             >
                                 LISTEN NOW &rarr;

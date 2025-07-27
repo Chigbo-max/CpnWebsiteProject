@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Courses from "../pages/Courses/Courses";
-import KnowledgeHub from "../pages/knowledgeHub/KnowledgeHub";
+import Resources from "../pages/Resources/Resources";
 import Events from "../pages/Events/Events";
 import Listen from "../pages/Listen/Listen";
 import Blog from "../pages/Blog/Blog"
@@ -42,9 +42,9 @@ const BrowserRouter = createBrowserRouter(
         { path: "InsideCPN/blog", element: <Blog /> },
         { path: "/blog/:slug", element: <BlogPost /> },
         { path: "/read", element: <Blog /> },
-        { path: "/knowledgeHub", element: <KnowledgeHub /> },
-        { path: "/knowledgeHub/listen", element: <Listen /> },
-        { path: "/knowledgeHub/read", element: <Blog /> },
+        { path: "/Resources", element: <Resources /> },
+        { path: "/Resources/listen", element: <Listen /> },
+        { path: "/Resources/read", element: <Blog /> },
         { path: "/events", element: <Events /> },
         { path: "/events/:eventId", element: <EventDetail /> },
         { path: "/InsideCPN/about", element: <About /> },

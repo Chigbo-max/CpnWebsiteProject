@@ -35,6 +35,7 @@ const EnrolleeManagement = () => {
     name: '',
     email: '',
     course: '',
+    whatsapp: '',
   });
 
   // API hooks
@@ -69,6 +70,7 @@ const EnrolleeManagement = () => {
       name: enrollment.name,
       email: enrollment.email,
       course: enrollment.course,
+      whatsapp: enrollment.whatsapp || '',
     });
     setShowEditModal(true);
   };
@@ -84,7 +86,7 @@ const EnrolleeManagement = () => {
       toast.success('Enrollment updated successfully');
       setShowEditModal(false);
       setEditingEnrollment(null);
-      setEditForm({ name: '', email: '', course: '' });
+      setEditForm({ name: '', email: '', course: '', whatsapp: '' });
     } catch (error) {
       toast.error(error.data?.error || 'Failed to update enrollment');
     }
@@ -151,6 +153,7 @@ const EnrolleeManagement = () => {
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Course</th>
+                <th className="px-4 py-2">WhatsApp</th>
                 <th className="px-4 py-2">Enrollment Date</th>
                 <th className="px-4 py-2">Enrollment ID</th>
                 <th className="px-4 py-2">Actions</th>
@@ -162,6 +165,7 @@ const EnrolleeManagement = () => {
                   <td className="px-4 py-2">{enrollment.name}</td>
                   <td className="px-4 py-2">{enrollment.email}</td>
                   <td className="px-4 py-2">{enrollment.course}</td>
+                  <td className="px-4 py-2">{enrollment.whatsapp || '-'}</td>
                   <td className="px-4 py-2">{formatDate(enrollment.enrolled_at)}</td>
                   <td className="px-4 py-2">{enrollment.enrollment_id}</td>
                   <td className="px-4 py-2">
@@ -244,6 +248,16 @@ const EnrolleeManagement = () => {
                   <option value="Doing Leadership Differently">Doing Leadership Differently</option>
                   <option value="Doing Work Differently">Doing Work Differently</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+                <input
+                  type="text"
+                  value={editForm.whatsapp}
+                  onChange={(e) => setEditForm({ ...editForm, whatsapp: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  required
+                />
               </div>
 
               <div className="flex gap-3">

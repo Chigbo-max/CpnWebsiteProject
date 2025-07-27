@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion, AnimatePresence } from 'framer-motion';
-import { faUsers, faBookOpen, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import { faUsers, faBookOpen, faCalendarAlt, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@fortawesome/free-brands-svg-icons";
 import Cpn1 from "../../assets/cpnevent1.jpg";
 import Cpn2 from "../../assets/cpnevent2.jpg";
@@ -14,6 +14,9 @@ import LatestRelease from "../../components/LatestRelease/LatestRelease";
 import Courses from "../../components/Courses/Courses";
 import FreeContent from "../../components/FreeContent/FreeContent";
 import { useGetEventsQuery } from '../../features/event/eventApi';
+
+const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
+const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
 
 const slides = [
   {
@@ -27,11 +30,11 @@ const slides = [
   },
   {
     image: Cpn2,
-    title: "Knowledge Hub",
+    title: "Resources",
     subtitle: "Biblical Resources for Professionals",
     text: "Access high-quality, biblically-aligned resources designed to help you grow professionally while maintaining Kingdom values.",
     buttonText: "Explore Resources",
-    buttonLink: "/knowledgeHub",
+    buttonLink: "/Resources",
     buttonType: "link"
   },
   {
@@ -40,7 +43,7 @@ const slides = [
     subtitle: "Connect & Grow Together",
     text: "Connect with like-minded professionals who share your values and commitment to Kingdom excellence in the workplace.",
     buttonText: "Join Community",
-    buttonLink: "https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ",
+    buttonLink: whatsappLink,
     buttonType: "external"
   },
   {
@@ -76,6 +79,18 @@ function Home() {
     }, 8000)
     return () => clearInterval(interval);
   }, [])
+
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      (prevIndex + 1) % slides.length
+    );
+  };
 
   return (
     <div className="w-full">
@@ -166,6 +181,23 @@ function Home() {
           </motion.div>
         </div>
         
+        {/* Navigation Arrows */}
+        <button
+          onClick={goToPrevious}
+          className="absolute left-4 sm:left-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+          aria-label="Previous slide"
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="text-xl sm:text-2xl" />
+        </button>
+        
+        <button
+          onClick={goToNext}
+          className="absolute right-4 sm:right-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+          aria-label="Next slide"
+        >
+          <FontAwesomeIcon icon={faChevronRight} className="text-xl sm:text-2xl" />
+        </button>
+        
         {/* Slide Indicators */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 flex space-x-3">
           {slides.map((_, index) => (
@@ -203,7 +235,7 @@ function Home() {
                 Connect with over 2,000 professionals in our active WhatsApp community. Share insights, ask questions, and grow together.
               </p>
               <a
-                href="https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ"
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors"
@@ -244,11 +276,11 @@ function Home() {
         </section>
       </div>
 
-      {/* Knowledge Hub Section - Full Width */}
+      {/* Resources Section - Full Width */}
       <section className="w-full" style={{backgroundColor: '#111826ff'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">Knowledge Hub</h2>
+            <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">Resources</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Access high-quality, biblically-aligned resources designed to help you excel in your professional journey.
             </p>
@@ -263,13 +295,13 @@ function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  to="/knowledgeHub/listen"
+                  to="/Resources/listen"
                   className="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   <FontAwesomeIcon icon={faSpotifyBrand} /> Listen Now
                 </Link>
                 <Link
-                  to="/knowledgeHub"
+                  to="/Resources"
                   className="inline-flex items-center gap-2 px-8 py-3 border-2 border-amber-400 text-amber-400 font-semibold rounded-lg hover:bg-amber-400 hover:text-gray-900 transition-colors"
                 >
                   Explore All Resources
@@ -385,7 +417,7 @@ function Home() {
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <iframe 
               className="w-full h-96 border-0 w-full" 
-              src="https://open.spotify.com/embed/show/2vmyOcrq7cFcKBMepGbpZP?utm_source=generator" 
+              src={podcastSource}
               allowFullScreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
               loading="lazy"

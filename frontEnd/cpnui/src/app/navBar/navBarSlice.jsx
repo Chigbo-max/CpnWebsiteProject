@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState ={
     dropDown: false,
-    knowledgeHubDropDown: false,
+    ResourcesDropDown: false,
     communityDropDown: false,
     coursesDropDown: false,
     openLink: false,
@@ -15,8 +15,8 @@ export const navBarSlice = createSlice({
         setDropDown: (state, action) => {
             state.dropDown = action.payload;
         },
-        setKnowledgeHubDropDown: (state, action) => {
-            state.knowledgeHubDropDown =  action.payload;
+        setResourcesDropDown: (state, action) => {
+            state.ResourcesDropDown =  action.payload;
         },
         setCommunityDropDown: (state, action) => {
             state.communityDropDown = action.payload;
@@ -30,5 +30,5 @@ export const navBarSlice = createSlice({
     },
 });
 
-export const {setDropDown, setKnowledgeHubDropDown, setCommunityDropDown, setCoursesDropDown, setOpenLink} = navBarSlice.actions;
+export const {setDropDown, setResourcesDropDown, setCommunityDropDown, setCoursesDropDown, setOpenLink} = navBarSlice.actions;
 export default navBarSlice.reducer;

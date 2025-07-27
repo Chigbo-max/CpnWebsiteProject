@@ -3,7 +3,7 @@ import { setSelectedTopic, clearFilters } from './podCastSlice';
 
 const TopicsFilter = () => {
   const dispatch = useDispatch();
-  const { topics, selectedTopic } = useSelector((state) => state.podcasts);
+  const { topics = [], selectedTopic = '' } = useSelector((state) => state?.podcasts || {});
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">

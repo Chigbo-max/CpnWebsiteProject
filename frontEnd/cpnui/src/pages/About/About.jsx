@@ -10,6 +10,12 @@ import ceo from "../../assets/ceo.jpeg";
 import commanager from "../../assets/commanager.jpeg";
 import contentlead from "../../assets/contentlead.jpeg";
 
+
+const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
+const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
+const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
+const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
+
 const team = [
   { name: 'Chigbo Guy', role: 'Founder', img: ceo },
   { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
@@ -107,12 +113,12 @@ function About() {
         </div>
       </section>
 
-      {/* Values - Horizontal layout with icons, icon stands alone */}
+      {/* Values - Responsive layout with icons, icon stands alone */}
       <section className="w-full bg-gray-900 py-12 px-4 sm:px-6">
         <h3 className="text-3xl font-extrabold text-amber-600 mb-8 text-center">Our Values</h3>
-        <div className="flex flex-row justify-between gap-0 max-w-7xl mx-auto flex-wrap md:flex-nowrap">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-7xl mx-auto flex-wrap">
           {values.map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center w-64 min-h-[180px] text-center flex-shrink-0">
+            <div key={idx} className="flex flex-col items-center justify-center w-full max-w-xs min-h-[180px] text-center flex-shrink-0 mx-auto">
               <div className="flex items-center justify-center w-20 h-20 rounded-full bg-amber-600 mb-4 shadow-lg">
                 {React.cloneElement(val.icon, { className: 'text-4xl text-white m-0' })}
               </div>
@@ -163,10 +169,10 @@ function About() {
         <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Connected</h3>
         <p className="text-lg text-gray-700 mb-6">Join our community, learn, and be inspired!</p>
         <div className="flex justify-center gap-4 mt-2">
-          <a href="https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faSpotify} className="text-4xl text-gray-900" /></a>
-          <a href="https://www.clubhouse.com/house/christian-professionals-network" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src={icon} className="w-10 h-10" alt="Clubhouse Icon" /></a>
-          <a href="https://www.instagram.com/christianprofessionalsnetwork/" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faInstagram} className="text-4xl text-gray-900" /></a>
-          <a href="https://chat.whatsapp.com/GwBz6QmeDhQ1GhfoAaJ8KQ" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faWhatsapp} className="text-4xl text-gray-900" /></a>
+          <a href={podcastSource} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faSpotify} className="text-4xl text-gray-900" /></a>
+          <a href={clubhouseLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src={icon} className="w-10 h-10" alt="Clubhouse Icon" /></a>
+          <a href={instagramLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faInstagram} className="text-4xl text-gray-900" /></a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faWhatsapp} className="text-4xl text-gray-900" /></a>
         </div>
       </section>
     </div>
