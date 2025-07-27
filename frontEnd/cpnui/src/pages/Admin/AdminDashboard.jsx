@@ -42,7 +42,7 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
             fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
             fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
             fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
-            fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${apiBaseUrl}/admin/blog`, { headers: { Authorization: `Bearer ${token}` } }),
             fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
             fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
           ]);
@@ -82,12 +82,12 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
           (async () => {
             try {
               const [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes] = await Promise.all([
-                fetch(`${apiBaseUrl}/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/enrollments/admin/enrollments`, { headers: { Authorization: `Bearer ${token}` } }),
                 fetch(`${apiBaseUrl}/subscribers`, { headers: { Authorization: `Bearer ${token}` } }),
                 fetch(`${apiBaseUrl}/events`, { headers: { Authorization: `Bearer ${token}` } }),
-                fetch(`${apiBaseUrl}/blog`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/admin/blog`, { headers: { Authorization: `Bearer ${token}` } }),
                 fetch(`${apiBaseUrl}/subscribers/monthly-counts`, { headers: { Authorization: `Bearer ${token}` } }),
-                fetch(`${apiBaseUrl}/admin/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
+                fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
               ]);
               
               // Check if all responses are ok
