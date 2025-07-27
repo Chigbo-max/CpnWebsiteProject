@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import Cpn1 from '../../assets/dwd.jpeg';
 import Cpn2 from '../../assets/dld.jpeg';
-import Cpn3 from '../../assets/dbd.jpeg';
 import bgImage from '../../assets/bookshelf.jpeg';
 
 function Courses() {
@@ -18,12 +17,7 @@ function Courses() {
       description: 'Learn how to lead with integrity, humility, and Kingdom values. This course equips you to influence and inspire others in any environment.',
       link: '/courses/doingLeadershipDifferently',
     },
-    {
-      title: 'Doing Business Differently (DBD)',
-      image: Cpn3,
-      description: 'Discover how to build and run businesses that honor God, create value, and impact society for good. Practical tools for Kingdom-minded entrepreneurs.',
-      link: '/courses/doingBusinessDifferently',
-    },
+ 
   ];
 
   return (

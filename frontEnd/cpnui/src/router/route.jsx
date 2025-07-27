@@ -25,7 +25,6 @@ import AdminResetPassword from '../pages/Admin/AdminResetPassword';
 import AdminSecuritySettings from '../pages/Admin/AdminSecuritySettings';
 import Terms from '../pages/Legal/Terms';
 import Privacy from '../pages/Legal/Privacy';
-import DoingWorkDifferently from '../pages/Courses/DoingWorkDifferently.jsx';
 import DoingLeadershipDifferently from '../pages/Courses/DoingLeadershipDifferently.jsx';
 import DoingBusinessDifferently from '../pages/Courses/DoingBusinessDifferently.jsx';
 
@@ -38,7 +37,6 @@ const BrowserRouter = createBrowserRouter(
         { path: "/courses", element: <Courses /> },
         { path: "/courses/doingWorkDifferently", element: <DoingWorkDifferently /> },
         { path: "/courses/doingLeadershipDifferently", element: <DoingLeadershipDifferently /> },
-        { path: "/courses/doingBusinessDifferently", element: <DoingBusinessDifferently /> },
         { path: "InsideCPN/blog", element: <Blog /> },
         { path: "/blog/:slug", element: <BlogPost /> },
         { path: "/read", element: <Blog /> },

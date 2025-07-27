@@ -20,6 +20,7 @@ function formatDate(date) {
 const EnrolleeManagement = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [broadcastStatus, setBroadcastStatus] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState('');
@@ -45,6 +46,18 @@ const EnrolleeManagement = () => {
   const [broadcastToEnrollments, { isLoading: isBroadcasting }] = useBroadcastToEnrollmentsMutation();
 
   const enrollments = enrollmentsData?.enrollments || [];
+
+  // Filter enrollments based on search term
+  const filteredEnrollments = enrollments.filter(enrollment => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      enrollment.name?.toLowerCase().includes(searchLower) ||
+      enrollment.email?.toLowerCase().includes(searchLower) ||
+      enrollment.course?.toLowerCase().includes(searchLower) ||
+      enrollment.whatsapp?.toLowerCase().includes(searchLower) ||
+      enrollment.enrollment_id?.toLowerCase().includes(searchLower)
+    );
+  });
 
   useEffect(() => {
     refetch();
@@ -141,6 +154,16 @@ const EnrolleeManagement = () => {
           <label className="block text-sm font-medium mb-1">End Date</label>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="border rounded px-3 py-2" />
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Search</label>
+          <input 
+            type="text" 
+            placeholder="Search by name, email, course, WhatsApp, or ID..." 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+            className="border rounded px-3 py-2 w-full md:w-64" 
+          />
+        </div>
         <button onClick={() => refetch()} className="bg-amber-600 text-white px-4 py-2 rounded mt-6 md:mt-0">Filter</button>
       </div>
       {isLoading ? (
@@ -160,7 +183,7 @@ const EnrolleeManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {enrollments.map((enrollment) => (
+              {filteredEnrollments.map((enrollment) => (
                 <tr key={enrollment.enrollment_id} className="border-t">
                   <td className="px-4 py-2">{enrollment.name}</td>
                   <td className="px-4 py-2">{enrollment.email}</td>
@@ -188,8 +211,15 @@ const EnrolleeManagement = () => {
                   </td>
                 </tr>
               ))}
-              {enrollments.length === 0 && (
-                <tr><td colSpan={7} className="text-center py-4">No enrollees found for selected period.</td></tr>
+              {filteredEnrollments.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="text-center py-4">
+                    {enrollments.length === 0 
+                      ? "No enrollees found for selected period." 
+                      : "No enrollees match your search criteria."
+                    }
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

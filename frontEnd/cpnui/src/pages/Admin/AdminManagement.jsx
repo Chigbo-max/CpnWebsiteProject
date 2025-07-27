@@ -11,6 +11,7 @@ import {
 
 const AdminManagement = ({ currentAdmin }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({ 
     username: '', 
     email: '', 
@@ -31,6 +32,17 @@ const AdminManagement = ({ currentAdmin }) => {
     error 
   } = useGetAdminsQuery(undefined, {
     skip: !currentAdmin || currentAdmin.role !== 'superadmin',
+  });
+
+  // Filter admins based on search term
+  const filteredAdmins = admins.filter(admin => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      admin.username?.toLowerCase().includes(searchLower) ||
+      admin.email?.toLowerCase().includes(searchLower) ||
+      admin.role?.toLowerCase().includes(searchLower) ||
+      admin.id?.toString().includes(searchLower)
+    );
   });
 
   const [addAdmin, { isLoading: isAdding }] = useAddAdminMutation();
@@ -110,6 +122,17 @@ const AdminManagement = ({ currentAdmin }) => {
         </button>
       </div>
 
+      {/* Search Input */}
+      <div className="mb-6">
+        <input 
+          type="text" 
+          placeholder="Search by name, email, role, or ID..." 
+          value={searchTerm} 
+          onChange={e => setSearchTerm(e.target.value)} 
+          className="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent" 
+        />
+      </div>
+
       {isLoading ? (
         <SimpleSpinner message="Loading admins..." />
       ) : isError ? (
@@ -118,6 +141,8 @@ const AdminManagement = ({ currentAdmin }) => {
         </div>
       ) : admins.length === 0 ? (
         <div className="text-center py-8 text-gray-500">No admins found.</div>
+      ) : filteredAdmins.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">No admins match your search criteria.</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -131,7 +156,7 @@ const AdminManagement = ({ currentAdmin }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {admins.map(admin => (
+              {filteredAdmins.map(admin => (
                 <tr key={admin.id}>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{admin.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-blue-700">{admin.email}</td>
