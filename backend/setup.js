@@ -9,7 +9,7 @@ async function setupDatabase() {
   });
 
   try {
-    console.log('Setting up database...');
+    //setting up database
     const schemaPath = path.join(__dirname, 'config', 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     
@@ -20,7 +20,6 @@ async function setupDatabase() {
       await pool.query(cmd);
     }
     
-    console.log('Database setup completed successfully');
   } catch (error) {
     console.error('Database setup failed:', error);
     process.exit(1);

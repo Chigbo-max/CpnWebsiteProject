@@ -39,7 +39,6 @@ router.post('/events', authenticateAdmin, upload.single('image'), async (req, re
     if (req.file) {
       const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
       image_url = await cloudinaryService.uploadImage(base64, 'event-images');
-      console.log('Image uploaded:', image_url);
     }
 
     const event = await eventService.createEvent({
@@ -75,12 +74,9 @@ router.get('/blog', authenticateAdmin, async (req, res, next) => {
     const cacheKey = 'admin:blog:posts';
     const cached = await redisClient.get(cacheKey);
     if (cached) {
-      console.log('Serving cached blog posts');
       return res.json(JSON.parse(cached));
     }
-    console.log('Fetching blog posts from database');
     const posts = await blogService.getAll();
-    console.log('Blog posts fetched:', posts.length);
     await redisClient.setEx(cacheKey, 300, JSON.stringify(posts));
     res.json({ blogs: posts });
   } catch (error) { 

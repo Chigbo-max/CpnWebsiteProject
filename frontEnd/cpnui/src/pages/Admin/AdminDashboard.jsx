@@ -69,7 +69,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
           const subscribers = (await subscribersRes.json()).subscribers?.length || 0;
           const events = (await eventsRes.json()).events?.length || 0;
           const blogsData = await blogsRes.json();
-          console.log('Blogs response:', blogsData);
           const blogs = blogsData.blogs?.length || blogsData.length || 0;
           setAnalytics({ enrollees, subscribers, events, blogs });
           const monthly = (await monthlyCountsRes.json()).data || [];
@@ -78,7 +77,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
           setEnrolleeMonthlyCounts(enrolleeMonthly.map(m => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })));
         } catch (error) {
           console.error('Error fetching dashboard data:', error);
-          // Don't show toast for dashboard data fetch errors as they're not critical
         }
       })();
     }
@@ -108,14 +106,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
               if (hasError) {
                 console.error('Some API calls failed in dashboard update');
                 // Log individual response statuses for debugging
-                console.log('Response statuses:', {
-                  enrollees: enrolleesRes.status,
-                  subscribers: subscribersRes.status,
-                  events: eventsRes.status,
-                  blogs: blogsRes.status,
-                  monthlyCounts: monthlyCountsRes.status,
-                  enrolleeMonthlyCounts: enrolleeMonthlyCountsRes.status
-                });
                 return;
               }
               

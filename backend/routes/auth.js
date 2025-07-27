@@ -54,8 +54,7 @@ router.post('/forgot-password', async (req, res) => {
       const token = uuidv4();
       await authService.saveResetToken(admin.id, token);
       const resetLink = `${process.env.FRONTEND_URL}/admin/reset-password?token=${token}`;
-      console.log(`[RESET] Sending password reset email to: ${admin.email}`);
-      console.log(`[RESET] Reset link: ${resetLink}`);
+     
       try {
         await mailer.sendMail({
           from: process.env.EMAIL_USER,
@@ -66,7 +65,6 @@ router.post('/forgot-password', async (req, res) => {
             content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>If you requested a password reset, click <a href="${resetLink}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
           })
         });
-        console.log(`[RESET] Password reset email sent successfully to: ${admin.email}`);
         status = 'success';
         reason = 'Email sent';
       } catch (mailErr) {
@@ -98,7 +96,6 @@ router.post('/reset-password', async (req, res) => {
     if (!admin) throw new Error('Invalid or expired token');
     await authService.updatePasswordAndInvalidateSessions(admin.id, password);
     await authService.clearResetToken(admin.id);
-    console.log(`[RESET] Password reset for admin: ${admin.email}`);
     try {
       await mailer.sendMail({
         from: process.env.EMAIL_USER,
@@ -109,7 +106,6 @@ router.post('/reset-password', async (req, res) => {
           content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>Your password was just reset. If you did not request this, please contact support immediately.</p>`
         })
       });
-      console.log(`[RESET] Password reset notification sent to: ${admin.email}`);
       status = 'success';
       reason = 'Password reset';
     } catch (mailErr) {

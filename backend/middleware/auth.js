@@ -7,9 +7,7 @@ const authenticateAdmin = (req, res, next) => {
       return res.status(401).json({ message: 'Access denied. No token provided.' });
     }
     
-    // Add debugging
-    console.log('Token received:', token ? 'Present' : 'Missing');
-    console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+   
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.admin = decoded; // decoded should include id, username, role

@@ -4,7 +4,6 @@ const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
 
 const base64Credentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
-console.log(base64Credentials)
 
 export const getAccessToken = async () => {
   try {
@@ -19,7 +18,6 @@ export const getAccessToken = async () => {
       }
     );
 
-    console.log("New Token Fetched:", response.data.access_token);
     return response.data.access_token;
   } catch (error) {
     console.error("Error Fetching Spotify Token:", error.response?.data || error);
