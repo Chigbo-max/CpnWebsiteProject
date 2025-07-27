@@ -3,6 +3,16 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useGetEventByIdQuery, useRegisterForEventMutation } from '../../features/event/eventApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faMapMarkerAlt, 
+  faCalendarAlt, 
+  faCheckCircle, 
+  faLink,
+  faClock,
+  faMapMarkedAlt
+} from '@fortawesome/free-solid-svg-icons';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const EventDetail = () => {
   const { eventId } = useParams();
@@ -33,7 +43,7 @@ const EventDetail = () => {
   if (isError || !event) return <div className="w-full text-center py-16 text-red-500">Event not found.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 mt-16 py-8 sm:py-12 lg:py-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 mt-20 pt-8 sm:pt-12 lg:pt-16 pb-8 sm:pb-12 lg:pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
           {event.image_url && (
@@ -67,19 +77,22 @@ const EventDetail = () => {
                 {event.title}
               </h1>
               
-              <div className="text-lg sm:text-xl text-gray-600 mb-6">
-                {new Date(event.start_time).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })} at {new Date(event.start_time).toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })} - {new Date(event.end_time).toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+              <div className="flex items-center gap-3 text-lg sm:text-xl text-gray-600 mb-6">
+                <FontAwesomeIcon icon={faCalendarAlt} className="text-amber-600" />
+                <span>
+                  {new Date(event.start_time).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })} at {new Date(event.start_time).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })} - {new Date(event.end_time).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
               </div>
             </div>
 
@@ -90,26 +103,32 @@ const EventDetail = () => {
               </p>
             </div>
 
-            {/* Event Location/Virtual Link */}
             <div className="mb-8 p-6 bg-gray-50 rounded-xl">
               {event.event_type === 'physical' ? (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">📍 Location</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-amber-600" />
+                    Location
+                  </h3>
                   <p className="text-lg text-gray-700 mb-3">{event.location_address}</p>
                   {event.location_map_url && (
                     <a 
                       href={event.location_map_url} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors"
+                      className="inline-flex items-center gap-2 text-amber-600 hover:text-amber-700 font-semibold transition-colors"
                     >
+                      <FontAwesomeIcon icon={faMapMarkedAlt} />
                       View on Google Maps →
                     </a>
                   )}
                 </div>
               ) : (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">🔗 Virtual Meeting</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faLink} className="text-blue-600" />
+                    Virtual Meeting
+                  </h3>
                   <a 
                     href={event.virtual_link} 
                     target="_blank" 
@@ -129,20 +148,59 @@ const EventDetail = () => {
             {isPast ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">📅</span>
+                  <FontAwesomeIcon icon={faCalendarAlt} className="text-2xl text-gray-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Closed</h3>
                 <p className="text-gray-600">This event has already taken place.</p>
               </div>
             ) : registered ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h3>
-                <p className="text-gray-600 mb-4">Thank you for registering for this event.</p>
-                <p className="text-sm text-gray-500">Check your email for event details and your registration code.</p>
-              </div>
+              <AnimatePresence>
+                <motion.div 
+                  className="text-center py-12"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <motion.div 
+                    className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+                    >
+                      <FontAwesomeIcon icon={faCheckCircle} className="text-4xl text-green-600" />
+                    </motion.div>
+                  </motion.div>
+                  <motion.h3 
+                    className="text-2xl font-bold text-gray-900 mb-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                  >
+                    Registration Successful!
+                  </motion.h3>
+                  <motion.p 
+                    className="text-gray-600 mb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
+                  >
+                    Thank you for registering for this event.
+                  </motion.p>
+                  <motion.p 
+                    className="text-sm text-gray-500"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.0, duration: 0.5 }}
+                  >
+                    Check your email for event details and your registration code.
+                  </motion.p>
+                </motion.div>
+              </AnimatePresence>
             ) : (
               <div>
                 <div className="text-center mb-8">
