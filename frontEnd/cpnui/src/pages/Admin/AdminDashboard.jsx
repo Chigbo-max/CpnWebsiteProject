@@ -1,6 +1,11 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import { useAdminAuth } from '../../app/useAdminAuth';
+import { useAuthErrorHandler } from '../../app/useAuthErrorHandler';
+import { useNavigate } from 'react-router-dom';
+import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
+import { ResponsiveBar, ResponsivePie } from '@nivo/core';
 import AdminLayout from './AdminLayout';
 import Profile from './Profile';
 import Subscribers from './Subscribers';
@@ -13,12 +18,6 @@ import AdminEvents from './Events';
 import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
-import { useAdminAuth } from '../../app/useAdminAuth';
-import { useAuthErrorHandler } from '../../app/useAuthErrorHandler';
-import { useNavigate } from 'react-router-dom';
-import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
-import { ResponsiveBar, ResponsivePie } from '@nivo/core';
-import { Bar, Pie } from '@nivo/core';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
@@ -143,7 +142,7 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
     return () => {
       if (ws) ws.close();
     };
-  }, [activeSection, token, apiBaseUrl, wsUrl]);
+  }, [activeSection, token, apiBaseUrl, wsUrl, handleMultipleResponses]);
 
   useEffect(() => {
     setIsLoggedIn(!!token);

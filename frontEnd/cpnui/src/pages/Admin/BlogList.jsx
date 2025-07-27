@@ -23,6 +23,8 @@ const BlogList = ({ onRefresh }) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useGetBlogsQuery();
+  const [deleteBlog] = useDeleteBlogMutation();
+  const [updateBlog] = useUpdateBlogMutation();
   
   // Handle authentication errors
   if (error && handleAuthError(error)) {
@@ -32,8 +34,6 @@ const BlogList = ({ onRefresh }) => {
   const posts = useMemo(() => {
     return data?.blogs ?? [];
   }, [data]);
-  const [deleteBlog] = useDeleteBlogMutation();
-  const [updateBlog] = useUpdateBlogMutation();
 
   // Filter and search logic
   const filteredPosts = useMemo(() => {
