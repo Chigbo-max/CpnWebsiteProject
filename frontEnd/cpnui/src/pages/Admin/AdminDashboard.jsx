@@ -26,16 +26,22 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
   const [analytics, setAnalytics] = useState({ enrollees: 0, subscribers: 0, events: 0, blogs: 0 });
   const [monthlyCounts, setMonthlyCounts] = useState([]);
   const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
 
   const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
-const wsUrl = import.meta.env.VITE_WS_URL || 
+  const wsUrl = import.meta.env.VITE_WS_URL || 
                 `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!token) {
+      navigate('/admin/login');
+    }
+  }, [token, navigate]);
+
   useEffect(() => {
     if (activeSection === 'dashboard' && token) {
       (async () => {
@@ -53,23 +59,14 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
           const responses = [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes];
           
           if (handleMultipleResponses(responses)) {
-            return; // Authentication error was handled, exit early
+            return; 
           }
           
-          // Check if all responses are ok
           const hasError = responses.some(res => !res.ok);
           
           if (hasError) {
             console.error('Some API calls failed in dashboard');
-            // Log individual response statuses for debugging
-            console.log('Response statuses:', {
-              enrollees: enrolleesRes.status,
-              subscribers: subscribersRes.status,
-              events: eventsRes.status,
-              blogs: blogsRes.status,
-              monthlyCounts: monthlyCountsRes.status,
-              enrolleeMonthlyCounts: enrolleeMonthlyCountsRes.status
-            });
+           
             return;
           }
           
@@ -146,39 +143,30 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
   }, [activeSection, token, apiBaseUrl, wsUrl, handleMultipleResponses]);
 
   useEffect(() => {
-    setIsLoggedIn(!!token);
-  }, [token]);
-
-  useEffect(() => {
     if (shouldRedirect) {
       navigate('/admin/login');
       setShouldRedirect(false);
     }
   }, [shouldRedirect, navigate, setShouldRedirect]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${apiBaseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        login(data.token, data.admin);
-        setIsLoggedIn(true);
-      } else {
-        toast.error('Login failed');
-      }
-    } catch {
-      toast.error('Login error');
+  useEffect(() => {
+    if (admin && admin.role !== 'superadmin' && activeSection === 'admin-management') {
+      setActiveSection('profile');
+      toast.error('Access denied. Only super admins can manage other admins.');
     }
-  };
+  }, [admin, activeSection]);
+
+  // Show loading while redirecting
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <SimpleSpinner message="Redirecting to login..." />
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     logout();
-    setIsLoggedIn(false);
   };
 
   const handleProfileUpdate = async (updatedData) => {
@@ -208,13 +196,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
   const handleShowChangePassword = () => {
     setShowChangePassword(true);
   };
-
-  useEffect(() => {
-    if (admin && admin.role !== 'superadmin' && activeSection === 'admin-management') {
-      setActiveSection('profile');
-      toast.error('Access denied. Only super admins can manage other admins.');
-    }
-  }, [admin, activeSection]);
 
   // Prepare Nivo bar chart data (compare all analytics)
   const barData = [
@@ -262,40 +243,6 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
       color: 'hsl(10, 70%, 50%)',
     },
   ];
-
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Admin Login</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Username"
-              value={loginData.username}
-              onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={loginData.password}
-              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              required
-            />
-            <button
-              type="submit"
-              className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-colors"
-            >
-              Login
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <AdminLayout
