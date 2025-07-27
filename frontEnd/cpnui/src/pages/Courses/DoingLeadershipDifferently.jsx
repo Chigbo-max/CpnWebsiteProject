@@ -110,8 +110,13 @@ function DoingLeadershipDifferently() {
             <button onClick={handleClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-900 text-2xl">&times;</button>
             <h2 className="text-2xl font-bold mb-4 text-center">Enroll in Doing Leadership Differently</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <input type="text" name="name" placeholder="Your Name" value={form.name} onChange={handleChange} className="border rounded px-4 py-3" required />
-              <input type="email" name="email" placeholder="Your Email" value={form.email} onChange={handleChange} className="border rounded px-4 py-3" required />
+              <input
+               type="text"
+                name="name"
+                 placeholder="Your Name *" value={form.name}
+                  onChange={handleChange}
+                   className="border rounded px-4 py-3" required />
+              <input type="email" name="email" placeholder="Your Email *" value={form.email} onChange={handleChange} className="border rounded px-4 py-3" required />
               <input type="text" name="whatsapp" placeholder="WhatsApp Number" value={form.whatsapp} onChange={handleChange} className="border rounded px-4 py-3" required />
               <button type="submit" className="bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-all duration-300" disabled={loading}>{loading ? 'Enrolling...' : 'Submit'}</button>
               {status && <div className={`text-center ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{status.message}</div>}

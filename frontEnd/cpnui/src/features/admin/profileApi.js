@@ -1,17 +1,36 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+// Custom baseQuery that handles authentication errors
+const baseQueryWithAuth = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_BASE_API_URL,
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+// Custom baseQuery with auth error handling
+const baseQueryWithAuthErrorHandling = async (args, api, extraOptions) => {
+  const result = await baseQueryWithAuth(args, api, extraOptions);
+  
+  // Handle 401 errors by logging out the user
+  if (result.error && result.error.status === 401) {
+    console.error('Token expired - logging out automatically');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+    // You could dispatch a logout action here if using Redux for auth state
+    window.location.href = '/admin/login';
+  }
+  
+  return result;
+};
+
 export const profileApi = createApi({
   reducerPath: 'profileApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_API_URL,
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithAuthErrorHandling,
   tagTypes: ['Profile'],
   endpoints: (builder) => ({
     getProfile: builder.query({

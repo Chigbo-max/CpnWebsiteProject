@@ -234,12 +234,13 @@ const EventDetail = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Whatsapp number</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Whatsapp number *</label>
                       <input 
                         type="tel" 
                         name="phone" 
                         value={form.phone} 
                         onChange={handleChange} 
+                        required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
                         placeholder="Enter your Whatsapp number"
                       />

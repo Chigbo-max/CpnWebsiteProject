@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import AdminLayout from './AdminLayout';
@@ -14,13 +14,15 @@ import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
 import { useAdminAuth } from '../../app/useAdminAuth';
+import { useAuthErrorHandler } from '../../app/useAuthErrorHandler';
 import { useNavigate } from 'react-router-dom';
 import { FaUserGraduate, FaUsers, FaCalendarAlt, FaFileAlt } from 'react-icons/fa';
-import { ResponsiveBar } from '@nivo/bar';
-import { ResponsivePie } from '@nivo/pie';
+import { ResponsiveBar, ResponsivePie } from '@nivo/core';
+import { Bar, Pie } from '@nivo/core';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
+  const { handleMultipleResponses } = useAuthErrorHandler();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -47,8 +49,14 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
             fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
           ]);
           
-          // Check if all responses are ok
+          // Check if any response is unauthorized (401) - token expired
           const responses = [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes];
+          
+          if (handleMultipleResponses(responses)) {
+            return; // Authentication error was handled, exit early
+          }
+          
+          // Check if all responses are ok
           const hasError = responses.some(res => !res.ok);
           
           if (hasError) {
@@ -99,8 +107,14 @@ const wsUrl = import.meta.env.VITE_WS_URL ||
                 fetch(`${apiBaseUrl}/enrollments/monthly-counts?months=60`, { headers: { Authorization: `Bearer ${token}` } }),
               ]);
               
-              // Check if all responses are ok
+              // Check if any response is unauthorized (401) - token expired
               const responses = [enrolleesRes, subscribersRes, eventsRes, blogsRes, monthlyCountsRes, enrolleeMonthlyCountsRes];
+              
+              if (handleMultipleResponses(responses)) {
+                return; // Authentication error was handled, exit early
+              }
+              
+              // Check if all responses are ok
               const hasError = responses.some(res => !res.ok);
               
               if (hasError) {

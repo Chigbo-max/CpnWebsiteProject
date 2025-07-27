@@ -2,18 +2,37 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
 
+// Custom baseQuery that handles authentication errors
+const baseQueryWithAuth = fetchBaseQuery({
+  baseUrl: apiBaseUrl,
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      headers.set('authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+// Custom baseQuery with auth error handling
+const baseQueryWithAuthErrorHandling = async (args, api, extraOptions) => {
+  const result = await baseQueryWithAuth(args, api, extraOptions);
+  
+  // Handle 401 errors by logging out the user
+  if (result.error && result.error.status === 401) {
+    console.error('Token expired - logging out automatically');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+    // You could dispatch a logout action here if using Redux for auth state
+    window.location.href = '/admin/login';
+  }
+  
+  return result;
+};
+
 export const enrollmentApi = createApi({
   reducerPath: 'enrollmentApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: apiBaseUrl,
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithAuthErrorHandling,
   tagTypes: ['Enrollment'],
   endpoints: (builder) => ({
     getEnrollments: builder.query({

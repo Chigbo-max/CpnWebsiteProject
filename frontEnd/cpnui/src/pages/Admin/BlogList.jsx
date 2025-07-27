@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { useAuthErrorHandler } from '../../app/useAuthErrorHandler';
 import {
   useGetBlogsQuery,
   useDeleteBlogMutation,
@@ -11,6 +12,7 @@ import {
 } from '../../features/blog/blogApi';
 
 const BlogList = ({ onRefresh }) => {
+  const { handleAuthError } = useAuthErrorHandler();
   const [viewPost, setViewPost] = useState(null);
   const [editPost, setEditPost] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -21,6 +23,12 @@ const BlogList = ({ onRefresh }) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useGetBlogsQuery();
+  
+  // Handle authentication errors
+  if (error && handleAuthError(error)) {
+    return null; // Exit early if authentication error was handled
+  }
+
   const posts = useMemo(() => {
     return data?.blogs ?? [];
   }, [data]);
