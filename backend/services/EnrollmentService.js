@@ -10,13 +10,13 @@ class EnrollmentService {
   }
 
   // Create a new enrollment and send confirmation email
-  async enroll({ course, name, email, whatsapp }) {
+  async enroll({ course, name, email }) {
     const enrollment_id = uuidv4();
     const enrolled_at = new Date();
     // Insert into DB
     const result = await this.db.query(
-      'INSERT INTO enrollments (enrollment_id, course, name, email, whatsapp, enrolled_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [enrollment_id, course, name, email, whatsapp, enrolled_at]
+      'INSERT INTO enrollments (enrollment_id, course, name, email, enrolled_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [enrollment_id, course, name, email, enrolled_at]
     );
     // Send confirmation email
     const content = `Thank you for enrolling in <b>${course}</b>!<br>Your enrollment ID: <b>${enrollment_id}</b><br>Date: <b>${enrolled_at.toLocaleString()}</b>`;
@@ -52,10 +52,10 @@ class EnrollmentService {
   }
 
   // Update enrollment
-  async updateEnrollment(enrollment_id, { course, name, email, whatsapp }) {
+  async updateEnrollment(enrollment_id, { course, name, email }) {
     const result = await this.db.query(
-      'UPDATE enrollments SET course = $1, name = $2, email = $3, whatsapp = $4 WHERE enrollment_id = $5 RETURNING *',
-      [course, name, email, whatsapp, enrollment_id]
+      'UPDATE enrollments SET course = $1, name = $2, email = $3 WHERE enrollment_id = $4 RETURNING *',
+      [course, name, email, enrollment_id]
     );
     return result.rows[0] || null;
   }
