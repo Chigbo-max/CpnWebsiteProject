@@ -74,11 +74,19 @@ router.get('/blog', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:blog:posts';
     const cached = await redisClient.get(cacheKey);
-    if (cached) return res.json(JSON.parse(cached));
+    if (cached) {
+      console.log('Serving cached blog posts');
+      return res.json(JSON.parse(cached));
+    }
+    console.log('Fetching blog posts from database');
     const posts = await blogService.getAll();
+    console.log('Blog posts fetched:', posts.length);
     await redisClient.setEx(cacheKey, 300, JSON.stringify(posts));
     res.json({ blogs: posts });
-  } catch (error) { next(error); }
+  } catch (error) { 
+    console.error('Error fetching blog posts:', error);
+    next(error); 
+  }
 });
 // Blog post creation with multer for multipart/form-data
 router.post('/blog', authenticateAdmin, upload.single('image'), async (req, res, next) => {
