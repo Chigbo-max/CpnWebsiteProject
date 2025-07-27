@@ -17,7 +17,7 @@ function formatDate(date) {
   return new Date(date).toLocaleDateString();
 }
 
-const EnrolleeManagement = ({ token }) => {
+const EnrolleeManagement = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [broadcastStatus, setBroadcastStatus] = useState(null);
@@ -412,11 +412,6 @@ const EnrolleeManagement = ({ token }) => {
       )}
     </div>
   );
-};
-
-import PropTypes from 'prop-types';
-EnrolleeManagement.propTypes = {
-  token: PropTypes.string.isRequired,
 };
 
 export default EnrolleeManagement;
