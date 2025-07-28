@@ -8,7 +8,7 @@ import clubhouseIcon from "../../assets/clubhouse.svg";
 
 
 
-const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
+const cpnPodcast = import.meta.env.VITE_CPN_PODCAST;
 const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
 const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
 const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
@@ -31,7 +31,7 @@ const resources = [
 ];
 
 const socialLinks = [
-    { icon: faSpotify, url: podcastSource, label: "Spotify" },
+    { icon: faSpotify, url: cpnPodcast, label: "Spotify" },
     { icon: faWhatsapp, url: whatsappLink, label: "WhatsApp" },
     { icon: faInstagram, url: instagramLink, label: "Instagram" },
     { icon: clubhouseIcon, url: clubhouseLink, label: "Clubhouse", isSvg: true }

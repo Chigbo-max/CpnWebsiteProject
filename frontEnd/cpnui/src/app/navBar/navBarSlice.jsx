@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState ={
     dropDown: false,
-    ResourcesDropDown: false,
+    resourcesDropDown: false,
     communityDropDown: false,
     coursesDropDown: false,
     openLink: false,

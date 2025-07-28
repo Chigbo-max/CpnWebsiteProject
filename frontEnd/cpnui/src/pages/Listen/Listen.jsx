@@ -5,6 +5,8 @@ import PodcastSearch from '../../app/Podcast/podCastSearch.jsx';
 import TopicsFilter from '../../app/Podcast/topicsFilter.jsx';
 import PodcastEpisodes from '../../app/Podcast/PodcastEpisodes.jsx';
 
+const cpnPodcastLink = import.meta.env.VITE_CPN_PODCAST;
+
 function Listen() {
 
   return (
@@ -41,7 +43,7 @@ function Listen() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <a
-              href="https://open.spotify.com/show/2vmyOcrq7cFcKBMepGbpZP"
+              href={cpnPodcastLink}
               className="inline-flex items-center gap-3 px-8 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
             >
               <FontAwesomeIcon icon={faSpotify} className="text-2xl" /> 
