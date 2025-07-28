@@ -16,7 +16,7 @@ export const navBarSlice = createSlice({
             state.dropDown = action.payload;
         },
         setResourcesDropDown: (state, action) => {
-            state.ResourcesDropDown =  action.payload;
+            state.resourcesDropDown =  action.payload;
         },
         setCommunityDropDown: (state, action) => {
             state.communityDropDown = action.payload;

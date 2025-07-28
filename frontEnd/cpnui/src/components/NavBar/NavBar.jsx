@@ -16,7 +16,7 @@ import clubhouseIcon from "../../assets/clubhouse.svg";
 
 
 
-const cpnPodcast = import.meta.env.VITE_CPN_POCAST;
+const cpnPodcast = import.meta.env.VITE_CPN_PODCAST;
 const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
 const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
 const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
