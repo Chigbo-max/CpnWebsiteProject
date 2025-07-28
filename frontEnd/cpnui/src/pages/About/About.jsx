@@ -6,9 +6,8 @@ import bgImage from "../../assets/cpnevent1.jpg";
 import { motion } from 'framer-motion';
 import { FaBullseye, FaEye, FaHandshake, FaLeaf, FaUsers, FaHandsHelping, FaBalanceScale, FaUserTie, FaChurch, FaRegCheckCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import ceo from "../../assets/ceo.jpeg";
-import commanager from "../../assets/commanager.jpeg";
-import contentlead from "../../assets/contentlead.jpeg";
+import ceo from "../../assets/Hadassah.jpg";
+import commanager from "../../assets/Uju.jpg";
 
 
 const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
@@ -17,9 +16,8 @@ const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
 const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
 
 const team = [
-  { name: 'Chigbo Guy', role: 'Founder', img: ceo },
-  { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
-  { name: 'Michael Aniakor', role: 'Content Lead', img: contentlead },
+  { name: 'Hadassah', role: 'Founder', img: ceo },
+  { name: 'Uju', role: 'Community Manager', img: commanager },
 ];
 
 const values = [

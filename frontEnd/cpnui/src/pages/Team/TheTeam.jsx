@@ -1,11 +1,9 @@
-import ceo from "../../assets/ceo.jpeg";
-import commanager from "../../assets/commanager.jpeg";
-import contentlead from "../../assets/contentlead.jpeg";
+import ceo from "../../assets/Hadassah.jpg";
+import commanager from "../../assets/Uju.jpg";
 
 const team = [
-  { name: 'Guy Ezeokeke', role: 'Founder', img: ceo },
-  { name: 'Jane Anachuna', role: 'Community Manager', img: commanager },
-  { name: 'Michael Aniakor', role: 'Content Lead', img: contentlead },
+  { name: 'Hadassah', role: 'Founder', img: ceo },
+  { name: 'Uju', role: 'Community Manager', img: commanager },
 ];
 
 function TheTeam() {
