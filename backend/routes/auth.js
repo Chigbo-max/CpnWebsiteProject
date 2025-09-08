@@ -2,9 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-const db = require('../config/database');
 const { AuthServiceImpl } = require('../services/AuthService');
-const authService = new AuthServiceImpl(db, bcrypt, jwt);
+const authService = new AuthServiceImpl(bcrypt, jwt);
 const nodemailer = require('nodemailer');
 const mailer = nodemailer.createTransport({
   service: 'gmail',

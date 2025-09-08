@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const { BlogServiceImpl } = require('../services/BlogService');
-const blogService = new BlogServiceImpl(db);
+const blogService = new BlogServiceImpl();
 const redisClient = require('../config/redisClient');
 
 router.get('/', async (req, res, next) => {

@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
-const subscriberService = new SubscriberServiceImpl(db);
+const subscriberService = new SubscriberServiceImpl();
 const { authenticateAdmin } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {

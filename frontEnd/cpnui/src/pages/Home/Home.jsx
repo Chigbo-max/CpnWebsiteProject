@@ -43,8 +43,8 @@ const slides = [
     subtitle: "Connect & Grow Together",
     text: "Connect with like-minded professionals who share your values and commitment to Kingdom excellence in the workplace.",
     buttonText: "Join Community",
-    buttonLink: whatsappLink,
-    buttonType: "external"
+    buttonLink: "/register",
+    buttonType: "link"
   },
   {
     image: Bookshelf, 
@@ -234,14 +234,12 @@ function Home() {
               <p className="text-gray-600 mb-6 leading-relaxed">
                 Connect with over 2,000 professionals in our active WhatsApp community. Share insights, ask questions, and grow together.
               </p>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/register"
                 className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors"
               >
                 Join Now <FontAwesomeIcon icon={faWhatsappBrand} className="text-lg" />
-              </a>
+              </Link>
             </div>
             
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">

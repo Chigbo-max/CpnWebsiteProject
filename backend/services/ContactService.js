@@ -1,3 +1,6 @@
+const ContactInquiry = require('../models/ContactInquiry');
+const Subscriber = require('../models/Subscriber');
+
 // IContactService interface
 class IContactService {
   submitContactForm(data) { throw new Error('Not implemented'); }
@@ -6,40 +9,42 @@ class IContactService {
 
 // ContactServiceImpl implements IContactService
 class ContactServiceImpl extends IContactService {
-  constructor(db) {
+  constructor() {
     super();
-    this.db = db;
   }
 
   async submitContactForm({ name, email, message }) {
     if (!name || !email || !message) {
       throw new Error('All fields are required');
     }
-    const result = await this.db.query(
-      'INSERT INTO contact_inquiries (name, email, message) VALUES ($1, $2, $3) RETURNING *',
-      [name, email, message]
-    );
-    return result.rows[0];
+
+    const inquiry = new ContactInquiry({
+      name,
+      email,
+      message
+    });
+
+    return await inquiry.save();
   }
 
   async subscribeToNewsletter({ email, name }) {
     if (!email) {
       throw new Error('Email is required');
     }
+
     // Check if already subscribed
-    const existing = await this.db.query(
-      'SELECT * FROM subscribers WHERE email = $1',
-      [email]
-    );
-    if (existing.rows.length > 0) {
+    const existing = await Subscriber.findOne({ email });
+    if (existing) {
       throw new Error('Email already subscribed');
     }
-    const result = await this.db.query(
-      'INSERT INTO subscribers (email, name) VALUES ($1, $2) RETURNING *',
-      [email, name]
-    );
-    return result.rows[0];
+
+    const subscriber = new Subscriber({
+      email,
+      name
+    });
+
+    return await subscriber.save();
   }
 }
 
-module.exports = { IContactService, ContactServiceImpl }; 
+module.exports = { IContactService, ContactServiceImpl };

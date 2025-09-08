@@ -4,8 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
-const setupDatabase = require('./setup');
-const pool = require('./config/database');
+const connectDB = require('./config/mongodb');
+const Admin = require('./models/Admin');
 
 const app = express();
 
@@ -31,13 +31,34 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Connect to MongoDB
+connectDB();
+
+// Seed super admin on startup
+(async () => {
+  try {
+    const count = await Admin.countDocuments({ role: 'superadmin' });
+    if (count === 0) {
+      const bcrypt = require('bcryptjs');
+      const password_hash = await bcrypt.hash(process.env.SUPERADMIN_PASSWORD, 10);
+      await Admin.create({ username: process.env.SUPERADMIN_USERNAME, email: process.env.SUPERADMIN_EMAIL, password_hash, role: 'superadmin' });
+      console.log('Seeded superadmin user: ', process.env.SUPERADMIN_USERNAME);
+    }
+  } catch (e) {
+    console.error('Error seeding superadmin:', e.message);
+  }
+})();
+
 // Health check with DB verification
 app.get('/health', async (req, res) => {
   try {
-    await pool.query('SELECT 1');
+    const mongoose = require('mongoose');
+    const dbState = mongoose.connection.readyState;
+    const isConnected = dbState === 1;
+    
     res.status(200).json({ 
       status: 'OK',
-      database: 'connected',
+      database: isConnected ? 'connected' : 'disconnected',
       websocket: wss.clients.size
     });
   } catch (err) {
@@ -48,11 +69,6 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Initialize database (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  setupDatabase().catch(console.error);
-}
-
 // Routes
 const routes = [
   { path: '/api/auth', router: require('./routes/auth') },
@@ -61,7 +77,8 @@ const routes = [
   { path: '/api/contact', router: require('./routes/contact') },
   { path: '/api/subscribers', router: require('./routes/subscribers') },
   { path: '/api/events', router: require('./routes/events') },
-  { path: '/api/enrollments', router: require('./routes/enrollments') }
+  { path: '/api/enrollments', router: require('./routes/enrollments') },
+  { path: '/api/users', router: require('./routes/users') }
 ];
 
 routes.forEach(route => {
@@ -138,79 +155,6 @@ server.listen(PORT, () => {
 module.exports = { app, server, broadcastDashboardUpdate };
 
 
-
-
-// const express = require('express');
-// const cors = require('cors');
-// const dotenv = require('dotenv');
-// const path = require('path');
-// const http = require('http');
-// const WebSocket = require('ws');
-
-// // Load environment variables
-// dotenv.config();
-
-// const app = express();
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-
-// // Health check endpoint
-// app.get('/health', (req, res) => {
-//   res.status(200).json({ status: 'OK', message: 'Server is running' });
-// });
-
-// // Database connection
-// const pool = require('./config/database');
-// // Test database connection (non-blocking)
-// pool.query('SELECT NOW()', (err, res) => {
-//   if (err) {
-//     console.error('Database connection error:', err);
-//   } else {
-//     console.log('Database connected successfully');
-//   }
-// });
-
-// // Routes
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/admin', require('./routes/admin'));
-// app.use('/api/blog', require('./routes/blog'));
-// app.use('/api/contact', require('./routes/contact'));
-// app.use('/api/subscribers', require('./routes/subscribers'));
-// app.use('/api/events', require('./routes/events'));
-// app.use('/api/enrollments', require('./routes/enrollments'));
-
-// // Serve static files
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({ message: 'Something went wrong!' });
-// });
-
-// const server = http.createServer(app);
-// const wss = new WebSocket.Server({ server });
-
-// function broadcastDashboardUpdate(data) {
-//   wss.clients.forEach(client => {
-//     if (client.readyState === WebSocket.OPEN) {
-//       client.send(JSON.stringify({ type: 'dashboard-update', ...data }));
-//     }
-//   });
-// }
-
-// app.set('broadcastDashboardUpdate', broadcastDashboardUpdate);
-
-// const PORT = process.env.PORT || 5000;
-
-// server.listen(PORT, '::', () => {
-//   console.log(`Server running on port [::]: ${PORT}`);
-// });
-
-// module.exports = { broadcastDashboardUpdate }; 
 
 
 

@@ -1,3 +1,5 @@
+const BlogPost = require('../models/BlogPost');
+
 // IBlogService interface
 class IBlogService {
   generateUniqueSlug(title, existingSlug) { throw new Error('Not implemented'); }
@@ -12,9 +14,8 @@ class IBlogService {
 
 // BlogServiceImpl implements IBlogService
 class BlogServiceImpl extends IBlogService {
-  constructor(db) {
+  constructor() {
     super();
-    this.db = db;
   }
 
   // Generate a unique slug from title
@@ -27,14 +28,15 @@ class BlogServiceImpl extends IBlogService {
       .trim('-');
     let slug = baseSlug;
     let counter = 1;
+    
     const checkSlug = async (testSlug) => {
       const query = existingSlug 
-        ? 'SELECT id FROM blog_posts WHERE slug = $1 AND slug != $2'
-        : 'SELECT id FROM blog_posts WHERE slug = $1';
-      const params = existingSlug ? [testSlug, existingSlug] : [testSlug];
-      const result = await this.db.query(query, params);
-      return result.rows.length > 0;
+        ? { slug: testSlug, _id: { $ne: existingSlug } }
+        : { slug: testSlug };
+      const existingPost = await BlogPost.findOne(query);
+      return !!existingPost;
     };
+    
     while (await checkSlug(slug)) {
       slug = `${baseSlug}-${counter}`;
       counter++;
@@ -85,19 +87,21 @@ class BlogServiceImpl extends IBlogService {
   }
 
   async getAll() {
-    return (await this.db.query('SELECT * FROM blog_posts ORDER BY created_at DESC')).rows;
+    return await BlogPost.find({}).sort({ createdAt: -1 });
   }
 
   async getPublished() {
-    return (await this.db.query('SELECT id, title, excerpt, slug,content, featured_image, created_at, status FROM blog_posts WHERE status = $1 ORDER BY created_at DESC', ['published'])).rows;
+    return await BlogPost.find({ status: 'published' })
+      .select('title excerpt slug content featured_image createdAt status')
+      .sort({ createdAt: -1 });
   }
 
   async getById(id) {
-    return (await this.db.query('SELECT * FROM blog_posts WHERE id = $1', [id])).rows[0];
+    return await BlogPost.findById(id);
   }
 
   async getBySlug(slug) {
-    return (await this.db.query('SELECT * FROM blog_posts WHERE slug = $1 AND status = $2', [slug, 'published'])).rows[0];
+    return await BlogPost.findOne({ slug, status: 'published' });
   }
 
   async create({ title, content, excerpt, tags, status, slug, authorId, featured_image }) {
@@ -105,20 +109,33 @@ class BlogServiceImpl extends IBlogService {
       // Generate unique slug if not provided or if it might conflict
       const uniqueSlug = slug ? await this.generateUniqueSlug(title, slug) : await this.generateUniqueSlug(title);
       
-      const result = await this.db.query(
-        'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-        [title, content, excerpt, tags, status, uniqueSlug, authorId, featured_image || null]
-      );
-      return result.rows[0];
+      const blogPost = new BlogPost({
+        title,
+        content,
+        excerpt,
+        tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+        status,
+        slug: uniqueSlug,
+        author_id: authorId,
+        featured_image: featured_image || null
+      });
+      
+      return await blogPost.save();
     } catch (error) {
-      if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
+      if (error.code === 11000 && error.keyPattern?.slug) {
         // Handle duplicate slug error
         const uniqueSlug = await this.generateUniqueSlug(title);
-        const result = await this.db.query(
-          'INSERT INTO blog_posts (title, content, excerpt, tags, status, slug, author_id, featured_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-          [title, content, excerpt, tags, status, uniqueSlug, authorId, featured_image || null]
-        );
-        return result.rows[0];
+        const blogPost = new BlogPost({
+          title,
+          content,
+          excerpt,
+          tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+          status,
+          slug: uniqueSlug,
+          author_id: authorId,
+          featured_image: featured_image || null
+        });
+        return await blogPost.save();
       }
       throw error;
     }
@@ -137,28 +154,36 @@ class BlogServiceImpl extends IBlogService {
         ? await this.generateUniqueSlug(title, currentPost.slug)
         : slug || currentPost.slug;
       
-      const result = await this.db.query(
-        'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
-        [title, content, excerpt, tags, uniqueSlug, status, id]
-      );
-      return result.rows[0];
+      const updateData = {
+        title,
+        content,
+        excerpt,
+        tags: tags ? tags.split(',').map(tag => tag.trim()) : currentPost.tags,
+        slug: uniqueSlug,
+        status
+      };
+      
+      return await BlogPost.findByIdAndUpdate(id, updateData, { new: true });
     } catch (error) {
-      if (error.code === '23505' && error.constraint === 'blog_posts_slug_key') {
+      if (error.code === 11000 && error.keyPattern?.slug) {
         // Handle duplicate slug error
         const uniqueSlug = await this.generateUniqueSlug(title);
-        const result = await this.db.query(
-          'UPDATE blog_posts SET title=$1, content=$2, excerpt=$3, tags=$4, slug=$5, status=$6 WHERE id=$7 RETURNING *',
-          [title, content, excerpt, tags, uniqueSlug, status, id]
-        );
-        return result.rows[0];
+        const updateData = {
+          title,
+          content,
+          excerpt,
+          tags: tags ? tags.split(',').map(tag => tag.trim()) : currentPost.tags,
+          slug: uniqueSlug,
+          status
+        };
+        return await BlogPost.findByIdAndUpdate(id, updateData, { new: true });
       }
       throw error;
     }
   }
 
   async delete(id) {
-    const result = await this.db.query('DELETE FROM blog_posts WHERE id=$1 RETURNING *', [id]);
-    return result.rows[0];
+    return await BlogPost.findByIdAndDelete(id);
   }
 }
 

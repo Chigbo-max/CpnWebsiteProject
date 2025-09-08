@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateAdmin } = require('../middleware/auth');
-const db = require('../config/database');
 const dotenv = require('dotenv');
 
 const nodemailer = require('nodemailer');
@@ -17,16 +16,16 @@ const { AdminServiceImpl } = require('../services/AdminService');
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
 const { EventServiceImpl } = require('../services/EventService');
 
-const blogService = new BlogServiceImpl(db);
-const subscriberService = new SubscriberServiceImpl(db);
-const inquiryService = new InquiryServiceImpl(db);
-const adminService = new AdminServiceImpl(db);
-const eventService = new EventServiceImpl(db);
+const blogService = new BlogServiceImpl();
+const subscriberService = new SubscriberServiceImpl();
+const inquiryService = new InquiryServiceImpl();
+const adminService = new AdminServiceImpl();
+const eventService = new EventServiceImpl();
 const mailer = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
-const newsletterService = new NewsletterServiceImpl(db, mailer);
+const newsletterService = new NewsletterServiceImpl(mailer);
 const cloudinaryService = new CloudinaryServiceImpl();
 
 

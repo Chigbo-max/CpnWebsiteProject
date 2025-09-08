@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   test:
@@ -14,16 +16,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: testdb
+      mongodb:
+        image: mongo:7
         ports:
-          - 5432:5432
+          - 27017:27017
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })' || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -40,17 +38,16 @@ jobs:
 
     env:
       NODE_ENV: test
-      DB_HOST: localhost
-      DB_PORT: 5433
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      DB_NAME: cpn_docker
+      MONGODB_URI: mongodb://localhost:27017/cpn_test
       REDIS_URL: ${{secrets.REDIS_URL}}}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
+      SUPERADMIN_USERNAME: ${{ secrets.SUPERADMIN_USERNAME }}
+      SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
+      SUPERADMIN_EMAIL: ${{ secrets.SUPERADMIN_EMAIL }}
 
     steps:
       - name: Checkout code
@@ -85,7 +82,7 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: [test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v3

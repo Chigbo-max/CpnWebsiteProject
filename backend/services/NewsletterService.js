@@ -1,14 +1,14 @@
-// INewsletterService interface
+const Newsletter = require('../models/Newsletter');
+const Subscriber = require('../models/Subscriber');
+
 class INewsletterService {
   sendNewsletter(subject, content) { throw new Error('Not implemented'); }
   static renderNewsletterTemplate({ name, content }) { throw new Error('Not implemented'); }
 }
 
-// NewsletterServiceImpl implements INewsletterService
 class NewsletterServiceImpl extends INewsletterService {
-  constructor(db, mailer) {
+  constructor(mailer) {
     super();
-    this.db = db;
     this.mailer = mailer;
   }
 
@@ -52,18 +52,42 @@ class NewsletterServiceImpl extends INewsletterService {
 
   async sendNewsletter(subject, content) {
     if (!subject || !content) throw new Error('Subject and content are required');
-    const subscribers = await this.db.query('SELECT email, name FROM subscribers');
-    const emailPromises = subscribers.rows.map(subscriber => {
-      return this.mailer.sendMail({
-        from: process.env.EMAIL_USER,
-        to: subscriber.email,
-        subject,
-        html: NewsletterServiceImpl.renderNewsletterTemplate({ name: subscriber.name, content })
-      });
+
+    const subscribers = await Subscriber.find({}, 'email name');
+    if (!subscribers.length) throw new Error('No subscribers found');
+
+    // Create a newsletter record
+    const newsletter = new Newsletter({
+      subject,
+      content,
+      recipients: subscribers.map(s => s.email),
+      status: 'queued'
     });
-    await Promise.all(emailPromises);
-    return subscribers.rows.length;
+    await newsletter.save();
+
+    try {
+      const emailPromises = subscribers.map(subscriber =>
+        this.mailer.sendMail({
+          from: process.env.EMAIL_USER,
+          to: subscriber.email,
+          subject,
+          html: NewsletterServiceImpl.renderNewsletterTemplate({ name: subscriber.name, content })
+        })
+      );
+      await Promise.all(emailPromises);
+
+      // Update status after sending
+      newsletter.status = 'sent';
+      newsletter.sentAt = new Date();
+      await newsletter.save();
+
+      return subscribers.length;
+    } catch (err) {
+      newsletter.status = 'failed';
+      await newsletter.save();
+      throw err;
+    }
   }
 }
 
-module.exports = { INewsletterService, NewsletterServiceImpl }; 
+module.exports = { INewsletterService, NewsletterServiceImpl };

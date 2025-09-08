@@ -1,10 +1,5 @@
 const request = require('supertest');
-const express = require('express');
-const subscribersRoutes = require('./subscribers');
-
-const app = express();
-app.use(express.json());
-app.use('/api/subscribers', subscribersRoutes);
+const { app } = require('../server');
 
 jest.mock('../config/database', () => ({}));
 jest.mock('../config/redisClient', () => ({

@@ -1,3 +1,5 @@
+const Subscriber = require('../models/Subscriber');
+
 // ISubscriberService interface
 class ISubscriberService {
   getAll() { throw new Error('Not implemented'); }
@@ -10,53 +12,67 @@ class ISubscriberService {
 
 // SubscriberServiceImpl implements ISubscriberService
 class SubscriberServiceImpl extends ISubscriberService {
-  constructor(db) {
+  constructor() {
     super();
-    this.db = db;
   }
 
   async getAll() {
-    return (await this.db.query('SELECT * FROM subscribers ORDER BY subscribed_at DESC')).rows;
+    return await Subscriber.find({}).sort({ subscribed_at: -1 });
   }
 
   async create({ name, email }) {
-    const result = await this.db.query('INSERT INTO subscribers (name, email) VALUES ($1, $2) RETURNING *', [name, email]);
-    return result.rows[0];
+    const subscriber = new Subscriber({ name, email });
+    return await subscriber.save();
   }
 
   async update(id, { name, email }) {
-    const result = await this.db.query('UPDATE subscribers SET name=$1, email=$2 WHERE id=$3 RETURNING *', [name, email, id]);
-    return result.rows[0];
+    return await Subscriber.findByIdAndUpdate(id, { name, email }, { new: true });
   }
 
   async delete(id) {
-    const result = await this.db.query('DELETE FROM subscribers WHERE id=$1 RETURNING *', [id]);
-    return result.rows[0];
+    return await Subscriber.findByIdAndDelete(id);
   }
 
   async findByEmail(email) {
-    const result = await this.db.query('SELECT * FROM subscribers WHERE email = $1', [email]);
-    return result.rows;
+    return await Subscriber.find({ email });
   }
 
   async deleteByEmail(email) {
-    const result = await this.db.query('DELETE FROM subscribers WHERE email = $1 RETURNING *', [email]);
-    return result.rows[0];
+    return await Subscriber.findOneAndDelete({ email });
   }
 
   async getMonthlyCounts() {
     // Returns [{ year: 2024, month: 6, count: 10 }, ...]
-    const result = await this.db.query(`
-      SELECT 
-        EXTRACT(YEAR FROM subscribed_at) AS year,
-        EXTRACT(MONTH FROM subscribed_at) AS month,
-        COUNT(*) AS count
-      FROM subscribers
-      WHERE subscribed_at >= (CURRENT_DATE - INTERVAL '12 months')
-      GROUP BY year, month
-      ORDER BY year, month
-    `);
-    return result.rows;
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+    return await Subscriber.aggregate([
+      {
+        $match: {
+          subscribed_at: { $gte: twelveMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$subscribed_at' },
+            month: { $month: '$subscribed_at' }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          year: '$_id.year',
+          month: '$_id.month',
+          count: 1,
+          _id: 0
+        }
+      },
+      {
+        $sort: { year: 1, month: 1 }
+      }
+    ]);
   }
 }
 

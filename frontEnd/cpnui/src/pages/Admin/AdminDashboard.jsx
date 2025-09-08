@@ -19,6 +19,7 @@ import AdminEvents from './Events';
 import EventCreate from './EventCreate';
 import EventRegistrations from './EventRegistrations';
 import EnrolleeManagement from './EnrolleeManagement';
+import UserManagement from './UserManagement';
 
 function AdminDashboard() {
   const { token, admin, login, logout, shouldRedirect, setShouldRedirect } = useAdminAuth();
@@ -465,6 +466,9 @@ function AdminDashboard() {
         )}
         {activeSection === 'enrollees' && (
           <EnrolleeManagement token={token} />
+        )}
+        {activeSection === 'user-management' && (
+          <UserManagement token={token} />
         )}
       </div>
     </AdminLayout>

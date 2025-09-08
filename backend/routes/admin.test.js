@@ -1,12 +1,5 @@
 const request = require('supertest');
-const express = require('express');
-const adminRoutes = require('./admin');
-
-const app = express();
-app.use(express.json());
-app.use('/api/admin', (req, res, next) => { req.admin = { id: 1, role: 'superadmin' }; next(); }, adminRoutes);
-
-jest.mock('../config/database', () => ({}));
+const { app } = require('../server');
 jest.mock('../config/redisClient', () => ({
   get: jest.fn().mockResolvedValue(null),
   setEx: jest.fn().mockResolvedValue(undefined),

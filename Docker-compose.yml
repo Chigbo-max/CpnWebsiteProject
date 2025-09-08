@@ -6,13 +6,13 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      postgres:
+      mongodb:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/cpn_docker
+      - MONGODB_URI=mongodb://mongodb:27017/cpn_docker
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - EMAIL_USER=${EMAIL_USER}
@@ -53,21 +53,16 @@ services:
       retries: 3
       start_period: 40s
 
-  postgres:
-    image: postgres:17
-    container_name: postgres-db
+  mongodb:
+    image: mongo:7
+    container_name: mongo-db
     restart: always
     ports:
-      - "5433:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=cpn_docker
+      - "27017:27017"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./backend/config/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - mongodata:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cpn_docker"]
+      test: ["CMD-SHELL", "mongosh --eval 'db.runCommand({ ping: 1 })' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -90,5 +85,5 @@ services:
       start_period: 30s
 
 volumes:
-  pgdata:
+  mongodata:
   redisdata:

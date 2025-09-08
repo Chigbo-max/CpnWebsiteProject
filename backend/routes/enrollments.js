@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const nodemailer = require('nodemailer');
 const EnrollmentService = require('../services/EnrollmentService');
 const { authenticateAdmin } = require('../middleware/auth');
@@ -13,7 +12,7 @@ const mailer = nodemailer.createTransport({
   },
 });
 
-const enrollmentService = new EnrollmentService(db, mailer);
+const enrollmentService = new EnrollmentService(mailer);
 
 // Public: Enroll in a course
 router.post('/', async (req, res) => {
