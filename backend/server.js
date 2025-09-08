@@ -11,7 +11,8 @@ const app = express();
 
 // Enhanced CORS configuration
 const allowedOrigins = [
-  'https://christianprofessionalsnetwork.onrender.com',
+  'https://cprofessionalsnetwork.onrender.com',
+  'https://cpn-frontend-dev.onrender.com',
   'http://localhost:5173'
 ];
 
@@ -150,7 +151,7 @@ const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== 'test') {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`WebSocket running on wss://cpnwebsiteproject.onrender.com`);
+    console.log(`WebSocket running`);
   });
 }
 
