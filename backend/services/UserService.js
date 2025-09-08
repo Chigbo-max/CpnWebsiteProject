@@ -7,11 +7,27 @@ class IUserService {
 }
 
 class UserServiceImpl extends IUserService {
-  async register({ email, firstName, lastName, whatsapp, nationality, state }) {
-    if (!email || !firstName || !lastName || !whatsapp || !nationality || !state) {
+  async register({ email, firstName, lastName, whatsapp, nationality, state, otherCountry }) {
+    if (!email || !firstName || !lastName || !whatsapp || !nationality) {
       const err = new Error('All fields are required');
       err.code = 'VALIDATION_ERROR';
       throw err;
+    }
+
+    const isNigeria = typeof nationality === 'string' && nationality.trim().toLowerCase() === 'nigeria';
+    const isOther = typeof nationality === 'string' && nationality.trim().toLowerCase() === 'other';
+    if (isNigeria && !state) {
+      const err = new Error('State of residence is required for Nigeria');
+      err.code = 'VALIDATION_ERROR';
+      throw err;
+    }
+    if (isOther) {
+      if (!otherCountry || !otherCountry.trim()) {
+        const err = new Error('Please specify your country');
+        err.code = 'VALIDATION_ERROR';
+        throw err;
+      }
+      nationality = otherCountry.trim();
     }
 
     const existing = await User.findOne({ email });
@@ -21,7 +37,7 @@ class UserServiceImpl extends IUserService {
       throw err;
     }
 
-    const user = new User({ email, firstName, lastName, whatsapp, nationality, state });
+    const user = new User({ email, firstName, lastName, whatsapp, nationality, state: isNigeria ? state : '' });
     return await user.save();
   }
 

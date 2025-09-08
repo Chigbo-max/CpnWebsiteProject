@@ -23,38 +23,17 @@ const UserManagement = ({ token }) => {
   ];
 
   const nationalities = [
-    'Nigerian', 'Ghanaian', 'Kenyan', 'South African', 'Egyptian', 'Moroccan',
-    'Tunisian', 'Algerian', 'Libyan', 'Sudanese', 'Ethiopian', 'Ugandan',
-    'Tanzanian', 'Rwandan', 'Botswana', 'Namibian', 'Zimbabwean', 'Zambian',
-    'Malawian', 'Mozambican', 'Angolan', 'Cameroonian', 'Senegalese', 'Malian',
+    'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'Morocco',
+    'Tunisia', 'Algeria', 'Libya', 'Sudan', 'Ethiopia', 'Uganda',
+    'Tanzania', 'Rwanda', 'Botswana', 'Namibia', 'Zimbabwe', 'Zambia',
+    'Malawi', 'Mozambique', 'Angola', 'Cameroon', 'Senegal', 'Mali', 'United States of America',
     'Burkina Faso', 'Niger', 'Chad', 'Central African Republic', 'Democratic Republic of Congo',
-    'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
+    'United Kingdom', 'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
     'Cape Verde', 'Guinea-Bissau', 'Guinea', 'Sierra Leone', 'Liberia', 'Côte d\'Ivoire',
     'Togo', 'Benin', 'Mauritania', 'Somalia', 'Djibouti', 'Eritrea', 'Burundi',
     'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
   ];
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      const response = await fetch('/api/users/admin/users', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users);
-      } else {
-        toast.error('Failed to fetch users');
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Error fetching users');
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -127,48 +106,8 @@ const UserManagement = ({ token }) => {
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/users/admin/users/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+  
 
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
-  const filterUsers = () => {
-    let filtered = users;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(user =>
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.whatsapp.includes(searchTerm)
-      );
-    }
-
-    // State filter
-    if (filterState) {
-      filtered = filtered.filter(user => user.state === filterState);
-    }
-
-    // Nationality filter
-    if (filterNationality) {
-      filtered = filtered.filter(user => user.nationality === filterNationality);
-    }
-
-    setFilteredUsers(filtered);
-  };
 
   const exportToPDF = async () => {
     setExporting(true);

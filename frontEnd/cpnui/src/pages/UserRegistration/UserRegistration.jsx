@@ -9,7 +9,8 @@ const UserRegistration = () => {
     lastName: '',
     whatsapp: '',
     nationality: '',
-    state: ''
+    state: '',
+    otherCountry: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -23,12 +24,12 @@ const UserRegistration = () => {
   ];
 
   const nationalities = [
-    'Nigerian', 'Ghanaian', 'Kenyan', 'South African', 'Egyptian', 'Moroccan',
-    'Tunisian', 'Algerian', 'Libyan', 'Sudanese', 'Ethiopian', 'Ugandan',
-    'Tanzanian', 'Rwandan', 'Botswana', 'Namibian', 'Zimbabwean', 'Zambian',
-    'Malawian', 'Mozambican', 'Angolan', 'Cameroonian', 'Senegalese', 'Malian',
+    'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'Morocco',
+    'Tunisia', 'Algeria', 'Libya', 'Sudan', 'Ethiopia', 'Uganda',
+    'Tanzania', 'Rwanda', 'Botswana', 'Namibia', 'Zimbabwe', 'Zambia',
+    'Malawi', 'Mozambique', 'Angola', 'Cameroon', 'Senegal', 'Mali', 'United States of America',
     'Burkina Faso', 'Niger', 'Chad', 'Central African Republic', 'Democratic Republic of Congo',
-    'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
+    'United Kingdom', 'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
     'Cape Verde', 'Guinea-Bissau', 'Guinea', 'Sierra Leone', 'Liberia', 'Côte d\'Ivoire',
     'Togo', 'Benin', 'Mauritania', 'Somalia', 'Djibouti', 'Eritrea', 'Burundi',
     'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
@@ -58,11 +59,17 @@ const UserRegistration = () => {
     }
 
     if (!formData.nationality) {
-      newErrors.nationality = 'Nationality is required';
+      newErrors.nationality = 'Country is required';
     }
 
-    if (!formData.state) {
-      newErrors.state = 'State of residence is required';
+    if (formData.nationality && formData.nationality.toLowerCase() === 'nigeria' && !formData.state) {
+      newErrors.state = 'State of residence is required for Nigeria';
+    }
+
+    if (formData.nationality && formData.nationality.toLowerCase() === 'other') {
+      if (!formData.otherCountry.trim()) {
+        newErrors.otherCountry = 'Please specify your country';
+      }
     }
 
     setErrors(newErrors);
@@ -240,7 +247,7 @@ const UserRegistration = () => {
                     errors.nationality ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
-                  <option value="">Select your nationality</option>
+                  <option value="">Select country you presently reside in</option>
                   {nationalities.map((nationality) => (
                     <option key={nationality} value={nationality}>
                       {nationality}
@@ -250,12 +257,32 @@ const UserRegistration = () => {
                 {errors.nationality && (
                   <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>
                 )}
+                {formData.nationality && formData.nationality.toLowerCase() === 'other' && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Specify Country *
+                    </label>
+                    <input
+                      type="text"
+                      name="otherCountry"
+                      value={formData.otherCountry}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                        errors.otherCountry ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter your country name"
+                    />
+                    {errors.otherCountry && (
+                      <p className="text-red-500 text-sm mt-1">{errors.otherCountry}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FaMapMarkerAlt className="inline mr-2 text-amber-600" />
-                  State of Residence *
+                  State of Residence(If you are in Nigeria) *
                 </label>
                 <select
                   name="state"
@@ -264,6 +291,7 @@ const UserRegistration = () => {
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
                     errors.state ? 'border-red-500' : 'border-gray-300'
                   }`}
+                  disabled={!(formData.nationality && formData.nationality.toLowerCase() === 'nigeria')}
                 >
                   <option value="">Select your state</option>
                   {nigerianStates.map((state) => (
@@ -291,7 +319,7 @@ const UserRegistration = () => {
                     Processing...
                   </>
                 ) : (
-                  'Join WhatsApp Community'
+                  'Join our WhatsApp Community'
                 )}
               </button>
             </div>

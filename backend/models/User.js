@@ -30,8 +30,9 @@ const userSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    required: true,
-    trim: true
+    required: false,
+    trim: true,
+    default: ''
   },
   registeredAt: {
     type: Date,

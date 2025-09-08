@@ -10,8 +10,8 @@ const userService = new UserServiceImpl();
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const { email, firstName, lastName, whatsapp, nationality, state } = req.body;
-    const user = await userService.register({ email, firstName, lastName, whatsapp, nationality, state });
+    const { email, firstName, lastName, whatsapp, nationality, state, otherCountry } = req.body;
+    const user = await userService.register({ email, firstName, lastName, whatsapp, nationality, state, otherCountry });
 
     const whatsappLink = process.env.VITE_WHATSAPP_LINK;
 
