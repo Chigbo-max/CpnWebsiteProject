@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { FaDownload, FaUsers, FaEye, FaFilter, FaSearch } from 'react-icons/fa';
+import { FaDownload, FaUsers, FaFilter, FaSearch } from 'react-icons/fa';
 import SimpleSpinner from '../../components/SimpleSpinner';
+import PropTypes from 'prop-types';
 
 const UserManagement = ({ token }) => {
   const [users, setUsers] = useState([]);
@@ -33,14 +34,76 @@ const UserManagement = ({ token }) => {
     'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
   ];
 
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await fetch('/api/users/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users);
+      } else {
+        toast.error('Failed to fetch users');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast.error('Error fetching users');
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await fetch('/api/users/admin/users/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  }, [token]);
+
   useEffect(() => {
     fetchUsers();
     fetchStats();
-  }, []);
+  }, [fetchUsers, fetchStats]);
+
+  const filterUsers = useCallback(() => {
+    let filtered = users;
+
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.whatsapp.includes(searchTerm)
+      );
+    }
+
+    if (filterState) {
+      filtered = filtered.filter(user => user.state === filterState);
+    }
+
+    if (filterNationality) {
+      filtered = filtered.filter(user => user.nationality === filterNationality);
+    }
+
+    setFilteredUsers(filtered);
+  }, [users, searchTerm, filterState, filterNationality]);
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, filterState, filterNationality]);
+  }, [filterUsers]);
 
   const fetchUsers = async () => {
     try {
@@ -347,3 +410,7 @@ const UserManagement = ({ token }) => {
 };
 
 export default UserManagement;
+
+UserManagement.propTypes = {
+  token: PropTypes.string.isRequired,
+};

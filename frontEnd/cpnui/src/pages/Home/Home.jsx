@@ -16,7 +16,6 @@ import FreeContent from "../../components/FreeContent/FreeContent";
 import { useGetEventsQuery } from '../../features/event/eventApi';
 
 const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
-const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
 
 const slides = [
   {

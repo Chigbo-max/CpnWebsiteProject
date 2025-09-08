@@ -53,7 +53,7 @@ const UserRegistration = () => {
 
     if (!formData.whatsapp.trim()) {
       newErrors.whatsapp = 'WhatsApp number is required';
-    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
+    } else if (!/^\+?[1-9]\d{0,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
       newErrors.whatsapp = 'Please enter a valid WhatsApp number';
     }
 
