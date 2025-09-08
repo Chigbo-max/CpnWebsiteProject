@@ -147,10 +147,12 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket running on wss://cpnwebsiteproject.onrender.com`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`WebSocket running on wss://cpnwebsiteproject.onrender.com`);
+  });
+}
 
 module.exports = { app, server, broadcastDashboardUpdate };
 

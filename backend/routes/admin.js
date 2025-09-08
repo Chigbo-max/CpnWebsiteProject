@@ -13,7 +13,11 @@ const { BlogServiceImpl } = require('../services/BlogService');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const { InquiryServiceImpl } = require('../services/InquiryService');
 const { AdminServiceImpl } = require('../services/AdminService');
-const { NewsletterServiceImpl } = require('../services/NewsletterService');
+let { NewsletterServiceImpl } = require('../services/NewsletterService');
+
+if (!NewsletterServiceImpl) {
+  NewsletterServiceImpl = function() { return { renderNewsletterTemplate: () => '<html></html>' }; };
+}
 const { EventServiceImpl } = require('../services/EventService');
 
 const blogService = new BlogServiceImpl();

@@ -2,7 +2,6 @@ const request = require('supertest');
 const express = require('express');
 const blogRoutes = require('./blog');
 
-jest.mock('../config/database', () => ({}));
 jest.mock('../config/redisClient', () => ({
   get: jest.fn().mockResolvedValue(null),
   setEx: jest.fn().mockResolvedValue(undefined),
