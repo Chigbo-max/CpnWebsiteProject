@@ -1,5 +1,5 @@
+# Christian Professionals Network (CPN) Platform
 
-Christian Professionals Network (CPN) Platform
 
 A full-stack web application for the Christian Professionals Network, featuring a modern React frontend, Node.js/Express backend, PostgreSQL, Redis, JWT authentication, real-time updates, and Cloudinary image uploads.
 
@@ -30,35 +30,36 @@ A full-stack web application for the Christian Professionals Network, featuring 
 
 
 CpnWebsiteProject/
-  backend/         # Node.js/Express API, MongoDB, Redis, WebSocket, Cloudinary
+  backend/         # Node.js/Express API, PostgreSQL, Redis, WebSocket, Cloudinary
   frontEnd/cpnui/  # React app, Tailwind, RTK Query, admin dashboard, public site
   Docker-compose.yml
   README.md
 
 
-##Local Development
+
+Local Development
+Prerequisites
+Node.js 18+
+Docker & Docker Compose
 
 
-#Prerequisites
-- Node.js 18+
-- Docker & Docker Compose
+Environment Variables
 
-
-#Environment Variables
-- Copy .env.example to .env in both backend/ and frontEnd/cpnui/
-- Set your secrets (DB, JWT, Cloudinary, email, etc.)
+Copy .env.example to .env in both backend/ and frontEnd/cpnui/
+Set your secrets (DB, JWT, Cloudinary, email, etc.)
 
 
 Start with Docker Compose
 
-- Frontend: http://localhost
-- Backend API: http://localhost:5000
-- PostgreSQL: localhost:5433
-- Redis: localhost:6379
+docker-compose up --build
+
+Frontend: http://localhost
+Backend API: http://localhost:5000
+PostgreSQL: localhost:5433
+Redis: localhost:6379
 
 
-# Manual Start (for development)
-
+Manual Start (for development)
 
 # Backend
 cd backend
@@ -71,41 +72,23 @@ npm install
 npm run dev
 
 
-# Running Tests & Lint
-- Lint:
- cd frontEnd/cpnui
+Running Tests & Lint
+
+Lint:
+  cd frontEnd/cpnui
   npm run lint
 
-- Backend Tests:
- cd backend
+Backend Tests:
+  cd backend
   npm test
 
 
-# Deployment
-- CI/CD:
+Deployment
+
+CI/CD:
 GitHub Actions runs lint/tests and builds/pushes Docker images on main branch.
-- Production:
+Production:
 Set all environment variables in your deployment environment or Docker secrets.
-
-
-#Key Endpoints
-
-- Auth: /api/auth/login, /api/auth/forgot-password, /api/auth/reset-password
-- Admin Profile: /api/admin/profile (PATCH), /api/admin/upload-image (POST), /api/admin/profile-picture (DELETE)
-- Blog: /api/admin/blog, /api/admin/blog/upload-image
-- Events: /api/events, /api/admin/events
-- Newsletter: /api/admin/newsletter
-- Enrollees: /api/enrollments/admin/enrollments, /api/enrollments/admin/enrollments/broadcast
-- Contact: /api/contact/submit
-
-
-#Notable Features
-
-- Profile Picture: Upload, update, and remove profile picture (reverts to initials avatar if removed)
-- WebSocket: Real-time dashboard updates for admins
-- Markdown Editor: Custom commands, image upload, table/underline commands removed for stability
-- Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
-- Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
 
 
 Key Endpoints
