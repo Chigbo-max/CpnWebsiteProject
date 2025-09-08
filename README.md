@@ -1,4 +1,5 @@
-# Christian Professionals Network (CPN) Platform
+
+Christian Professionals Network (CPN) Platform
 
 A full-stack web application for the Christian Professionals Network, featuring a modern React frontend, Node.js/Express backend, PostgreSQL, Redis, JWT authentication, real-time updates, and Cloudinary image uploads.
 
@@ -27,8 +28,9 @@ A full-stack web application for the Christian Professionals Network, featuring 
 
 #Monorepo Structure
 
+
 CpnWebsiteProject/
-  backend/         # Node.js/Express API, PostgreSQL, Redis, WebSocket, Cloudinary
+  backend/         # Node.js/Express API, MongoDB, Redis, WebSocket, Cloudinary
   frontEnd/cpnui/  # React app, Tailwind, RTK Query, admin dashboard, public site
   Docker-compose.yml
   README.md
@@ -56,6 +58,7 @@ Start with Docker Compose
 
 
 # Manual Start (for development)
+
 
 # Backend
 cd backend
@@ -104,14 +107,35 @@ Set all environment variables in your deployment environment or Docker secrets.
 - Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
 - Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+Key Endpoints
 
-## License
+Auth: /api/auth/login, /api/auth/forgot-password, /api/auth/reset-password
+Admin Profile: /api/admin/profile (PATCH), /api/admin/upload-image (POST), /api/admin/profile-picture (DELETE)
+Blog: /api/admin/blog, /api/admin/blog/upload-image
+Events: /api/events, /api/admin/events
+Newsletter: /api/admin/newsletter
+Enrollees: /api/enrollments/admin/enrollments, /api/enrollments/admin/enrollments/broadcast
+Contact: /api/contact/submit
 
-This project is licensed under the MIT License. 
+
+Notable Features
+
+Profile Picture: Upload, update, and remove profile picture (reverts to initials avatar if removed)
+WebSocket: Real-time dashboard updates for admins
+Markdown Editor: Custom commands, image upload, table/underline commands removed for stability
+Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
+Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
+
+
+Contributing
+
+1. Fork the repo
+2. Create your feature branch (git checkout -b feature/YourFeature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin feature/YourFeature)
+5. Open a pull request
+
+
+License
+MIT
