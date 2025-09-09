@@ -1,6 +1,6 @@
-import './App.css'
-import { RouterProvider } from 'react-router-dom'
-import router from "./router/route.jsx"
+import './App.css';
+import { RouterProvider } from 'react-router-dom';
+import router from './router/route.jsx';
 import React from 'react';
 import ServerDown from './pages/Error/ServerDown';
 import NoInternet from './pages/Error/NoInternet';
@@ -23,13 +23,12 @@ function App() {
     };
   }, []);
 
-  // Global fetch error handler
   React.useEffect(() => {
     const origFetch = window.fetch;
     window.fetch = async (...args) => {
       try {
         const response = await origFetch(...args);
-        if (!response.ok && response.status >= 500) {
+        if (!response.ok && (response.status >= 500 || response.status === 429 || response.status === 401)) {
           setHasServerError(true);
         }
         return response;
@@ -47,15 +46,22 @@ function App() {
     };
   }, []);
 
-  if (!isOnline) return <NoInternet />;
-  if (hasServerError) return <ServerDown />;
-
   return (
     <ErrorBoundary>
-        <AdminAuthProvider>
-          <Toaster position="top-center" richColors />
-          <RouterProvider router={router} />
-        </AdminAuthProvider>
+      <AdminAuthProvider>
+        <Toaster position="top-center" richColors />
+        {isOnline ? (
+          hasServerError ? (
+            <RouterProvider router={router}>
+              <ServerDown />
+            </RouterProvider>
+          ) : (
+            <RouterProvider router={router} />
+          )
+        ) : (
+          <NoInternet />
+        )}
+      </AdminAuthProvider>
     </ErrorBoundary>
   );
 }

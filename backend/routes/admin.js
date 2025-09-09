@@ -51,7 +51,9 @@ router.post('/events', authenticateAdmin, upload.single('image'), async (req, re
     });
 
     // Invalidate cache
+    if(redisClient){
     await redisClient.del('events:list');
+    }
     req.app.get('broadcastDashboardUpdate')({ entity: 'event', action: 'create' });
     
     res.status(201).json(event);
@@ -75,12 +77,22 @@ router.post('/events', authenticateAdmin, upload.single('image'), async (req, re
 router.get('/blog', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:blog:posts';
-    const cached = await redisClient.get(cacheKey);
+
+    let cached = null;
+
+    if(redisClient){
+    cached = await redisClient.get(cacheKey);
+    }
+
     if (cached) {
       return res.json(JSON.parse(cached));
     }
     const posts = await blogService.getAll();
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(posts));
+    }
+
     res.json({ blogs: posts });
   } catch (error) { 
     console.error('Error fetching blog posts:', error);
@@ -101,8 +113,13 @@ router.post('/blog', authenticateAdmin, upload.single('image'), async (req, res,
     }
     
     const post = await blogService.create({ title, content, excerpt, tags, status, slug, authorId: req.admin.id, featured_image });
+
+    if(redisClient){
     await redisClient.del('admin:blog:posts');
+    }
+    if(redisClient){
     await redisClient.del('blog:posts');
+    }
     // Broadcast dashboard update
     req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'create' });
     res.status(201).json({ message: 'Blog post created successfully', post });
@@ -133,8 +150,15 @@ router.put('/blog/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const post = await blogService.update(req.params.id, req.body);
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
+
+    if(redisClient){
     await redisClient.del('admin:blog:posts');
+    }
+
+    if(redisClient){
     await redisClient.del('blog:posts');
+    }
+
     req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'update' });
     res.json({ message: 'Blog post updated', post });
   } catch (error) {
@@ -164,8 +188,15 @@ router.delete('/blog/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const post = await blogService.delete(req.params.id);
     if (!post) return res.status(404).json({ message: 'Blog post not found' });
+
+    if(redisClient){
     await redisClient.del('admin:blog:posts');
+    };
+
+    if(redisClient){
     await redisClient.del('blog:posts');
+    }
+
     req.app.get('broadcastDashboardUpdate')({ entity: 'blog', action: 'delete' });
     res.json({ message: 'Blog post deleted' });
   } catch (error) { next(error); }
@@ -185,18 +216,33 @@ router.post('/blog/upload-image', authenticateAdmin, async (req, res) => {
 router.get('/subscribers', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:subscribers:list';
-    const cached = await redisClient.get(cacheKey);
+
+    let cached = null;
+    if(redisClient){
+    cached = await redisClient.get(cacheKey);
+    }
+
     if (cached) return res.json(JSON.parse(cached));
     const subs = await subscriberService.getAll();
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(subs));
+    }
+
     res.json({ subscribers: subs });
   } catch (error) { next(error); }
 });
 router.post('/subscribers', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.create(req.body);
+
+    if(redisClient){
     await redisClient.del('admin:subscribers:list');
+    }
+
+    if(redisClient){
     await redisClient.del('subscribers:list');
+    }
     res.status(201).json({ message: 'Subscriber added', subscriber: sub });
   } catch (error) { next(error); }
 });
@@ -204,8 +250,15 @@ router.put('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.update(req.params.id, req.body);
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
+
+    if(redisClient){
     await redisClient.del('admin:subscribers:list');
+    };
+
+    if(redisClient){
     await redisClient.del('subscribers:list');
+    }
+
     req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'update' });
     res.json({ message: 'Subscriber updated', subscriber: sub });
   } catch (error) { next(error); }
@@ -214,8 +267,14 @@ router.delete('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const sub = await subscriberService.delete(req.params.id);
     if (!sub) return res.status(404).json({ message: 'Subscriber not found' });
+
+    if(redisClient){
     await redisClient.del('admin:subscribers:list');
+    }
+    if(redisClient){
     await redisClient.del('subscribers:list');
+    }
+
     req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'delete' });
     res.json({ message: 'Subscriber deleted' });
   } catch (error) { next(error); }
@@ -224,10 +283,20 @@ router.delete('/subscribers/:id', authenticateAdmin, async (req, res, next) => {
 router.get('/inquiries', authenticateAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:inquiries:list';
-    const cached = await redisClient.get(cacheKey);
+
+    let cached = null;
+  
+    if(redisClient){
+    cached = await redisClient.get(cacheKey);
+    }
+
     if (cached) return res.json(JSON.parse(cached));
     const inquiries = await inquiryService.getAll();
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(inquiries));
+    }
+
     res.json(inquiries);
   } catch (error) { next(error); }
 });
@@ -235,7 +304,11 @@ router.patch('/inquiries/:id/status', authenticateAdmin, async (req, res, next) 
   try {
     const inquiry = await inquiryService.updateStatus(req.params.id, req.body.status);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
+
+    if(redisClient){
     await redisClient.del('admin:inquiries:list');
+    }
+
     res.json({ message: 'Inquiry status updated', inquiry });
   } catch (error) { next(error); }
 });
@@ -252,7 +325,10 @@ router.put('/inquiries/:id', authenticateAdmin, async (req, res, next) => {
         content: `<p>${req.body.admin_response}</p><p>Thank you for contacting us!</p>`
       })
     });
+
+    if(redisClient){
     await redisClient.del('admin:inquiries:list');
+    }
     res.json({ message: 'Response sent successfully', inquiry });
   } catch (error) { next(error); }
 });
@@ -260,7 +336,10 @@ router.delete('/inquiries/:id', authenticateAdmin, async (req, res, next) => {
   try {
     const inquiry = await inquiryService.delete(req.params.id);
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
+
+    if(redisClient){
     await redisClient.del('admin:inquiries:list');
+    }
     res.json({ message: 'Inquiry deleted' });
   } catch (error) { next(error); }
 });
@@ -349,10 +428,19 @@ function requireSuperAdmin(req, res, next) {
 router.get('/admins', authenticateAdmin, requireSuperAdmin, async (req, res, next) => {
   try {
     const cacheKey = 'admin:admins:list';
+
+    let cached = null;
+
+    if(redisClient){
     const cached = await redisClient.get(cacheKey);
+    };
+
     if (cached) return res.json(JSON.parse(cached));
     const admins = await adminService.getAll();
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(admins));
+    };
     res.json(admins);
   } catch (error) { next(error); }
 });
@@ -363,7 +451,10 @@ router.post('/admins', authenticateAdmin, requireSuperAdmin, async (req, res, ne
     const bcrypt = require('bcryptjs');
     const password_hash = await bcrypt.hash(password, 10);
     const admin = await adminService.create({ username, email, password_hash, role });
+
+    if(redisClient){
     await redisClient.del('admin:admins:list');
+    };
     await mailer.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -381,7 +472,10 @@ router.delete('/admins/:id', authenticateAdmin, requireSuperAdmin, async (req, r
     if (req.admin.id == req.params.id) return res.status(400).json({ message: 'Cannot delete yourself' });
     const admin = await adminService.delete(req.params.id);
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    if(redisClient){
     await redisClient.del('admin:admins:list');
+    }
     res.json({ message: 'Admin deleted' });
   } catch (error) { next(error); }
 });

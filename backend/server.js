@@ -6,8 +6,10 @@ const http = require('http');
 const WebSocket = require('ws');
 const connectDB = require('./config/mongodb');
 const Admin = require('./models/Admin');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
+
 
 // Enhanced CORS configuration
 const allowedOrigins = [
@@ -28,6 +30,24 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
+
+
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 600, // Limit each IP to 600 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.headers['upgrade'] === 'websocket',
+});
+
+// Apply rate limiting globally
+// app.use(limiter);
+
+
+
+
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -104,9 +124,14 @@ const wss = new WebSocket.Server({
 
 wss.on('connection', (ws, req) => {
   console.log('New WebSocket connection');
+
+   // Ping every 30 seconds to keep connection alive
+  ws.isAlive = true;
+  ws.on('pong', () => { ws.isAlive = true; });
   
   ws.on('message', (message) => {
     try {
+      
       const data = JSON.parse(message);
       console.log('Received:', data);
     } catch (err) {
@@ -118,6 +143,17 @@ wss.on('connection', (ws, req) => {
     console.log('WebSocket disconnected');
   });
 });
+
+// Ping clients every 30 seconds
+setInterval(() => {
+  wss.clients.forEach((client) => {
+    if (!client.isAlive) return client.terminate();
+    client.isAlive = false;
+    client.ping();
+  });
+}, 30000);
+
+
 
 function broadcastDashboardUpdate(data) {
   wss.clients.forEach(client => {

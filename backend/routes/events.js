@@ -16,14 +16,24 @@ const cloudinaryService = new CloudinaryServiceImpl();
 router.get('/', async (req, res) => {
   try {
     const cacheKey = 'events:list';
-    const cached = await redisClient.get(cacheKey);
+
+    let cached = null;
+
+    if(redisClient){ 
+      cached = await redisClient.get(cacheKey);
+    }
+    
+  
     if (cached) {
       const parsed = JSON.parse(cached);
       return res.json(Array.isArray(parsed) ? { events: parsed } : parsed);
     }
     const events = await eventService.getEvents();
     console.log("Fetched events:", events);
+    
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
+    }
     res.json({ events });
   } catch (error) {
     console.error('Error fetching events:', error);
