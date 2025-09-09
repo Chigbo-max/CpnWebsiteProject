@@ -1,4 +1,5 @@
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { useAdminAuth } from '../../app/useAdminAuth';
@@ -50,7 +51,7 @@ function AdminDashboard() {
     }
   }, [token, navigate]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const endpoints = [
         { url: `${apiBaseUrl}/enrollments/admin/enrollments`, key: 'enrollees', process: (data) => data.enrollments?.length || 0 },
@@ -118,7 +119,7 @@ function AdminDashboard() {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data.');
     }
-  };
+  }, [apiBaseUrl, token, handleMultipleResponses]);
 
   // --- WEBSOCKET with exponential backoff ---
   useEffect(() => {
@@ -172,7 +173,7 @@ function AdminDashboard() {
         wsRef.current.close();
       }
     };
-  }, [activeSection, token, wsUrl]);
+  }, [activeSection, token, wsUrl, fetchDashboardData]);
 
   // forced redirect
   useEffect(() => {
@@ -328,6 +329,11 @@ function SummaryCard({ icon, value, label }) {
     </div>
   );
 }
+SummaryCard.propTypes = {
+  icon: PropTypes.node.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  label: PropTypes.string.isRequired,
+};
 
 function ChartCard({ title, children }) {
   return (
@@ -337,6 +343,10 @@ function ChartCard({ title, children }) {
     </div>
   );
 }
+ChartCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 
 function BarChart({ data, indexBy, keys }) {
   return data.length === 0 || data.every((d) => keys.every((k) => d[k] === 0)) ? (
@@ -384,6 +394,11 @@ function BarChart({ data, indexBy, keys }) {
     />
   );
 }
+BarChart.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  indexBy: PropTypes.string.isRequired,
+  keys: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
 
 function PieChart({ data }) {
   return data.length === 0 || data.every((d) => d.value === 0) ? (
@@ -421,5 +436,14 @@ function PieChart({ data }) {
     />
   );
 }
+PieChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      value: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
 
 export default AdminDashboard;
