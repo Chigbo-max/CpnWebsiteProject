@@ -34,7 +34,6 @@ const UserManagement = ({ token }) => {
     'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
   ];
 
-
   const fetchStats = useCallback(async () => {
     try {
       const response = await fetch('/api/users/admin/users/stats', {
@@ -53,9 +52,31 @@ const UserManagement = ({ token }) => {
   }, [token]);
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/users/admin/users', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data.users);
+        } else {
+          toast.error('Failed to fetch users');
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        toast.error('Error fetching users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUsers();
     fetchStats();
-  }, [fetchUsers, fetchStats]);
+  }, [token, fetchStats]);
 
   const filterUsers = useCallback(() => {
     let filtered = users;
@@ -83,31 +104,6 @@ const UserManagement = ({ token }) => {
   useEffect(() => {
     filterUsers();
   }, [filterUsers]);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('/api/users/admin/users', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users);
-      } else {
-        toast.error('Failed to fetch users');
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Error fetching users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  
-
 
   const exportToPDF = async () => {
     setExporting(true);
