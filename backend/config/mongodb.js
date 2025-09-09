@@ -18,7 +18,9 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    if (process.env.NODE_ENV != 'test'){
     process.exit(1);
+    }
   }
 };
 
