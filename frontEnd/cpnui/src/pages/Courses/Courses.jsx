@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Cpn1 from '../../assets/dwd.jpeg';
 import Cpn2 from '../../assets/dld.jpeg';
 import bgImage from '../../assets/bookshelf.jpeg';
+import JoinCommunityBanner from '../../components/JoinCommunityBanner';
 
 function Courses() {
   const courses = [
@@ -33,7 +34,7 @@ function Courses() {
           }}
         />
         <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 py-20 mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-amber-400 mb-6">Courses</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-accent-500 mb-6">Courses</h1>
           <p className="text-xl sm:text-2xl md:text-3xl text-white max-w-4xl mx-auto leading-relaxed">
             Explore our range of courses designed to help you do work, leadership, and business differently—anchored in Kingdom values and practical excellence.
           </p>
@@ -51,7 +52,7 @@ function Courses() {
               <p className="text-gray-700 mb-6">{course.description}</p>
               <Link
                 to={course.link}
-                className="inline-block px-8 py-3 bg-amber-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300"
+                className="inline-block px-8 py-3 bg-accent-600 text-white font-bold rounded-lg shadow hover:bg-amber-700 transition-all duration-300"
               >
                 Learn More
               </Link>
@@ -59,6 +60,7 @@ function Courses() {
           ))}
         </div>
       </div>
+      <JoinCommunityBanner/>
     </div>
   );
 }

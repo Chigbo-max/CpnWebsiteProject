@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { FaUser, FaEnvelope, FaPhone, FaGlobe, FaMapMarkerAlt, FaSpinner } from 'react-icons/fa';
+import { User, Mail, Phone, Globe, MapPin, Loader2 } from 'lucide-react';
 
 const UserRegistration = () => {
   const [formData, setFormData] = useState({
@@ -24,15 +24,47 @@ const UserRegistration = () => {
   ];
 
   const nationalities = [
-    'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'Morocco',
-    'Tunisia', 'Algeria', 'Libya', 'Sudan', 'Ethiopia', 'Uganda',
-    'Tanzania', 'Rwanda', 'Botswana', 'Namibia', 'Zimbabwe', 'Zambia',
-    'Malawi', 'Mozambique', 'Angola', 'Cameroon', 'Senegal', 'Mali', 'United States of America',
-    'Burkina Faso', 'Niger', 'Chad', 'Central African Republic', 'Democratic Republic of Congo',
-    'United Kingdom', 'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
-    'Cape Verde', 'Guinea-Bissau', 'Guinea', 'Sierra Leone', 'Liberia', 'Côte d\'Ivoire',
-    'Togo', 'Benin', 'Mauritania', 'Somalia', 'Djibouti', 'Eritrea', 'Burundi',
-    'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
+    { name: 'Nigeria', flag: '🇳🇬' },
+    { name: 'Ghana', flag: '🇬🇭' },
+    { name: 'Kenya', flag: '🇰🇪' },
+    { name: 'South Africa', flag: '🇿🇦' },
+    { name: 'Egypt', flag: '🇪🇬' },
+    { name: 'Morocco', flag: '🇲🇦' },
+    { name: 'Tunisia', flag: '🇹🇳' },
+    { name: 'Algeria', flag: '🇩🇿' },
+    { name: 'Libya', flag: '🇱🇾' },
+    { name: 'Sudan', flag: '🇸🇩' },
+    { name: 'Ethiopia', flag: '🇪🇹' },
+    { name: 'Uganda', flag: '🇺🇬' },
+    { name: 'Tanzania', flag: '🇹🇿' },
+    { name: 'Rwanda', flag: '🇷🇼' },
+    { name: 'Botswana', flag: '🇧🇼' },
+    { name: 'Namibia', flag: '🇳🇦' },
+    { name: 'Zimbabwe', flag: '🇿🇼' },
+    { name: 'Zambia', flag: '🇿🇲' },
+    { name: 'Malawi', flag: '🇲🇼' },
+    { name: 'Mozambique', flag: '🇲🇿' },
+    { name: 'Angola', flag: '🇦🇴' },
+    { name: 'Cameroon', flag: '🇨🇲' },
+    { name: 'Senegal', flag: '🇸🇳' },
+    { name: 'Mali', flag: '🇲🇱' },
+    { name: 'United States of America', flag: '🇺🇸' },
+    { name: 'United Kingdom', flag: '🇬🇧' },
+    { name: 'Canada', flag: '🇨🇦' },
+    { name: 'Australia', flag: '🇦🇺' },
+    { name: 'Germany', flag: '🇩🇪' },
+    { name: 'France', flag: '🇫🇷' },
+    { name: 'Italy', flag: '🇮🇹' },
+    { name: 'Spain', flag: '🇪🇸' },
+    { name: 'Netherlands', flag: '🇳🇱' },
+    { name: 'Belgium', flag: '🇧🇪' },
+    { name: 'Switzerland', flag: '🇨🇭' },
+    { name: 'Austria', flag: '🇦🇹' },
+    { name: 'Sweden', flag: '🇸🇪' },
+    { name: 'Norway', flag: '🇳🇴' },
+    { name: 'Denmark', flag: '🇩🇰' },
+    { name: 'Finland', flag: '🇫🇮' },
+    { name: 'Other', flag: '🌍' }
   ];
 
   const validateForm = () => {
@@ -132,15 +164,15 @@ const UserRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-amber-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-accent-900 py-12 px-4 mt-12 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-6">
+          <div className="bg-gradient-to-r from-primary-600 to-primary-800 px-8 py-6">
             <h1 className="text-3xl font-bold text-white text-center">
               Join CPN Community
             </h1>
-            <p className="text-amber-100 text-center mt-2">
+            <p className="text-primary-100 text-center mt-2">
               Fill in your details to join our WhatsApp community
             </p>
           </div>
@@ -151,7 +183,7 @@ const UserRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaUser className="inline mr-2 text-amber-600" />
+                  <User className="inline w-4 h-4 mr-2 text-primary-600" />
                   First Name *
                 </label>
                 <input
@@ -159,7 +191,7 @@ const UserRegistration = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-all duration-200 ${
                     errors.firstName ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your first name"
@@ -171,7 +203,7 @@ const UserRegistration = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaUser className="inline mr-2 text-amber-600" />
+                  <User className="inline w-4 h-4 mr-2 text-primary-600" />
                   Last Name *
                 </label>
                 <input
@@ -179,7 +211,7 @@ const UserRegistration = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                     errors.lastName ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your last name"
@@ -193,7 +225,7 @@ const UserRegistration = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FaEnvelope className="inline mr-2 text-amber-600" />
+                <Mail className="inline w-4 h-4 mr-2 text-primary-600" />
                 Email Address *
               </label>
               <input
@@ -201,7 +233,7 @@ const UserRegistration = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter your email address"
@@ -214,7 +246,7 @@ const UserRegistration = () => {
             {/* WhatsApp */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FaPhone className="inline mr-2 text-amber-600" />
+                <Phone className="inline w-4 h-4 mr-2 text-primary-600" />
                 WhatsApp Number *
               </label>
               <input
@@ -222,7 +254,7 @@ const UserRegistration = () => {
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                   errors.whatsapp ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="e.g., +234 801 234 5678"
@@ -236,21 +268,21 @@ const UserRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaGlobe className="inline mr-2 text-amber-600" />
+                  <Globe className="inline w-4 h-4 mr-2 text-primary-600" />
                   Nationality *
                 </label>
                 <select
                   name="nationality"
                   value={formData.nationality}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                     errors.nationality ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
                   <option value="">Select country you presently reside in</option>
-                  {nationalities.map((nationality) => (
-                    <option key={nationality} value={nationality}>
-                      {nationality}
+                  {nationalities.map((country) => (
+                    <option key={country.name} value={country.name}>
+                      {country.flag} {country.name}
                     </option>
                   ))}
                 </select>
@@ -267,7 +299,7 @@ const UserRegistration = () => {
                       name="otherCountry"
                       value={formData.otherCountry}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                         errors.otherCountry ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Enter your country name"
@@ -281,14 +313,14 @@ const UserRegistration = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaMapMarkerAlt className="inline mr-2 text-amber-600" />
+                  <MapPin className="inline w-4 h-4 mr-2 text-primary-600" />
                   State of Residence(If you are in Nigeria) *
                 </label>
                 <select
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
                     errors.state ? 'border-red-500' : 'border-gray-300'
                   }`}
                   disabled={!(formData.nationality && formData.nationality.toLowerCase() === 'nigeria')}
@@ -311,11 +343,11 @@ const UserRegistration = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-4 px-6 rounded-lg hover:from-amber-600 hover:to-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-primary-600 to-primary-800 text-white font-bold py-4 px-6 rounded-lg hover:from-primary-600 hover:to-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
-                    <FaSpinner className="animate-spin mr-2" />
+                    <Loader2 className="animate-spin w-5 h-5 mr-2" />
                     Processing...
                   </>
                 ) : (
@@ -325,8 +357,8 @@ const UserRegistration = () => {
             </div>
 
             {/* Info */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-sm text-amber-800">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+              <p className="text-sm text-primary-800">
                 <strong>Note:</strong> After successful registration, you will be redirected to our WhatsApp community group where you can connect with other Christian professionals.
               </p>
             </div>

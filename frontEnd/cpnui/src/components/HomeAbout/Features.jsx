@@ -10,8 +10,8 @@ const Features = () => {
         </div>
         <div className="max-w-lg lg:max-w-xl xl:max-w-2xl min-w-80 lg:min-w-96">
           <h5 className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">ABOUT CPN</h5>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight text-gray-900 mb-6">
-            Empowering Professionals for <span className="text-amber-600">Kingdom Impact</span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight text-primary-900 mb-6">
+            Empowering Professionals for <span className="text-accent-500">Kingdom Impact</span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-8">
             Christian Professionals Network (CPN) is a platform to mentor and raise
@@ -22,7 +22,7 @@ const Features = () => {
           <div className="mt-8">
             <Link 
               to="/insideCPN/about"
-              className="inline-block bg-gray-900 hover:bg-amber-600 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+              className="inline-block bg-primary-900 hover:bg-primary-900 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
             >
               LEARN MORE &rarr;
             </Link>

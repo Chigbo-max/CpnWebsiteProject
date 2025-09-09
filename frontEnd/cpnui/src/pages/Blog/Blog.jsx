@@ -7,6 +7,7 @@ import ServerDown from '../Error/ServerDown';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { FaRegNewspaper } from 'react-icons/fa';
 import { useGetBlogsQuery } from '../../features/blog/blogApi';
+import JoinCommunityBanner from '../../components/JoinCommunityBanner';
 
 function Blog() {
     const { data, isLoading, isError, error } = useGetBlogsQuery();
@@ -14,7 +15,7 @@ function Blog() {
         const posts = data?.blogs ?? [];
         return posts;
     }, [data]);
-    
+
     const serverDown = isError && (error?.message === 'Failed to fetch' || error?.message === 'NetworkError when attempting to fetch resource.');
 
     const formatDate = (dateString) => {
@@ -57,7 +58,7 @@ function Blog() {
                         initial={{ x: "-100vw", opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-amber-400 mb-6"
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-accent-500 mb-6"
                     >
                         Blog
                     </motion.h1>
@@ -67,7 +68,7 @@ function Blog() {
                         transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
                         className="text-xl sm:text-2xl md:text-3xl text-white max-w-4xl mx-auto leading-relaxed"
                     >
-                        Discover insights, leadership tips, and professional guidance 
+                        Discover insights, leadership tips, and professional guidance
                         from our community of Christian professionals.
                     </motion.p>
                 </div>
@@ -87,8 +88,8 @@ function Blog() {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {publishedPosts.map((post, index) => (
-                                <motion.article 
-                                    key={post.id} 
+                                <motion.article
+                                    key={post.id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -96,23 +97,23 @@ function Blog() {
                                 >
                                     {post.featured_image ? (
                                         <div className="aspect-video bg-gray-200">
-                                            <img 
-                                                src={post.featured_image} 
+                                            <img
+                                                src={post.featured_image}
                                                 alt={post.title}
                                                 className="w-full h-full object-cover"
-                                                onError={e => { e.target.onerror = null; e.target.src = '/vite.svg'; }}
+                                                onError={e => { e.target.onerror = null; e.target.src = '/cpnBanner.png'; }}
                                             />
                                         </div>
                                     ) : (
-                                        <div className="aspect-video bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                                        <div className="aspect-video bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
                                             <FaRegNewspaper className="w-16 h-16 text-white" />
                                         </div>
                                     )}
                                     <div className="p-6">
                                         <div className="flex items-center text-sm text-gray-500 mb-3">
-                                            <FontAwesomeIcon icon={faCalendar} className="mr-2 text-amber-500" />
+                                            <FontAwesomeIcon icon={faCalendar} className="mr-2 text-accent-500" />
                                             <span>{formatDate(post.created_at)}</span>
-                                            <FontAwesomeIcon icon={faUser} className="ml-4 mr-2 text-amber-500" />
+                                            <FontAwesomeIcon icon={faUser} className="ml-4 mr-2 text-accent-500" />
                                             <span>CPN Team</span>
                                         </div>
                                         <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
@@ -121,9 +122,9 @@ function Blog() {
                                         <p className="text-gray-600 mb-4 line-clamp-3">
                                             {post.excerpt}
                                         </p>
-                                        <Link 
+                                        <Link
                                             to={`/blog/${post.slug}`}
-                                            className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors duration-200"
+                                            className="inline-flex items-center text-accent-600 hover:text-accent-700 font-semibold transition-colors duration-200"
                                         >
                                             Read More
                                             <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
@@ -135,6 +136,7 @@ function Blog() {
                     )}
                 </div>
             </div>
+            <JoinCommunityBanner />
         </div>
     );
 }

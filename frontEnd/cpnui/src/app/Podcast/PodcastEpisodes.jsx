@@ -62,7 +62,7 @@ const PodcastEpisodes = () => {
         <select 
           value={episodesPerPage} 
           onChange={handlePageSizeChange}
-          className="rounded-md px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 text-white bg-gray-900 shadow-sm"
+          className="rounded-md px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-400 text-white bg-primary-900 shadow-sm"
         >
           <option value={12}>12</option>
           <option value={16}>16</option>
@@ -77,7 +77,7 @@ const PodcastEpisodes = () => {
           {filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
             <div
               key={episode.id}
-              className={`rounded-2xl shadow-xl text-white p-0 flex flex-col gap-0 border-0 bg-gradient-to-br from-gray-900 to-gray-800 hover:scale-[1.025] hover:shadow-2xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
+              className={`rounded-2xl shadow-xl text-white p-0 flex flex-col gap-0 border-0 bg-gradient-to-br from-primary-800 to-primary-900 hover:scale-[1.025] hover:shadow-2xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
               style={{ minHeight: '370px', position: 'relative' }}
             >
               {episode.images?.length > 0 && (

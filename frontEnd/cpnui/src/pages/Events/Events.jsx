@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import SimpleSpinner from '../../components/SimpleSpinner';
 import { useGetEventsQuery } from '../../features/event/eventApi';
+import JoinCommunityBanner from "../../components/JoinCommunityBanner";
 
 function Events() {
   const [search, setSearch] = useState('');
@@ -67,7 +68,7 @@ function Events() {
             initial={{ x: "-100vw", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-amber-400 mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-accent-500 mb-6"
           >
             Events
           </motion.h1>
@@ -93,12 +94,12 @@ function Events() {
                 placeholder="Search events..."
                 value={search}
                 onChange={e => { setSearch(e.target.value); setPage(1); }}
-                className="w-full sm:w-80 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white shadow-sm"
+                className="w-full sm:w-80 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-500 bg-white shadow-sm"
               />
               <select
                 value={typeFilter}
                 onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-                className="px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="px-4 py-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
               >
                 <option value="">All Types</option>
                 <option value="physical">Physical</option>
@@ -142,7 +143,7 @@ function Events() {
                           />
                         </div>
                       ) : (
-                        <div className="aspect-video bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                        <div className="aspect-video bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
                           <FontAwesomeIcon icon={faCalendarAlt} className="text-4xl text-white" />
                         </div>
                       )}
@@ -160,19 +161,19 @@ function Events() {
                         <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{ev.title}</h3>
                         <div className="space-y-2 mb-4 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faClock} className="text-amber-500" />
+                            <FontAwesomeIcon icon={faClock} className="text-accent-500" />
                             <span>{new Date(ev.start_time).toLocaleDateString()} at {new Date(ev.start_time).toLocaleTimeString()}</span>
                           </div>
                           {ev.location_address && (
                             <div className="flex items-center gap-2">
-                              <FontAwesomeIcon icon={faMapMarkerAlt} className="text-amber-500" />
+                              <FontAwesomeIcon icon={faMapMarkerAlt} className="text-accent-500" />
                               <span className="line-clamp-1">{ev.location_address}</span>
                             </div>
                           )}
                         </div>
                         <p className="text-gray-700 mb-4 line-clamp-3">{ev.description?.slice(0, 120)}...</p>
                         <div className="flex justify-between items-center">
-                          <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-colors">
+                          <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-accent-600 text-white hover:bg-accent-700 transition-colors">
                             Register Now
                           </span>
                         </div>
@@ -220,7 +221,7 @@ function Events() {
           {/* Past Events Section */}
           {past.length > 0 && (
             <section>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-gray-900 text-center">Past Events</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-primary-900 text-center">Past Events</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {past.map(ev => (
                   <div key={ev.event_id} className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden opacity-75">
@@ -230,7 +231,7 @@ function Events() {
                           src={ev.image_url} 
                           alt={ev.title} 
                           className="w-full h-full object-cover"
-                          onError={e => { e.target.onerror = null; e.target.src = '/vite.svg'; }}
+                          onError={e => { e.target.onerror = null; e.target.src = '/cpnBanner.png'; }}
                         />
                       </div>
                     ) : (
@@ -249,7 +250,7 @@ function Events() {
                           {ev.event_type === 'virtual' ? 'Virtual' : 'Physical'}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">{ev.title}</h3>
+                      <h3 className="text-xl font-bold text-primary-900 mb-3">{ev.title}</h3>
                       <div className="space-y-2 mb-4 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <FontAwesomeIcon icon={faClock} className="text-gray-500" />
@@ -271,6 +272,7 @@ function Events() {
           )}
         </div>
       </div>
+      <JoinCommunityBanner/>
     </div>
   );
 }
