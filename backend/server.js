@@ -6,7 +6,6 @@ const http = require('http');
 const WebSocket = require('ws');
 const connectDB = require('./config/mongodb');
 const Admin = require('./models/Admin');
-const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -32,18 +31,6 @@ app.use(cors({
 }));
 
 
-// Rate limiting configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 600, // Limit each IP to 600 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => req.headers['upgrade'] === 'websocket',
-});
-
-// Apply rate limiting globally
-// app.use(limiter);
 
 
 

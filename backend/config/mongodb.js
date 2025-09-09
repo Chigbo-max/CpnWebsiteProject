@@ -2,9 +2,18 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const uri = process.env.NODE_ENV === 'production' 
-      ? process.env.MONGODB_URI_PROD 
-      : process.env.MONGODB_URI_DEV;
+    let uri;
+
+    if (process.env.NODE_ENV === 'production') {
+      // Production → use production Atlas
+      uri = process.env.MONGODB_URI_PROD;
+    } else if (process.env.NODE_ENV === 'development' && process.env.RENDER) {
+      // Dev on Render → use Atlas dev cluster
+      uri = process.env.MONGODB_URI_DEV_ATLAS;
+    } else {
+      // Local dev → use Compass/localhost
+      uri = process.env.MONGODB_URI_DEV;
+    }
 
     if (!uri) {
       throw new Error("MongoDB URI not set in environment variables");
@@ -14,9 +23,9 @@ const connectDB = async () => {
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('MongoDB connection error:', error);
-    if (process.env.NODE_ENV != 'test'){
-    process.exit(1);
+    console.error("MongoDB connection error:", error);
+    if (process.env.NODE_ENV !== "test") {
+      process.exit(1);
     }
   }
 };
