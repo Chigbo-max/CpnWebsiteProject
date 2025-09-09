@@ -227,7 +227,7 @@ function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
                 <Users className="w-8 h-8 text-accent-600" />
               </div>
@@ -243,7 +243,7 @@ function Home() {
               </Link>
             </div>
             
-            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
                 <FontAwesomeIcon icon={faBookOpen} className="text-2xl text-accent-600" />
               </div>
@@ -251,12 +251,12 @@ function Home() {
               <p className="text-gray-300 mb-6 leading-relaxed">
                 Join our Wednesday 5AM prayer sessions via WhatsApp. Start your day with spiritual strength and community support.
               </p>
-              <span className="inline-flex items-center gap-2 text-gray-500 font-semibold">
+              <span className="inline-flex items-center gap-2 text-primary-100 font-semibold">
                 Every Wednesday 5AM
               </span>
             </div>
             
-            <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
                 <Calendar className="w-8 h-8 text-accent-600" />
               </div>
@@ -276,7 +276,7 @@ function Home() {
       </div>
 
       {/* Resources Section - Full Width */}
-      <section className="w-full bg-primary-900">
+      <section className="w-full bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">Resources</h2>
@@ -308,7 +308,7 @@ function Home() {
               </div>
             </div>
             
-            <div className="bg-gray-800 rounded-2xl p-8 text-white border border-gray-700">
+            <div className="rounded-2xl p-8 text-white border border-gray-700">
               <h4 className="text-2xl font-bold mb-6 text-white">Available Resources</h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">

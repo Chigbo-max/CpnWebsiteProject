@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import SoundWave from "../../assets/soundWave.png";
 import bgImage from "../../assets/listen.jpeg";
 import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 async function setupDatabase() {
-  const uri = process.env.MONGODB_URI;
+    const uri = process.env.NODE_ENV === 'production' 
+      ? process.env.MONGODB_URI_PROD 
+      : process.env.MONGODB_URI_DEV;
+
 
   if (!uri) {
     console.error("MONGODB_URI is not set in environment variables");

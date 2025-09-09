@@ -77,7 +77,7 @@ const PodcastEpisodes = () => {
           {filteredEpisodes.slice(startIndex, endIndex).map((episode) => (
             <div
               key={episode.id}
-              className={`rounded-2xl shadow-xl text-white p-0 flex flex-col gap-0 border-0 bg-gradient-to-br from-primary-800 to-primary-900 hover:scale-[1.025] hover:shadow-2xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-amber-400' : ''}`}
+              className={`rounded-2xl shadow-xl text-white p-0 flex flex-col gap-0 border-0 bg-gradient-to-br from-primary-800 to-primary-900 hover:scale-[1.025] hover:shadow-2xl transition-all duration-300 ${playingId === episode.id ? 'ring-4 ring-accent-400' : ''}`}
               style={{ minHeight: '370px', position: 'relative' }}
             >
               {episode.images?.length > 0 && (
@@ -99,7 +99,7 @@ const PodcastEpisodes = () => {
                   {episode.audio_preview_url ? (
                     <button 
                       onClick={() => handlePlayPause(episode.id)}
-                      className={`modernAmberBtn flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-white shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'ring-2 ring-amber-400' : ''}`}
+                      className={`modernaccentBtn flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-white shadow-md transition-all duration-300 text-sm ${playingId === episode.id ? 'ring-2 ring-accent-500' : ''}`}
                     >
                       <FontAwesomeIcon 
                         icon={playingId === episode.id ? faPause : faPlay} 
@@ -139,7 +139,7 @@ const PodcastEpisodes = () => {
         <button 
           onClick={() => handlePageChange(currentPage - 1)} 
           disabled={currentPage === 1}
-          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
+          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-accent-600 transition-colors disabled:opacity-50"
         >
           Previous
         </button>
@@ -147,7 +147,7 @@ const PodcastEpisodes = () => {
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-2 rounded-md font-semibold border-2 ${currentPage === index + 1 ? 'bg-amber-400 text-gray-900 border-amber-400' : 'bg-white text-gray-900 border-gray-300 hover:bg-amber-100'} transition-colors`}
+            className={`px-3 py-2 rounded-md font-semibold border-2 ${currentPage === index + 1 ? 'bg-accent-400 text-gray-900 border-accent-400' : 'bg-white text-gray-900 border-gray-300 hover:bg-accent-100'} transition-colors`}
           >
             {index + 1}
           </button>
@@ -155,7 +155,7 @@ const PodcastEpisodes = () => {
         <button 
           onClick={() => handlePageChange(currentPage + 1)} 
           disabled={currentPage === totalPages}
-          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
+          className="px-3 py-2 rounded-md bg-gray-900 text-white font-semibold hover:bg-accent-600 transition-colors disabled:opacity-50"
         >
           Next
         </button>
