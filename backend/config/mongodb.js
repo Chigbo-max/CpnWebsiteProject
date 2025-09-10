@@ -7,10 +7,7 @@ const connectDB = async () => {
     if (process.env.NODE_ENV === 'production') {
       // Production → use production Atlas
       uri = process.env.MONGODB_URI_PROD;
-    } else if (process.env.NODE_ENV === 'development' && process.env.RENDER) {
-      // Dev on Render → use Atlas dev cluster
-      uri = process.env.MONGODB_URI_DEV_ATLAS;
-    } else {
+    }  else {
       // Local dev → use Compass/localhost
       uri = process.env.MONGODB_URI_DEV;
     }
