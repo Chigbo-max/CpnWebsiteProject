@@ -12,7 +12,7 @@ beforeAll(async () => {
   // Increase timeout for CI cold starts
   jest.setTimeout(30000);
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI_DEV);
   }
 });
 
