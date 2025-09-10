@@ -8,19 +8,6 @@ process.env.SUPERADMIN_USERNAME = process.env.SUPERADMIN_USERNAME || 'Uju';
 process.env.SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'password';
 process.env.SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL || 'uju@example.com';
 
-// Mock the server startup to prevent actual HTTP server creation
-// Use the correct path relative to the setup file location
-jest.mock('../../server', () => {
-  return {
-    server: {
-      listen: jest.fn(),
-      close: jest.fn()
-    },
-    app: require('express')(),
-    broadcastDashboardUpdate: jest.fn()
-  };
-});
-
 beforeAll(async () => {
   // Increase timeout for CI cold starts
   jest.setTimeout(30000);
