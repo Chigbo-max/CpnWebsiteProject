@@ -34,59 +34,84 @@ const UserManagement = ({ token }) => {
     'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
   ];
 
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
+
   const fetchStats = useCallback(async () => {
     try {
-      const response = await fetch('/api/users/admin/users/stats', {
+      const response = await fetch(`${apiBaseUrl}/users/admin/users/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Stats fetch failed:', response.status, errorText);
+        return;
       }
+
+      const data = await response.json();
+      setStats(data);
     } catch (error) {
       console.error('Error fetching stats:', error);
+      // Don't show toast for stats - it's secondary data
     }
-  }, [token]);
+  }, [token, apiBaseUrl]);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${apiBaseUrl}/users/admin/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Users fetch failed:', response.status, errorText);
+        
+        if (response.status === 401) {
+          toast.error('Session expired. Please login again.');
+        } else if (response.status === 403) {
+          toast.error('Access denied. You need admin privileges.');
+        } else if (response.status === 404) {
+          toast.error('Users endpoint not found. Check server configuration.');
+        } else {
+          toast.error(`Failed to fetch users: ${response.status}`);
+        }
+        return;
+      }
+
+      const data = await response.json();
+      setUsers(data.users || []);
+      
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        toast.error('Network error. Check if server is running.');
+      } else {
+        toast.error('Error fetching users');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [token, apiBaseUrl]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('/api/users/admin/users', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data.users);
-        } else {
-          toast.error('Failed to fetch users');
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        toast.error('Error fetching users');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
     fetchStats();
-  }, [token, fetchStats]);
+  }, [fetchUsers, fetchStats]);
 
   const filterUsers = useCallback(() => {
     let filtered = users;
 
     if (searchTerm) {
       filtered = filtered.filter(user =>
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.whatsapp.includes(searchTerm)
+        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.whatsapp?.includes(searchTerm)
       );
     }
 
@@ -108,26 +133,29 @@ const UserManagement = ({ token }) => {
   const exportToPDF = async () => {
     setExporting(true);
     try {
-      const response = await fetch('/api/users/admin/users/export', {
+      const response = await fetch(`${apiBaseUrl}/users/admin/users/export`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `cpn-users-${new Date().toISOString().split('T')[0]}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        toast.success('Users exported successfully');
-      } else {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Export failed:', response.status, errorText);
         toast.error('Failed to export users');
+        return;
       }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cpn-users-${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Users exported successfully');
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Error exporting users');
@@ -150,7 +178,7 @@ const UserManagement = ({ token }) => {
         </div>
         <button
           onClick={exportToPDF}
-          disabled={exporting}
+          disabled={exporting || users.length === 0}
           className="inline-flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
         >
           {exporting ? (
@@ -322,7 +350,7 @@ const UserManagement = ({ token }) => {
                     <div className="text-sm text-gray-900">{user.nationality}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.state}</div>
+                    <div className="text-sm text-gray-900">{user.state || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
@@ -334,9 +362,14 @@ const UserManagement = ({ token }) => {
             </tbody>
           </table>
         </div>
-        {filteredUsers.length === 0 && (
+        {filteredUsers.length === 0 && users.length > 0 && (
           <div className="text-center py-8 text-gray-500">
             No users found matching your criteria.
+          </div>
+        )}
+        {users.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No users found.
           </div>
         )}
       </div>

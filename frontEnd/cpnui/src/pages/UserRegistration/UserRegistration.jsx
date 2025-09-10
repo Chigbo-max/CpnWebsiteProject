@@ -66,6 +66,8 @@ const UserRegistration = () => {
     { name: 'Finland', flag: '🇫🇮' },
     { name: 'Other', flag: '🌍' }
   ];
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -87,7 +89,7 @@ const UserRegistration = () => {
     if (!formData.whatsapp.trim()) {
       newErrors.whatsapp = 'WhatsApp number is required';
     } else if (!/^\+?[1-9]\d{0,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
-      newErrors.whatsapp = 'Please enter a valid WhatsApp number';
+      newErrors.whatsapp = 'Please enter a valid WhatsApp number("e.g., +234 801 234 5678")';
     }
 
     if (!formData.nationality) {
@@ -135,7 +137,7 @@ const UserRegistration = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/users/register', {
+      const response = await fetch(`${apiBaseUrl}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

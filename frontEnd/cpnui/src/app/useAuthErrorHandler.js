@@ -1,32 +1,35 @@
 import { useAdminAuth } from './useAdminAuth';
 import { toast } from 'sonner';
+import { useRef } from 'react';
 
 export const useAuthErrorHandler = () => {
   const { logout } = useAdminAuth();
+  const hasLoggedOutRef = useRef(false); // prevent multiple logouts
+
+  const triggerLogout = () => {
+    if (hasLoggedOutRef.current) return; // already logged out, skip
+    hasLoggedOutRef.current = true;
+    console.error('Token expired - logging out automatically');
+    logout();
+    toast.error('Session expired. Please log in again.');
+  };
 
   const handleAuthError = (response) => {
     if (response.status === 401) {
-      console.error('Token expired - logging out automatically');
-      logout();
-      toast.error('Session expired. Please log in again.');
-      return true; // Indicates authentication error was handled
+      triggerLogout();
+      return true;
     }
-    return false; // No authentication error
+    return false;
   };
 
   const handleMultipleResponses = (responses) => {
-    // Check if any response is unauthorized (401) - token expired
     const unauthorizedResponse = responses.find(res => res.status === 401);
-    
     if (unauthorizedResponse) {
-      console.error('Token expired - logging out automatically');
-      logout();
-      toast.error('Session expired. Please log in again.');
-      return true; // Indicates authentication error was handled
+      triggerLogout();
+      return true;
     }
-    
-    return false; // No authentication error
+    return false;
   };
 
   return { handleAuthError, handleMultipleResponses };
-}; 
+};

@@ -35,20 +35,15 @@ function AdminDashboard() {
   const [enrolleeMonthlyCounts, setEnrolleeMonthlyCounts] = useState([]);
 
   const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
-  const wsUrl =
-    import.meta.env.VITE_WS_URL ||
-    `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
 
-  // refs for websocket + reconnect timer
+  // --- WebSocket refs ---
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
 
   // Redirect if no token
   useEffect(() => {
-    if (!token) {
-      navigate('/admin/login');
-    }
+    if (!token) navigate('/admin/login');
   }, [token, navigate]);
 
   const fetchDashboardData = useCallback(async () => {
@@ -61,18 +56,12 @@ function AdminDashboard() {
         {
           url: `${apiBaseUrl}/subscribers/monthly-counts`,
           key: 'monthlyCounts',
-          process: (data) => (data.data || []).map((m) => ({
-            month: `${m.year}-${String(m.month).padStart(2, '0')}`,
-            subscribers: Number(m.count),
-          })),
+          process: (data) => (data.data || []).map((m) => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, subscribers: Number(m.count) })),
         },
         {
           url: `${apiBaseUrl}/enrollments/monthly-counts?months=60`,
           key: 'enrolleeMonthlyCounts',
-          process: (data) => (data.data || []).map((m) => ({
-            month: `${m.year}-${String(m.month).padStart(2, '0')}`,
-            enrollees: Number(m.count),
-          })),
+          process: (data) => (data.data || []).map((m) => ({ month: `${m.year}-${String(m.month).padStart(2, '0')}`, enrollees: Number(m.count) })),
         },
       ];
 
@@ -121,59 +110,119 @@ function AdminDashboard() {
     }
   }, [apiBaseUrl, token, handleMultipleResponses]);
 
-  // --- WEBSOCKET with exponential backoff ---
+  // --- WebSocket with robust reconnection logic ---
   useEffect(() => {
-    if (activeSection !== 'dashboard' || !token) return;
-
-    function connectWebSocket() {
-      const ws = new window.WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        console.log("websocket connected");
-        reconnectAttemptsRef.current = 0; // reset attempts
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === 'dashboard-update') {
-            fetchDashboardData();
-          }
-        } catch (err) {
-          console.error('WebSocket message error:', err);
-        }
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
-
-        // exponential backoff: 2^attempts * 1000ms (capped at 30s)
-        const delay = Math.min(30000, Math.pow(2, reconnectAttemptsRef.current) * 1000);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          reconnectAttemptsRef.current += 1;
-          console.log(`Reconnecting WebSocket (attempt ${reconnectAttemptsRef.current}) in ${delay / 1000}s...`);
-          connectWebSocket();
-        }, delay);
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
+    if (activeSection !== 'dashboard') {
+      // Clean up WebSocket when not on dashboard
+      if (wsRef.current) {
+        wsRef.current.onclose = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      return;
+    }
+    
+    if (!token) {
+      if (wsRef.current) {
+        wsRef.current.onclose = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      return;
     }
 
-    fetchDashboardData();
+    let isUnmounting = false;
+    const maxReconnectAttempts = 10;
+
+    async function initialFetch() {
+      await fetchDashboardData();
+    }
+
+    function connectWebSocket() {
+      if (isUnmounting) return;
+      
+      // Clean up existing connection
+      if (wsRef.current) {
+        wsRef.current.onclose = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+
+      // Determine WebSocket URL based on environment
+      let wsUrl;
+      if (window.location.hostname === 'localhost') {
+        // Local development - connect to backend port (5000)
+        wsUrl = `ws://localhost:5000`;
+      } else {
+        // Production - use same protocol and host as current page
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        wsUrl = `${protocol}://${window.location.host}`;
+      }
+
+      console.log('Connecting to WebSocket:', wsUrl);
+      
+      try {
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+          console.log('✅ WebSocket connected successfully');
+          reconnectAttemptsRef.current = 0;
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'dashboard-update' && data.payload) {
+              setAnalytics((prev) => ({ ...prev, ...data.payload }));
+            }
+          } catch (err) {
+            console.error('WebSocket message parsing error:', err);
+          }
+        };
+
+        ws.onclose = (event) => {
+          console.log(`WebSocket closed: Code ${event.code}, Reason: ${event.reason}`);
+          wsRef.current = null;
+          
+          if (isUnmounting) return;
+          
+          // Exponential backoff with max delay of 30 seconds
+          const delay = Math.min(30000, Math.pow(2, reconnectAttemptsRef.current) * 1000);
+          console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1})`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+              reconnectAttemptsRef.current++;
+              connectWebSocket();
+            } else {
+              console.error('Max reconnection attempts reached');
+            }
+          }, delay);
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+      } catch (error) {
+        console.error('WebSocket creation error:', error);
+      }
+    }
+
+    initialFetch();
     connectWebSocket();
 
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
+      isUnmounting = true;
+      clearTimeout(reconnectTimeoutRef.current);
       if (wsRef.current) {
+        wsRef.current.onclose = null;
         wsRef.current.close();
+        wsRef.current = null;
       }
     };
-  }, [activeSection, token, wsUrl, fetchDashboardData]);
+  }, [activeSection, token, fetchDashboardData]);
 
   // forced redirect
   useEffect(() => {
@@ -199,18 +248,13 @@ function AdminDashboard() {
     );
   }
 
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogout = () => logout();
 
   const handleProfileUpdate = async (updatedData) => {
     try {
       const response = await fetch(`${apiBaseUrl}/admin/profile`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(updatedData),
       });
 
@@ -256,7 +300,6 @@ function AdminDashboard() {
         <div className="w-full h-full">
           {activeSection === 'dashboard' && (
             <div className="w-full min-h-[60vh] flex flex-col items-center justify-center">
-              {/* Summary Cards */}
               <h2 className="text-3xl font-bold mb-8 text-gray-900">Admin Analytics Dashboard</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mb-12">
                 <SummaryCard icon={<FaUserGraduate />} value={analytics.enrollees} label="Enrolled Students" />
@@ -265,7 +308,6 @@ function AdminDashboard() {
                 <SummaryCard icon={<FaFileAlt />} value={analytics.blogs} label="Blogs" />
               </div>
 
-              {/* Charts */}
               <ChartCard title="Overview Comparison (Bar Chart)">
                 <BarChart data={barData} indexBy="category" keys={['count']} />
               </ChartCard>
@@ -293,22 +335,12 @@ function AdminDashboard() {
               setShowChangePassword={setShowChangePassword}
             />
           )}
-          {activeSection === 'subscribers' && (
-            <Suspense fallback={<SimpleSpinner message="Loading Subscribers..." />}>
-              <Subscribers token={token} />
-            </Suspense>
-          )}
-          {activeSection === 'newsletter' && (
-            <Suspense fallback={<SimpleSpinner message="Loading Newsletter..." />}>
-              <Newsletter token={token} />
-            </Suspense>
-          )}
+          {activeSection === 'subscribers' && <Suspense fallback={<SimpleSpinner message="Loading Subscribers..." />}><Subscribers token={token} /></Suspense>}
+          {activeSection === 'newsletter' && <Suspense fallback={<SimpleSpinner message="Loading Newsletter..." />}><Newsletter token={token} /></Suspense>}
           {activeSection === 'blog-create' && <BlogCreate token={token} />}
           {activeSection === 'blog-list' && <BlogList token={token} />}
           {activeSection === 'inquiries' && <ContactInquiries token={token} />}
-          {activeSection === 'admin-management' && admin?.role === 'superadmin' && (
-            <AdminManagement token={token} currentAdmin={admin} />
-          )}
+          {activeSection === 'admin-management' && admin?.role === 'superadmin' && <AdminManagement token={token} currentAdmin={admin} />}
           {activeSection === 'events' && <AdminEvents />}
           {activeSection === 'create-event' && <EventCreate />}
           {activeSection === 'event-registrations' && <EventRegistrations />}
@@ -320,6 +352,7 @@ function AdminDashboard() {
   );
 }
 
+// --- Supporting Components ---
 function SummaryCard({ icon, value, label }) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
@@ -372,23 +405,12 @@ function BarChart({ data, indexBy, keys }) {
       }}
       enableLabel={false}
       tooltip={({ id, value, color }) => (
-        <div
-          style={{
-            color,
-            padding: 8,
-            background: '#fff',
-            borderRadius: 4,
-            boxShadow: '0 2px 8px #0001',
-          }}
-        >
+        <div style={{ color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
           <strong>{id}:</strong> {value}
         </div>
       )}
       theme={{
-        axis: {
-          ticks: { text: { fontSize: 12, fill: '#333' } },
-          legend: { text: { fontSize: 14, fill: '#222' } },
-        },
+        axis: { ticks: { text: { fontSize: 12, fill: '#333' } }, legend: { text: { fontSize: 14, fill: '#222' } } },
         grid: { line: { stroke: '#eee', strokeWidth: 1 } },
       }}
     />
@@ -421,15 +443,7 @@ function PieChart({ data }) {
       arcLabelsSkipAngle={10}
       arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
       tooltip={({ datum }) => (
-        <div
-          style={{
-            color: datum.color,
-            padding: 8,
-            background: '#fff',
-            borderRadius: 4,
-            boxShadow: '0 2px 8px #0001',
-          }}
-        >
+        <div style={{ color: datum.color, padding: 8, background: '#fff', borderRadius: 4, boxShadow: '0 2px 8px #0001' }}>
           <strong>{datum.label}:</strong> {datum.value}
         </div>
       )}
