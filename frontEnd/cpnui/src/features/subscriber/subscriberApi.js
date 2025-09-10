@@ -1,9 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const baseUrl = import.meta.env.VITE_BASE_API_URL || '';
+
 export const subscriberApi = createApi({
   reducerPath: 'subscriberApi',
   baseQuery: fetchBaseQuery({
-     baseUrl: import.meta.env.VITE_BASE_API_URL}),
+     baseUrl: baseUrl
+    }),
   tagTypes: ['Subscriber'],
   endpoints: (builder) => ({
     getSubscribers: builder.query({
