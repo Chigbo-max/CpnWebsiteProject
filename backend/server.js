@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -43,7 +45,7 @@ function initializeServer() {
   const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://cprofessionalsnetwork.onrender.com',
+    'https://cprofessionalsnetworkdev.onrender.com',
     'https://cpn-frontend-dev.onrender.com'
   ];
 

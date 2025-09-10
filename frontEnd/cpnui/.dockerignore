@@ -4,4 +4,6 @@ build
 .git
 .gitignore
 npm-debug.log
+.env
+.env*
 
