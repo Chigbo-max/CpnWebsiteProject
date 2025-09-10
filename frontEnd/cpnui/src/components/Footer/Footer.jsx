@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons'; // Use as Clubhouse icon substitute and for contact icons
+import { faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons'; 
 import FooterLogo from "../../assets/ChristianProfessionalsNetwork.png";
 import { Link } from "react-router-dom";
 import clubhouseIcon from "../../assets/clubhouse.svg";
@@ -39,7 +39,7 @@ const socialLinks = [
 
 function Footer() {
     return (
-        <footer className="bg-gray-900 text-white w-full">
+        <footer className="bg-primary-900 text-white w-full">
             {/* Main Footer Content */}
             <div className="w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
                 <div className="max-w-7xl mx-auto">
@@ -78,7 +78,7 @@ function Footer() {
 
                         {/* Quick Links */}
                         <div className="sm:col-span-1">
-                            <h3 className="text-base sm:text-lg font-bold text-amber-400 mb-4 sm:mb-6">Quick Links</h3>
+                            <h3 className="text-base sm:text-lg font-bold text-accent-400 mb-4 sm:mb-6">Quick Links</h3>
                             <ul className="space-y-2 sm:space-y-3">
                                 {quickLinks.concat([
                                     { title: "Terms of Service", path: "/terms" },
@@ -87,7 +87,7 @@ function Footer() {
                                     <li key={idx}>
                                         <Link 
                                             to={link.path}
-                                            className="text-gray-300 hover:text-amber-400 transition-colors duration-200 block py-1"
+                                            className="text-gray-300 hover:text-accent-500 transition-colors duration-200 block py-1"
                                         >
                                             {link.title}
                                         </Link>
@@ -98,13 +98,13 @@ function Footer() {
 
                         {/* Resources */}
                         <div className="sm:col-span-1">
-                            <h3 className="text-base sm:text-lg font-bold text-amber-400 mb-4 sm:mb-6">Resources</h3>
+                            <h3 className="text-base sm:text-lg font-bold text-accent-400 mb-4 sm:mb-6">Resources</h3>
                             <ul className="space-y-2 sm:space-y-3">
                                 {resources.map((resource, index) => (
                                     <li key={index}>
                                         <Link 
                                             to={resource.path}
-                                            className="text-gray-300 hover:text-amber-400 transition-colors duration-300 text-sm"
+                                            className="text-gray-300 hover:text-accent-500 transition-colors duration-300 text-sm"
                                         >
                                             {resource.title}
                                         </Link>
@@ -115,10 +115,10 @@ function Footer() {
 
                         {/* Contact Information */}
                         <div className="sm:col-span-2 lg:col-span-1">
-                            <h3 className="text-base sm:text-lg font-bold text-amber-400 mb-4 sm:mb-6">Contact Info</h3>
+                            <h3 className="text-base sm:text-lg font-bold text-accent-400 mb-4 sm:mb-6">Contact Info</h3>
                             <div className="space-y-3 sm:space-y-4">
                                 <div className="flex items-start space-x-3">
-                                    <FontAwesomeIcon icon={faPhone} className="text-amber-400 mt-1 text-sm" />
+                                    <FontAwesomeIcon icon={faPhone} className="text-accent-400 mt-1 text-sm" />
                                     <div>
                                         <p className="text-gray-300 text-sm font-medium">Phone</p>
                                         <p className="text-gray-400 text-sm">+234 703 328 8115</p>
@@ -126,7 +126,7 @@ function Footer() {
                                 </div>
                                 
                                 <div className="flex items-start space-x-3">
-                                    <FontAwesomeIcon icon={faEnvelope} className="text-amber-400 mt-1 text-sm" />
+                                    <FontAwesomeIcon icon={faEnvelope} className="text-accent-400 mt-1 text-sm" />
                                     <div>
                                         <p className="text-gray-300 text-sm font-medium">Email</p>
                                         <p className="text-gray-400 text-sm">cprofessionalsnetwork@gmail.com</p>
@@ -134,7 +134,7 @@ function Footer() {
                                 </div>
                                 
                                 <div className="flex items-start space-x-3">
-                                    <FontAwesomeIcon icon={faClock} className="text-amber-400 mt-1 text-sm" />
+                                    <FontAwesomeIcon icon={faClock} className="text-accent-400 mt-1 text-sm" />
                                     <div>
                                         <p className="text-gray-300 text-sm font-medium">Prayer Time</p>
                                         <p className="text-gray-400 text-sm">Wednesdays 5AM (WhatsApp)</p>
@@ -157,13 +157,13 @@ function Footer() {
                                 </p>
                             </div>
                             <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm">
-                                <Link to="/privacy" className="text-gray-400 hover:text-amber-400 transition-colors duration-300">
+                                <Link to="/privacy" className="text-gray-400 hover:text-accent-500 transition-colors duration-300">
                                     Privacy Policy
                                 </Link>
-                                <Link to="/terms" className="text-gray-400 hover:text-amber-400 transition-colors duration-300">
+                                <Link to="/terms" className="text-gray-400 hover:text-accent-500 transition-colors duration-300">
                                     Terms of Service
                                 </Link>
-                                <Link to="/contactUs" className="text-gray-400 hover:text-amber-400 transition-colors duration-300">
+                                <Link to="/contactUs" className="text-gray-400 hover:text-accent-500 transition-colors duration-300">
                                     Support
                                 </Link>
                             </div>

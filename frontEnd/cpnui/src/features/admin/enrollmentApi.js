@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const apiBaseUrl = import.meta.env.VITE_BASE_API_URL;
+const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
 
 // Custom baseQuery that handles authentication errors
 const baseQueryWithAuth = fetchBaseQuery({

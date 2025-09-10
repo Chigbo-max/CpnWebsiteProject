@@ -12,9 +12,4 @@ export const dropDownItems = [
         "cName": "drop_down_item"
     },
 
-    {
-        "title": "The Team",
-        "path": "/InsideCPN/team",
-        "cName": "drop_down_item"
-    }
 ]

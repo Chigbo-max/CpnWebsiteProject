@@ -19,6 +19,6 @@ export const fetchNewAccessToken = async () => {
     return response.data.access_token;
   } catch (error) {
     console.error('Error fetching token:', error);
-    throw new Error('Failed to get access token');
+    throw new Error('Poor Network Connection');
   }
 };

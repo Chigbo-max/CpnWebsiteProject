@@ -1,5 +1,6 @@
 # Christian Professionals Network (CPN) Platform
 
+
 A full-stack web application for the Christian Professionals Network, featuring a modern React frontend, Node.js/Express backend, PostgreSQL, Redis, JWT authentication, real-time updates, and Cloudinary image uploads.
 
 
@@ -27,6 +28,7 @@ A full-stack web application for the Christian Professionals Network, featuring 
 
 #Monorepo Structure
 
+
 CpnWebsiteProject/
   backend/         # Node.js/Express API, PostgreSQL, Redis, WebSocket, Cloudinary
   frontEnd/cpnui/  # React app, Tailwind, RTK Query, admin dashboard, public site
@@ -34,28 +36,30 @@ CpnWebsiteProject/
   README.md
 
 
-##Local Development
+
+Local Development
+Prerequisites
+Node.js 18+
+Docker & Docker Compose
 
 
-#Prerequisites
-- Node.js 18+
-- Docker & Docker Compose
+Environment Variables
 
-
-#Environment Variables
-- Copy .env.example to .env in both backend/ and frontEnd/cpnui/
-- Set your secrets (DB, JWT, Cloudinary, email, etc.)
+Copy .env.example to .env in both backend/ and frontEnd/cpnui/
+Set your secrets (DB, JWT, Cloudinary, email, etc.)
 
 
 Start with Docker Compose
 
-- Frontend: http://localhost
-- Backend API: http://localhost:5000
-- PostgreSQL: localhost:5433
-- Redis: localhost:6379
+docker-compose up --build
+
+Frontend: http://localhost
+Backend API: http://localhost:5000
+PostgreSQL: localhost:5433
+Redis: localhost:6379
 
 
-# Manual Start (for development)
+Manual Start (for development)
 
 # Backend
 cd backend
@@ -68,50 +72,53 @@ npm install
 npm run dev
 
 
-# Running Tests & Lint
-- Lint:
- cd frontEnd/cpnui
+Running Tests & Lint
+
+Lint:
+  cd frontEnd/cpnui
   npm run lint
 
-- Backend Tests:
- cd backend
+Backend Tests:
+  cd backend
   npm test
 
 
-# Deployment
-- CI/CD:
+Deployment
+
+CI/CD:
 GitHub Actions runs lint/tests and builds/pushes Docker images on main branch.
-- Production:
+Production:
 Set all environment variables in your deployment environment or Docker secrets.
 
 
-#Key Endpoints
+Key Endpoints
 
-- Auth: /api/auth/login, /api/auth/forgot-password, /api/auth/reset-password
-- Admin Profile: /api/admin/profile (PATCH), /api/admin/upload-image (POST), /api/admin/profile-picture (DELETE)
-- Blog: /api/admin/blog, /api/admin/blog/upload-image
-- Events: /api/events, /api/admin/events
-- Newsletter: /api/admin/newsletter
-- Enrollees: /api/enrollments/admin/enrollments, /api/enrollments/admin/enrollments/broadcast
-- Contact: /api/contact/submit
+Auth: /api/auth/login, /api/auth/forgot-password, /api/auth/reset-password
+Admin Profile: /api/admin/profile (PATCH), /api/admin/upload-image (POST), /api/admin/profile-picture (DELETE)
+Blog: /api/admin/blog, /api/admin/blog/upload-image
+Events: /api/events, /api/admin/events
+Newsletter: /api/admin/newsletter
+Enrollees: /api/enrollments/admin/enrollments, /api/enrollments/admin/enrollments/broadcast
+Contact: /api/contact/submit
 
 
-#Notable Features
+Notable Features
 
-- Profile Picture: Upload, update, and remove profile picture (reverts to initials avatar if removed)
-- WebSocket: Real-time dashboard updates for admins
-- Markdown Editor: Custom commands, image upload, table/underline commands removed for stability
-- Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
-- Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
+Profile Picture: Upload, update, and remove profile picture (reverts to initials avatar if removed)
+WebSocket: Real-time dashboard updates for admins
+Markdown Editor: Custom commands, image upload, table/underline commands removed for stability
+Error Handling: Defensive coding, toast notifications, auto-logout on token expiration
+Responsive Design: Sidebar, navbar, and dashboard are mobile-friendly and accessible
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+Contributing
 
-## License
+1. Fork the repo
+2. Create your feature branch (git checkout -b feature/YourFeature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin feature/YourFeature)
+5. Open a pull request
 
-This project is licensed under the MIT License. 
+
+License
+MIT

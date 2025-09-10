@@ -41,10 +41,10 @@ const NewsLetter = () => {
     <div className={`relative p-6 sm:p-8 md:p-10 rounded-xl shadow-lg transition-all duration-300 ease-in-out ${
       theme === "dark" 
         ? "bg-gray-800 text-white" 
-        : "bg-white text-gray-900 border border-gray-200"
+        : "bg-white text-primary-900 border border-gray-200"
     }`}>
       <h3 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-4 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
+        theme === "dark" ? "text-white" : "text-primary-900"
       }`}>
         Subscribe to receive future updates
       </h3>
@@ -81,7 +81,7 @@ const NewsLetter = () => {
           placeholder="Enter your name" 
           value={formData.name}
           onChange={handleInputChange}
-          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 transition-all duration-300 ${
+          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 transition-all duration-300 ${
             theme === "dark" 
               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" 
               : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
@@ -94,7 +94,7 @@ const NewsLetter = () => {
           value={formData.email}
           onChange={handleInputChange}
           required
-          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 transition-all duration-300 ${
+          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 transition-all duration-300 ${
             theme === "dark" 
               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" 
               : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500"
@@ -103,10 +103,10 @@ const NewsLetter = () => {
         <button 
           type="submit"
           disabled={isLoading}
-          className={`w-full px-6 py-3 rounded-lg font-bold cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`w-full px-6 py-3 rounded-lg font-bold cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed ${
             theme === "dark" 
-              ? "bg-amber-600 hover:bg-amber-700 text-white" 
-              : "bg-gray-900 hover:bg-amber-600 text-white"
+              ? "bg-accent-600 hover:bg-accent-700 text-white" 
+              : "bg-gray-900 hover:bg-accent-600 text-white"
           }`}
         >
           {isLoading ? 'Subscribing...' : 'Subscribe'}
@@ -119,10 +119,10 @@ const NewsLetter = () => {
       </form>
       <button 
         onClick={() => setTheme(theme === "light" ? "dark" : "light")} 
-        className={`mt-6 px-6 py-3 rounded-lg font-medium cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 mx-auto block ${
+        className={`mt-6 px-6 py-3 rounded-lg font-medium cursor-pointer transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 mx-auto block ${
           theme === "dark" 
-            ? "bg-amber-600 hover:bg-amber-700 text-white" 
-            : "bg-gray-900 hover:bg-amber-600 text-white"
+            ? "bg-accent-600 hover:bg-accent-700 text-white" 
+            : "bg-gray-900 hover:bg-accent-600 text-white"
         }`}
       >
         Switch to {theme === "dark" ? "Light" : "Dark"} Mode

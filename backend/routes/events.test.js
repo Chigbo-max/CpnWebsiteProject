@@ -1,8 +1,7 @@
 const request = require('supertest');
-const express = require('express');
-const eventsRoutes = require('./events');
+const server = require('../server');
+const app = server.app;
 
-jest.mock('../config/database', () => ({}));
 jest.mock('../config/redisClient', () => ({
   get: jest.fn().mockResolvedValue(null),
   setEx: jest.fn().mockResolvedValue(undefined),
@@ -40,9 +39,7 @@ jest.mock('../middleware/auth', () => ({
   }
 }));
 
-const app = express();
-app.use(express.json());
-app.use('/api/events', eventsRoutes);
+// app from server already mounts /api/events
 
 describe('Events API', () => {
   it('GET /api/events should return { events: [...] }', async () => {

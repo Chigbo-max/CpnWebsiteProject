@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const { EventServiceImpl } = require('../services/EventService');
 const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
@@ -9,33 +8,55 @@ const redisClient = require('../config/redisClient');
 const multer = require('multer');
 const upload = multer();
 
-console.log('Loaded events routes');
 
-const eventService = new EventServiceImpl(db);
+const eventService = new EventServiceImpl();
 const cloudinaryService = new CloudinaryServiceImpl();
 
 // GET /api/events
 router.get('/', async (req, res) => {
-  const cacheKey = 'events:list';
-  const cached = await redisClient.get(cacheKey);
-  if (cached) {
-    const parsed = JSON.parse(cached);
-    return res.json(Array.isArray(parsed) ? { events: parsed } : parsed);
+  try {
+    const cacheKey = 'events:list';
+
+    let cached = null;
+
+    if(redisClient){ 
+      cached = await redisClient.get(cacheKey);
+    }
+    
+  
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      return res.json(Array.isArray(parsed) ? { events: parsed } : parsed);
+    }
+    const events = await eventService.getEvents();
+    console.log("Fetched events:", events);
+    
+    if(redisClient){
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
+    }
+    res.json({ events });
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ message: 'Failed to fetch events', error: error.message });
   }
-  const events = await eventService.getEvents();
-  await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
-  res.json({ events });
 });
 
 // GET /api/events/:event_id
 router.get('/:event_id', async (req, res) => {
-  const cacheKey = `events:${req.params.event_id}`;
-  const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
-  const event = await eventService.getEventById(req.params.event_id);
-  if (!event) return res.status(404).json({ message: 'Event not found' });
-  await redisClient.setEx(cacheKey, 300, JSON.stringify(event));
-  res.json(event);
+  try {
+    const cacheKey = `events:${req.params.event_id}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    const event = await eventService.getEventById(req.params.event_id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(event));
+    res.json(event);
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    res.status(500).json({ message: 'Failed to fetch event', error: error.message });
+  }
 });
 
 // PUT /api/events/:event_id (admin only)
@@ -149,24 +170,37 @@ router.post('/:event_id/register', async (req, res) => {
 
 // GET /api/events/:event_id/registrations (admin only)
 router.get('/:event_id/registrations', authenticateAdmin, async (req, res) => {
-  const cacheKey = `event_registrations:${req.params.event_id}`;
-  const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
-  const regs = await eventService.getRegistrationsForEvent(req.params.event_id);
-  await redisClient.setEx(cacheKey, 300, JSON.stringify(regs));
-  res.json(regs);
+  try {
+    const cacheKey = `event_registrations:${req.params.event_id}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    const regs = await eventService.getRegistrationsForEvent(req.params.event_id);
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(regs));
+    res.json(regs);
+  } catch (error) {
+    console.error('Error fetching registrations:', error);
+    res.status(500).json({ message: 'Failed to fetch registrations', error: error.message });
+  }
 });
 
 // GET /api/events/:event_id/registrations/csv (admin only)
 router.get('/:event_id/registrations/csv', authenticateAdmin, async (req, res) => {
-  const cacheKey = `event_registrations_csv:${req.params.event_id}`;
-  const cached = await redisClient.get(cacheKey);
-  if (cached) return res.json(JSON.parse(cached));
-  const csvData = await eventService.getRegistrationsCSV(req.params.event_id);
-  await redisClient.setEx(cacheKey, 300, JSON.stringify(csvData));
-  res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', `attachment; filename=registrations_${req.params.event_id}.csv`);
-  res.send(csvData);
+  try {
+    const cacheKey = `event_registrations_csv:${req.params.event_id}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    const csvData = await eventService.getRegistrationsCSV(req.params.event_id);
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(csvData));
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=registrations_${req.params.event_id}.csv`);
+    res.send(csvData);
+  } catch (error) {
+    console.error('Error generating CSV:', error);
+    res.status(500).json({ message: 'Failed to fetch CSV', error: error.message });
+  }
 });
 
 module.exports = router;

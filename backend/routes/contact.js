@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const { ContactServiceImpl } = require('../services/ContactService');
-const contactService = new ContactServiceImpl(db);
+const contactService = new ContactServiceImpl();
 
 // Submit contact form
 router.post('/submit', async (req, res) => {

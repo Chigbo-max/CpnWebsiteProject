@@ -72,7 +72,7 @@ function NavBar() {
 
     return (
         <nav className="w-full">
-            <div className="flex justify-center items-center gap-8 lg:gap-16 xl:gap-24 w-full h-20 lg:h-24 fixed top-0 left-0 z-50 bg-gray-900 px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center gap-8 lg:gap-16 xl:gap-24 w-full h-20 lg:h-24 fixed top-0 left-0 z-50 bg-primary-900 px-4 sm:px-6 lg:px-8">
                 <div className="flex-shrink-0">
                     <Link to="/" className="block">
                         <img src={Logo} alt="CPN Logo" className="w-32 sm:w-40 md:w-48 lg:w-52 h-auto" />
@@ -143,7 +143,7 @@ function NavBar() {
                                 <li key={index} className="relative">
                                     <Link 
                                         to={item.path}
-                                        className="text-white text-sm lg:text-base font-medium px-2 py-1 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
+                                        className="text-white text-sm lg:text-base font-medium px-2 py-1 rounded transition-all duration-300 hover:bg-primary-800 hover:text-amber-100"
                                     >
                                         {item.title}
                                     </Link>
@@ -155,7 +155,7 @@ function NavBar() {
                 
                 <div className="hidden lg:block">
                     <button
-                        className="h-8 w-20 lg:h-10 lg:w-24 text-sm lg:text-base font-bold text-gray-900 bg-white rounded-full transition-all duration-300 hover:bg-gray-900 hover:text-white hover:border-2 hover:border-white focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+                        className="h-8 w-20 lg:h-10 lg:w-24 text-sm lg:text-base font-bold text-primary-900 bg-white rounded-full transition-all duration-300 hover:bg-primary-900 hover:text-white hover:border-2 hover:border-white focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
                         onClick={() => setShowFollowModal(true)}
                         aria-label="Follow us on social media"
                     >
@@ -172,14 +172,14 @@ function NavBar() {
             {/* Mobile Menu Overlay */}
             {openLink && (
                 <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" onClick={toggleBar}>
-                    <div className="absolute top-20 left-0 w-full bg-gray-900 border-2 border-white rounded-b-xl shadow-2xl p-4" onClick={(e) => e.stopPropagation()} ref={mobileMenuRef}>
+                    <div className="absolute top-20 left-0 w-full bg-primary-900 border-2 border-white rounded-b-xl shadow-2xl p-4" onClick={(e) => e.stopPropagation()} ref={mobileMenuRef}>
                         <ul className="flex flex-col gap-4">
                             {navBarItems.map((item, index) => (
                                 <li key={index}>
                                     {item.title === 'Courses' ? (
                                         <>
                                             <button
-                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100 focus:outline-none"
+                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-primary-800 hover:text-amber-100 focus:outline-none"
                                                 onClick={() => {
                                                     setMobileCoursesDropdown((open) => !open);
                                                     setMobileResourcesDropdown(false);
@@ -198,7 +198,7 @@ function NavBar() {
                                     ) : item.title === 'Resources' ? (
                                         <>
                                             <button
-                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100 focus:outline-none"
+                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-primary-800 hover:text-amber-100 focus:outline-none"
                                                 onClick={() => {
                                                     setMobileResourcesDropdown((open) => !open);
                                                     setMobileCoursesDropdown(false);
@@ -217,7 +217,7 @@ function NavBar() {
                                     ) : item.title === 'Inside CPN' ? (
                                         <>
                                             <button
-                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100 focus:outline-none"
+                                                className="block w-full text-left text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-primary-800 hover:text-amber-100 focus:outline-none"
                                                 onClick={() => {
                                                     setMobileInsideCPNDropdown((open) => !open);
                                                     setMobileCoursesDropdown(false);
@@ -236,7 +236,7 @@ function NavBar() {
                                     ) : (
                                         <Link 
                                             to={item.path}
-                                            className="block text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-gray-800 hover:text-amber-100"
+                                            className="block text-white text-base font-medium px-4 py-2 rounded transition-all duration-300 hover:bg-primary-800 hover:text-amber-100"
                                             onClick={toggleBar}
                                         >
                                             {item.title}
@@ -252,9 +252,9 @@ function NavBar() {
             {/* Follow Us Modal */}
             {showFollowModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-blue-950 bg-opacity-80 backdrop-blur-sm transition-all duration-300">
-                    <div className="relative bg-gray-900 bg-opacity-90 rounded-2xl shadow-2xl p-8 flex flex-col items-center max-w-xs w-full mx-4 animate-fadeIn">
+                    <div className="relative bg-primary-900 bg-opacity-90 rounded-2xl shadow-2xl p-8 flex flex-col items-center max-w-xs w-full mx-4 animate-fadeIn">
                         <button
-                            className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl focus:outline-none"
+                            className="absolute top-3 right-3 text-primary-400 hover:text-white text-2xl focus:outline-none"
                             onClick={() => setShowFollowModal(false)}
                             aria-label="Close social modal"
                         >
@@ -271,7 +271,7 @@ function NavBar() {
                                     className="flex flex-col items-center group"
                                     aria-label={social.label}
                                 >
-                                    <span className="bg-gray-800 group-hover:bg-amber-600 text-white p-4 rounded-full transition-all duration-300 shadow-lg mb-2">
+                                    <span className="bg-primary-800 group-hover:bg-amber-600 text-white p-4 rounded-full transition-all duration-300 shadow-lg mb-2">
                                         {social.isSvg ? (
                                             <img src={social.icon} alt={social.label} className="w-6 h-6" />
                                         ) : (

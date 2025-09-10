@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { useSubmitContactMutation } from '../../features/contact/contactApi';
+import JoinCommunityBanner from '../../components/JoinCommunityBanner';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -54,7 +55,7 @@ const Contact = () => {
             transition={{ duration: 1, ease: "easeOut" }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-8 drop-shadow-lg leading-tight mx-auto"
           >
-            <span className="text-amber-400">Contact</span> Us
+            <span className="text-accent-500">Contact</span> Us
           </motion.h1>
           <motion.p
             initial={{ x: "100vw", opacity: 0 }}
@@ -102,7 +103,7 @@ const Contact = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         required
-                        className="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                        className="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400" 
                       />
                     </div>
                     <div className="flex-1 flex flex-col">
@@ -115,7 +116,7 @@ const Contact = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                        className="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400" 
                       />
                     </div>
                   </div>
@@ -129,13 +130,13 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400 resize-none"
                     ></textarea>
                   </div>
                   <button 
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full bg-gray-900 text-white font-bold py-3 px-6 rounded-lg border-2 border-gray-900 transition-all duration-300 hover:bg-amber-600 hover:text-gray-900 hover:border-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gray-900 text-white font-bold py-3 px-6 rounded-lg border-2 border-gray-900 transition-all duration-300 hover:bg-accent-600 hover:text-gray-900 hover:border-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? 'Sending...' : 'Submit Ticket'}
                   </button>
@@ -156,6 +157,7 @@ const Contact = () => {
           </section>
         </div>
       </div>
+      <JoinCommunityBanner/>
     </div>
   );
 };

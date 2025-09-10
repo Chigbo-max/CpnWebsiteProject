@@ -1,73 +1,30 @@
-const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-async function setupDatabase() {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-  });
-
+const connectDB = async () => {
   try {
-    //setting up database
-    const schemaPath = path.join(__dirname, 'config', 'schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
-    
-    // Split into individual commands
-    const commands = schema.split(';').filter(cmd => cmd.trim().length > 0);
-    
-    for (const cmd of commands) {
-      await pool.query(cmd);
+    let uri;
+
+    if (process.env.NODE_ENV === 'production') {
+      // Production → use production Atlas
+      uri = process.env.MONGODB_URI_PROD;
+    } else {
+      // Local dev → use Compass/localhost
+      uri = process.env.MONGODB_URI_DEV;
     }
-    
+
+    if (!uri) {
+      throw new Error("MongoDB URI not set in environment variables");
+    }
+
+    const conn = await mongoose.connect(uri);
+
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('Database setup failed:', error);
-    process.exit(1);
-  } finally {
-    await pool.end();
+    console.error("MongoDB connection error:", error);
+    if (process.env.NODE_ENV !== "test") {
+      process.exit(1);
+    }
   }
-}
+};
 
-module.exports = setupDatabase;
-
-
-
-// const { Pool } = require('pg');
-// const fs = require('fs');
-// const path = require('path');
-
-// // Database configuration
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-//   user: process.env.DB_USER,
-//   host: process.env.DB_HOST,
-//   database: process.env.DB_NAME,
-//   password: process.env.DB_PASSWORD,
-//   port: process.env.DB_PORT,
-// });
-
-// async function setupDatabase() {
-//   try {
-//     console.log('Setting up database...');
-    
-//     // Read schema file
-//     const schemaPath = path.join(__dirname, 'config', 'schema.sql');
-//     const schema = fs.readFileSync(schemaPath, 'utf8');
-    
-//     // Execute schema
-//     await pool.query(schema);
-    
-    
-//   } catch (error) {
-//     console.error('Database setup failed:', error);
-//   } finally {
-//     await pool.end();
-//   }
-// }
-
-// setupDatabase(); 
-
-
-
-
-
+module.exports = connectDB;

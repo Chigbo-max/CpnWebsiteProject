@@ -12,7 +12,7 @@ function Listen() {
   return (
     <div className="w-full">
       <section className="relative w-full min-h-screen flex items-start justify-center text-center overflow-hidden pt-20 sm:pt-24 md:pt-32">
-        <div className="absolute inset-0 w-full h-full bg-gray-900" />
+        <div className="absolute inset-0 w-full h-full bg-primary-900" />
         <div className="relative z-20 flex flex-col justify-start items-center w-full px-6 py-20 mx-auto">
           <motion.h1
             initial={{ x: "-100vw", opacity: 0 }}
@@ -20,7 +20,7 @@ function Listen() {
             transition={{ duration: 1, ease: "easeOut" }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-8 drop-shadow-lg leading-tight mx-auto"
           >
-            Subscribe to <span className="text-amber-400">Christian Professionals Network</span>
+            Subscribe to <span className="text-accent-500">Christian Professionals Network</span>
           </motion.h1>
           <motion.h3 
             initial={{ x: "-100vw", opacity: 0 }}
@@ -44,7 +44,7 @@ function Listen() {
           >
             <a
               href={cpnPodcastLink}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-accent-500 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-accent-600 hover:scale-105 transition-all duration-300 border-2 border-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"
             >
               <FontAwesomeIcon icon={faSpotify} className="text-2xl" /> 
               <span>Listen on Spotify</span>
@@ -59,7 +59,7 @@ function Listen() {
           {/* Content Header */}
           <section className="mb-24">
             <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">What to <span className="text-amber-400">Listen to</span></h2>
+              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">What to <span className="text-accent-500">Listen to</span></h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Be inspired by discussions with business leaders who have embraced their marketplace calling and continue to seek ways to steward what God has given them.
               </p>

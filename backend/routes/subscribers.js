@@ -1,21 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
-const subscriberService = new SubscriberServiceImpl(db);
+const subscriberService = new SubscriberServiceImpl();
 const { authenticateAdmin } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
   const cacheKey = 'subscribers:list';
-  const cached = await redisClient.get(cacheKey);
+
+  let cached = null;
+
+  if(redisClient){
+  cached = await redisClient.get(cacheKey);
+  }
+
   if (cached) {
     const parsed = JSON.parse(cached);
     return res.json(Array.isArray(parsed) ? { subscribers: parsed } : parsed);
   }
   try {
     const result = await subscriberService.getAll();
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+    }
     res.json({ subscribers: result });
   } catch (error) {
     console.error('Error fetching subscribers:', error);

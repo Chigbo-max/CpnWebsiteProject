@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion, AnimatePresence } from 'framer-motion';
-import { faUsers, faBookOpen, faCalendarAlt, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { Users, Calendar, ChevronLeft, ChevronRight} from 'lucide-react';
+import { faBookOpen} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@fortawesome/free-brands-svg-icons";
 import Cpn1 from "../../assets/cpnevent1.jpg";
 import Cpn2 from "../../assets/cpnevent2.jpg";
@@ -11,12 +12,12 @@ import Bookshelf from "../../assets/bookshelf.jpeg";
 
 import Features from "../../components/HomeAbout/Features";
 import LatestRelease from "../../components/LatestRelease/LatestRelease";
+import JoinCommunityBanner from "../../components/JoinCommunityBanner";
 import Courses from "../../components/Courses/Courses";
 import FreeContent from "../../components/FreeContent/FreeContent";
 import { useGetEventsQuery } from '../../features/event/eventApi';
 
 const podcastSource = import.meta.env.VITE_PODCAST_SOURCE;
-const whatsappLink = import.meta.env.VITE_WHATSAPP_LINK;
 
 const slides = [
   {
@@ -43,8 +44,8 @@ const slides = [
     subtitle: "Connect & Grow Together",
     text: "Connect with like-minded professionals who share your values and commitment to Kingdom excellence in the workplace.",
     buttonText: "Join Community",
-    buttonLink: whatsappLink,
-    buttonType: "external"
+    buttonLink: "/register",
+    buttonType: "link"
   },
   {
     image: Bookshelf, 
@@ -123,7 +124,7 @@ function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.8 }}
-            className="text-amber-400 text-lg sm:text-xl md:text-2xl font-semibold mb-4 tracking-wide"
+            className="text-accent-400 text-lg sm:text-xl md:text-2xl font-semibold mb-4 tracking-wide"
           >
             {slides[currentIndex].subtitle}
           </motion.div>
@@ -163,7 +164,7 @@ function Home() {
             {slides[currentIndex].buttonType === "link" && (
               <Link
                 to={slides[currentIndex].buttonLink}
-                className="inline-block px-10 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+                className="inline-block px-10 py-4 bg-accent-500 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-accent-600 hover:scale-105 transition-all duration-300 border-2 border-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"
               >
                 {slides[currentIndex].buttonText}
               </Link>
@@ -173,7 +174,7 @@ function Home() {
                 href={slides[currentIndex].buttonLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-10 py-4 bg-amber-400 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+                className="inline-block px-10 py-4 bg-accent-500 text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:bg-amber-500 hover:scale-105 transition-all duration-300 border-2 border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
               >
                 {slides[currentIndex].buttonText}
               </a>
@@ -184,18 +185,18 @@ function Home() {
         {/* Navigation Arrows */}
         <button
           onClick={goToPrevious}
-          className="absolute left-4 sm:left-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+          className="absolute left-4 sm:left-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"
           aria-label="Previous slide"
         >
-          <FontAwesomeIcon icon={faChevronLeft} className="text-xl sm:text-2xl" />
+          <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
         
         <button
           onClick={goToNext}
-          className="absolute right-4 sm:right-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50"
+          className="absolute right-4 sm:right-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"
           aria-label="Next slide"
         >
-          <FontAwesomeIcon icon={faChevronRight} className="text-xl sm:text-2xl" />
+          <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
         
         {/* Slide Indicators */}
@@ -205,7 +206,7 @@ function Home() {
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex ? 'bg-amber-400 scale-125' : 'bg-white bg-opacity-50'
+                index === currentIndex ? 'bg-accent-500 scale-125' : 'bg-white bg-opacity-50'
               }`}
             />
           ))}
@@ -213,61 +214,59 @@ function Home() {
       </section>
 
       {/* Main Content Sections */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-accent-50">
                 <Features />
 
         {/* Community Section */}
         <section className="mb-24 max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">Our Community</h2>
+            <h2 className="text-4xl sm:text-5xl font-black py-8 text-primary-900 mb-6">Our Community</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Join thousands of professionals who are transforming their workplaces with Kingdom values and biblical principles.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-6">
-                <FontAwesomeIcon icon={faUsers} className="text-2xl text-amber-600" />
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
+                <Users className="w-8 h-8 text-accent-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">WhatsApp Community</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Connect with over 2,000 professionals in our active WhatsApp community. Share insights, ask questions, and grow together.
+              <h3 className="text-2xl font-bold text-white mb-4">WhatsApp Community</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Connect with other Christian professionals in our active WhatsApp community. Share insights, ask questions, and grow together.
               </p>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors"
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 text-accent-400 font-semibold hover:text-accent-700 transition-colors"
               >
                 Join Now <FontAwesomeIcon icon={faWhatsappBrand} className="text-lg" />
-              </a>
+              </Link>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-6">
-                <FontAwesomeIcon icon={faBookOpen} className="text-2xl text-amber-600" />
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
+                <FontAwesomeIcon icon={faBookOpen} className="text-2xl text-accent-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Weekly Prayers</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold text-white mb-4">Weekly Prayers</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
                 Join our Wednesday 5AM prayer sessions via WhatsApp. Start your day with spiritual strength and community support.
               </p>
-              <span className="inline-flex items-center gap-2 text-gray-500 font-semibold">
+              <span className="inline-flex items-center gap-2 text-primary-100 font-semibold">
                 Every Wednesday 5AM
               </span>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-6">
-                <FontAwesomeIcon icon={faCalendarAlt} className="text-2xl text-amber-600" />
+            <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
+                <Calendar className="w-8 h-8 text-accent-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Monthly Mentorship</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Participate in our monthly Zoom mentorship sessions with industry leaders and spiritual mentors.
+              <h3 className="text-2xl font-bold text-white mb-4">Monthly Mentorship</h3>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Participate in our monthly mentorship sessions with the convener. Get guidance, support, and insights.
               </p>
               <Link
                 to="/events"
-                className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700 transition-colors"
+                className="inline-flex items-center gap-2 text-accent-400 font-semibold hover:text-accent-700 transition-colors"
               >
                 View Schedule
               </Link>
@@ -277,7 +276,7 @@ function Home() {
       </div>
 
       {/* Resources Section - Full Width */}
-      <section className="w-full" style={{backgroundColor: '#111826ff'}}>
+      <section className="w-full bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-6">Resources</h2>
@@ -289,47 +288,47 @@ function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-3xl font-bold text-white mb-6">Latest Podcasts and Blogs</h3>
-              <h4 className="text-xl font-semibold text-amber-400 mb-4">Available on the go!</h4>
+              <h4 className="text-xl font-semibold text-accent-400 mb-4">Available on the go!</h4>
               <p className="text-gray-300 mb-8 leading-relaxed">
                 Leadership is a skill that can be learned. Discover practical biblical principles for effective leadership in the workplace and beyond.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/Resources/listen"
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-accent-600 text-white font-semibold rounded-lg hover:bg-accent-700 transition-colors"
                 >
-                  <FontAwesomeIcon icon={faSpotifyBrand} /> Listen Now
+                  <FontAwesomeIcon icon={faSpotifyBrand} className="text-lg" /> Listen Now
                 </Link>
                 <Link
                   to="/Resources"
-                  className="inline-flex items-center gap-2 px-8 py-3 border-2 border-amber-400 text-amber-400 font-semibold rounded-lg hover:bg-amber-400 hover:text-gray-900 transition-colors"
+                  className="inline-flex items-center gap-2 px-8 py-3 border-2 border-accent-400 text-accent-400 font-semibold rounded-lg hover:bg-accent-400 hover:text-primary-900 transition-colors"
                 >
                   Explore All Resources
                 </Link>
               </div>
             </div>
             
-            <div className="bg-gray-800 rounded-2xl p-8 text-white border border-gray-700">
+            <div className="rounded-2xl p-8 text-white border border-gray-700">
               <h4 className="text-2xl font-bold mb-6 text-white">Available Resources</h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
                   <span className="text-gray-200">Weekly Podcast Episodes</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
                   <span className="text-gray-200">Biblical Leadership Articles</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
                   <span className="text-gray-200">Professional Development Guides</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
                   <span className="text-gray-200">Industry-Specific Insights</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
                   <span className="text-gray-200">Mentorship Resources</span>
                 </div>
               </div>
@@ -339,13 +338,13 @@ function Home() {
       </section>
 
       {/* Main Content Sections Continued */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-amber-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-accent-50">
         {/* Events Section */}
         <section className="mb-24 max-w-7xl mx-auto">
           <div className="w-full text-center mb-8 px-4 sm:px-6 lg:px-8">
             <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">EVENTS</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
-                Connect at <span className="text-amber-600">Our Events</span>
+                Connect at <span className="text-accent-600">Our Events</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mt-4">
               Join us for transformative events designed to equip and inspire Kingdom professionals.
@@ -382,17 +381,17 @@ function Home() {
                       <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className={`h-48 bg-gradient-to-br ${idx % 2 === 0 ? 'from-amber-400 to-amber-600' : 'from-gray-800 to-gray-900'} flex items-center justify-center`}>
-                      <FontAwesomeIcon icon={faCalendarAlt} className="text-6xl text-white" />
+                    <div className={`h-48 bg-gradient-to-br ${idx % 2 === 0 ? 'from-accent-400 to-accent-600' : 'from-primary-800 to-primary-900'} flex items-center justify-center`}>
+                      <Calendar className="w-16 h-16 text-white" />
                     </div>
                   )}
                   <div className="p-6">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white mb-2">Upcoming Event</span>
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-accent-600 text-white mb-2">Upcoming Event</span>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{event.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">{new Date(event.start_time).toLocaleDateString()}</span>
-                      <Link to={`/events/${event.event_id}`} className="text-amber-600 font-semibold hover:text-amber-700">Learn More</Link>
+                      <Link to={`/events/${event.event_id}`} className="text-accent-600 font-semibold hover:text-accent-700">Learn More</Link>
                     </div>
                   </div>
                 </div>
@@ -402,7 +401,7 @@ function Home() {
         </section>
         {upcomingEvents.length > 0 && (
           <div className="flex justify-center mt-8">
-            <Link to="/events" className="inline-block px-8 py-3 bg-amber-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-amber-700 transition-all duration-300 border-2 border-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50">
+            <Link to="/events" className="inline-block px-8 py-3 bg-accent-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-accent-700 transition-all duration-300 border-2 border-accent-600 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50">
               View All Events
             </Link>
           </div>
@@ -416,7 +415,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <iframe 
-              className="w-full h-96 border-0 w-full" 
+              className="w-full h-96 border-0" 
               src={podcastSource}
               allowFullScreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
@@ -426,11 +425,14 @@ function Home() {
         </section>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-amber-50">
-        <LatestRelease/>
+      <LatestRelease/>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-accent-50">
         <Courses/>
         <FreeContent/>
       </div>
+      
+      <JoinCommunityBanner />
     </div>
   )
 }

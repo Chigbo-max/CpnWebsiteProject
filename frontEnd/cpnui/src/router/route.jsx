@@ -7,7 +7,6 @@ import Listen from "../pages/Listen/Listen";
 import Blog from "../pages/Blog/Blog"
 import BlogPost from "../pages/Blog/BlogPost"
 import AdminDashboard from "../pages/Admin/AdminDashboard"
-import TheTeam from "../pages/Team/TheTeam";
 import About from "../pages/About/About"
 import ContactUs from "../pages/ContactUs/ContactUs"
 import Layout from "../components/Layout";
@@ -27,6 +26,7 @@ import Terms from '../pages/Legal/Terms';
 import Privacy from '../pages/Legal/Privacy';
 import DoingLeadershipDifferently from '../pages/Courses/DoingLeadershipDifferently.jsx';
 import DoingWorkDifferently from '../pages/Courses/DoingWorkDifferently.jsx';
+import UserRegistration from '../pages/UserRegistration/UserRegistration.jsx';
 
 const BrowserRouter = createBrowserRouter(
     [{
@@ -46,8 +46,8 @@ const BrowserRouter = createBrowserRouter(
         { path: "/events", element: <Events /> },
         { path: "/events/:eventId", element: <EventDetail /> },
         { path: "/InsideCPN/about", element: <About /> },
-        { path: "/InsideCPN/team", element: <TheTeam /> },
         { path: "/contactUs", element: <ContactUs /> },
+        { path: "/register", element: <UserRegistration /> },
         { path: "/terms", element: <Terms /> },
         { path: "/privacy", element: <Privacy /> },
         { path: "/admin/login", element: <AdminLogin /> },

@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const { BlogServiceImpl } = require('../services/BlogService');
-const blogService = new BlogServiceImpl(db);
+const blogService = new BlogServiceImpl();
 const redisClient = require('../config/redisClient');
 
 router.get('/', async (req, res, next) => {
@@ -17,7 +16,13 @@ router.get('/', async (req, res, next) => {
 // Get single blog post by slug
 router.get('/:slug', async (req, res) => {
   const cacheKey = `blog:post:${req.params.slug}`;
-  const cached = await redisClient.get(cacheKey);
+
+  let cached = null;
+
+  if(redisClient){
+  cached = await redisClient.get(cacheKey);
+  }
+
   if (cached) return res.json(JSON.parse(cached));
   try {
     const post = await blogService.getBySlug(req.params.slug);
@@ -30,7 +35,10 @@ router.get('/:slug', async (req, res) => {
       content_type: 'markdown',
       html: null 
     };
+
+    if(redisClient){
     await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
+    }
     res.json(response);
   } catch (error) {
     console.error('Error fetching blog post:', error);

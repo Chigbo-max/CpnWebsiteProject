@@ -78,7 +78,7 @@ function BlogPost() {
                         <p className="mb-8">{error?.data?.message || error?.message}</p>
                         <Link 
                             to="/blog"
-                            className="inline-flex items-center text-amber-500 hover:text-amber-400 font-semibold"
+                            className="inline-flex items-center text-accent-500 hover:text-accent-400 font-semibold"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                             Back to Blog
@@ -100,7 +100,7 @@ function BlogPost() {
                 <div className="mb-8">
                     <Link 
                         to="/blog"
-                        className="inline-flex items-center text-amber-500 hover:text-amber-400 font-semibold transition-colors duration-200"
+                        className="inline-flex items-center text-accent-500 hover:text-accent-400 font-semibold transition-colors duration-200"
                     >
                         <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                         Back to Blog
@@ -110,7 +110,7 @@ function BlogPost() {
                 {/* Blog Post Content */}
                 <div className="bg-white rounded-xl shadow-xl overflow-hidden">
                     {/* Header with CPN Logo */}
-                    <div className="bg-amber-600 p-8 text-center">
+                    <div className="bg-accent-600 p-8 text-center">
                         <img 
                             src={CpnLogo} 
                             alt="CPN Logo" 
@@ -150,7 +150,7 @@ function BlogPost() {
                     <div className="p-8">
                         {/* Excerpt */}
                         {post.excerpt && (
-                            <div className="mb-8 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                            <div className="mb-8 p-4 bg-amber-50 border-l-4 border-accent-500 rounded-r-lg">
                                 <p className="text-lg text-gray-700 italic">{post.excerpt}</p>
                             </div>
                         )}
@@ -161,7 +161,7 @@ function BlogPost() {
                                 {post.tags.split(',').map((tag, index) => (
                                     <span 
                                         key={index}
-                                        className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium"
+                                        className="px-3 py-1 bg-amber-100 text-accent-800 rounded-full text-sm font-medium"
                                     >
                                         #{tag.trim()}
                                     </span>
@@ -174,17 +174,17 @@ function BlogPost() {
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h1: ({ ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4" {...props} />,
-                                    h2: ({ ...props}) => <h2 className="text-2xl font-bold text-gray-900 mb-3 mt-6" {...props} />,
-                                    h3: ({ ...props}) => <h3 className="text-xl font-bold text-gray-900 mb-2 mt-5" {...props} />,
+                                    h1: ({ ...props}) => <h1 className="text-3xl font-bold text-primary-900 mb-4" {...props} />,
+                                    h2: ({ ...props}) => <h2 className="text-2xl font-bold text-primary-900 mb-3 mt-6" {...props} />,
+                                    h3: ({ ...props}) => <h3 className="text-xl font-bold text-primary-900 mb-2 mt-5" {...props} />,
                                     p: ({ ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
                                     ul: ({ ...props}) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
                                     ol: ({ ...props}) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
                                     li: ({ ...props}) => <li className="text-gray-700" {...props} />,
-                                    strong: ({ ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                                    strong: ({ ...props}) => <strong className="font-bold text-primary-900" {...props} />,
                                     em: ({ ...props}) => <em className="italic text-gray-800" {...props} />,
                                     blockquote: ({ ...props}) => (
-                                        <blockquote className="border-l-4 border-amber-500 pl-4 italic text-gray-600 mb-4" {...props} />
+                                        <blockquote className="border-l-4 border-accent-500 pl-4 italic text-gray-600 mb-4" {...props} />
                                     ),
                                     code: ({ ...props}) => (
                                         <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono" {...props} />
@@ -205,7 +205,7 @@ function BlogPost() {
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowShareOptions(!showShareOptions)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+                                        className="flex items-center gap-2 px-4 py-2 bg-accent-100 text-accent-700 rounded-lg hover:bg-accent-300 transition-colors"
                                     >
                                         <FontAwesomeIcon icon={faShare} className="text-sm" />
                                         Share

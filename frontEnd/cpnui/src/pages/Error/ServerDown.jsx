@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faServer, faRedo } from '@fortawesome/free-solid-svg-icons';
 
@@ -19,12 +18,12 @@ function ServerDown() {
           <FontAwesomeIcon icon={faRedo} className="mr-2" />
           Retry
         </button>
-        <Link
-          to="/"
+        <a
+          href="/"
           className="inline-flex items-center bg-gray-700 text-white font-bold px-6 py-3 rounded-lg shadow hover:bg-gray-600 transition-colors"
         >
           Go Home
-        </Link>
+        </a>
       </div>
     </div>
   );

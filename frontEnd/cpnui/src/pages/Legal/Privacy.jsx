@@ -3,7 +3,7 @@ const Privacy = () => (
     <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
     <p className="mb-4 text-sm text-gray-500">Last updated: July 27, 2025</p>
     <p className="mb-4">Christian Professionals Network (&quot;CPN&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.</p>
-    <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect</h2>
+    <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect </h2>
     <p className="mb-4">We may collect the following types of information:<br/>- Personal information you provide to us (such as your name, email address, and account details)<br/>- Information collected automatically (such as IP address, browser type, device information, and usage data)<br/>- Information from cookies and similar technologies</p>
     <h2 className="text-xl font-semibold mt-6 mb-2">2. How We Use Your Information</h2>
     <p className="mb-4">We use your information to:<br/>- Provide, operate, and maintain our services<br/>- Improve, personalize, and expand our services<br/>- Communicate with you, including for customer service and updates<br/>- Comply with legal obligations</p>

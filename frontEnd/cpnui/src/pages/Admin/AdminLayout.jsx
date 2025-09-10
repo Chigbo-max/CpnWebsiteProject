@@ -11,6 +11,7 @@ const sidebarLinks = [
   { id: 'subscribers', label: 'Subscribers', icon: faUsers },
   { id: 'newsletter', label: 'Newsletter', icon: faList },
   { id: 'enrollees', label: 'Enrollee Management', icon: faUserGraduate },
+  { id: 'user-management', label: 'User Management', icon: faUsers },
   { id: 'blog-create', label: 'Create Blog Post', icon: faPlus },
   { id: 'blog-list', label: 'Blog Posts', icon: faFileAlt },
   { id: 'inquiries', label: 'Contact Inquiries', icon: faEnvelope },

@@ -1,9 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+
+const baseUrl = import.meta.env.VITE_BASE_API_URL || '';
+
+
 export const blogApi = createApi({
   reducerPath: 'blogApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_API_URL,
+    baseUrl: baseUrl,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('adminToken');
       if (token) {

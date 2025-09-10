@@ -53,21 +53,7 @@ class ErrorBoundary extends React.Component {
               </button>
             </div>
             
-            {typeof window !== 'undefined' && window.location.hostname === 'localhost' && this.state.errorInfo && (
-              <details className="mt-6 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
-                  Error Details (Development)
-                </summary>
-                <div className="mt-2 p-4 bg-gray-100 rounded text-xs font-mono text-gray-800 overflow-auto">
-                  {this.state.errorInfo && (
-                    <div>
-                      <strong>Component Stack:</strong>
-                      <pre className="whitespace-pre-wrap">{this.state.errorInfo.componentStack}</pre>
-                    </div>
-                  )}
-                </div>
-              </details>
-            )}
+        
           </div>
         </div>
       );
