@@ -14,6 +14,22 @@ RUN npm install
 # Copy all remaining source code AFTER installing dependencies
 COPY . .
 
+
+# Tell Docker these env vars will come from Render at runtime
+ENV NODE_ENV=production
+
+ENV MONGODB_URI_PROD=""
+ENV REDIS_URL=""
+ENV JWT_SECRET=""
+ENV EMAIL_USER=""
+ENV EMAIL_PASS=""
+ENV CLOUDINARY_API_KEY=""
+ENV CLOUDINARY_API_SECRET=""
+ENV CLOUDINARY_CLOUD_NAME=""
+ENV SUPERADMIN_USERNAME=""
+ENV SUPERADMIN_EMAIL=""
+ENV SUPERADMIN_PASSWORD=""
+
 # Expose backend port
 EXPOSE 5000
 

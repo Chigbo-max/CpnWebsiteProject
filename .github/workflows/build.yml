@@ -107,6 +107,7 @@ jobs:
             echo "FRONTEND_TAG=${{ secrets.DOCKERHUB_USERNAME }}/cpn-frontend:dev" >> $GITHUB_ENV
           fi
 
+      # Build and push backend
       - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
@@ -115,6 +116,7 @@ jobs:
           push: true
           tags: ${{ env.BACKEND_TAG }}
 
+      # Build and push frontend with build args
       - name: Build and push frontend
         uses: docker/build-push-action@v4
         with:
@@ -122,3 +124,16 @@ jobs:
           file: ./frontEnd/cpnui/Dockerfile
           push: true
           tags: ${{ env.FRONTEND_TAG }}
+          build-args: |
+            VITE_BASE_API_URL=${{ secrets.VITE_BASE_API_URL }}
+            VITE_WS_URL=${{ secrets.VITE_WS_URL }}
+            VITE_SPOTIFY_CLIENT_ID=${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
+            VITE_SPOTIFY_CLIENT_SECRET=${{ secrets.VITE_SPOTIFY_CLIENT_SECRET }}
+            VITE_SPOTIFY_REDIRECT_URI=${{ secrets.VITE_SPOTIFY_REDIRECT_URI }}
+            VITE_WS_URL=${{ secrets.VITE_WS_URL }}
+            VITE_SHOW_ID=${{ secrets.VITE_SHOW_ID }}
+            VITE_PODCAST_SOURCE=${{ secrets.VITE_PODCAST_SOURCE }}
+            VITE_WHATSAPP_LINK=${{ secrets.VITE_WHATSAPP_LINK }}
+            VITE_INSTAGRAM_LINK=${{ secrets.VITE_INSTAGRAM_LINK }}
+            VITE_CLUBHOUSE_LINK=${{ secrets.VITE_CLUBHOUSE_LINK }}
+            VITE_CPN_PODCAST=${{ secrets.VITE_CPN_PODCAST }}
