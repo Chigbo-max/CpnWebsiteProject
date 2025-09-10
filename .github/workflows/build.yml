@@ -38,7 +38,7 @@ jobs:
 
     env:
       NODE_ENV: test
-      MONGODB_URI: mongodb://localhost:27017/cpn_test
+      MONGODB_URI_DEV: mongodb://localhost:27017/cpn_test
       REDIS_URL: ${{ secrets.REDIS_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
