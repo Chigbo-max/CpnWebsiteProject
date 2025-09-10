@@ -46,7 +46,8 @@ function initializeServer() {
     'http://localhost:5173',
     'http://localhost:5174',
     'https://cprofessionalsnetworkdev.onrender.com',
-    'https://cpn-frontend-dev.onrender.com'
+    'https://cpn-frontend-dev.onrender.com',
+    'https://cpn-front-dev.onrender.com',
   ];
 
   app.use(cors({
