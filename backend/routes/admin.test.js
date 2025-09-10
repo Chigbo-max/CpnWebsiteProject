@@ -1,6 +1,6 @@
 const request = require('supertest');
-const { app } = require('../server');
-
+const server = require('../server');
+const app = server.app;
 
 jest.mock('../config/redisClient', () => ({
   get: jest.fn().mockResolvedValue(null),

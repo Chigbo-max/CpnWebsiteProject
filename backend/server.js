@@ -10,196 +10,196 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 
-// --- CORS ---
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://cprofessionalsnetwork.onrender.com',
-  'https://cpn-frontend-dev.onrender.com'
-];
+// --- Test environment handling ---
+if (process.env.NODE_ENV === 'test') {
+  console.log('Test environment: Exporting mock server');
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, WebSocket)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    console.log('CORS blocked origin:', origin);
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
-  allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept','Origin']
-}));
+  const app = express();
+  app.use(express.json());
 
-// --- Rate limiting ---
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 600,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => (req.headers['upgrade'] || '').toLowerCase() === 'websocket',
-});
-if (process.env.NODE_ENV === 'production') app.use(limiter);
+  [
+    { path: '/api/auth', router: require('./routes/auth') },
+    { path: '/api/admin', router: require('./routes/admin') },
+    { path: '/api/blog', router: require('./routes/blog') },
+    { path: '/api/contact', router: require('./routes/contact') },
+    { path: '/api/subscribers', router: require('./routes/subscribers') },
+    { path: '/api/events', router: require('./routes/events') },
+    { path: '/api/enrollments', router: require('./routes/enrollments') },
+    { path: '/api/users', router: require('./routes/users') }
+  ].forEach(route => app.use(route.path, route.router));
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  module.exports = { 
+    app, 
+    server: { listen: () => {}, close: () => {} },
+    broadcastDashboardUpdate: () => {}
+  };
+} else {
+  // Normal server initialization for non-test environments
+  initializeServer();
+}
 
-// --- DB Connection ---
-connectDB();
+function initializeServer() {
+  // --- CORS ---
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://cprofessionalsnetwork.onrender.com',
+    'https://cpn-frontend-dev.onrender.com'
+  ];
 
-// --- Seed superadmin ---
-(async () => {
-  try {
-    const count = await Admin.countDocuments({ role: 'superadmin' });
-    if (count === 0) {
-      const bcrypt = require('bcryptjs');
-      const password_hash = await bcrypt.hash(process.env.SUPERADMIN_PASSWORD, 10);
-      await Admin.create({
-        username: process.env.SUPERADMIN_USERNAME,
-        email: process.env.SUPERADMIN_EMAIL,
-        password_hash,
-        role: 'superadmin'
-      });
-      console.log('Seeded superadmin user:', process.env.SUPERADMIN_USERNAME);
-    }
-  } catch (e) {
-    console.error('Error seeding superadmin:', e.message);
-  }
-})();
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.log('CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
+    allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept','Origin']
+  }));
 
-// --- Server + WebSocket ---
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ 
-  server,
-  clientTracking: true
-});
-
-// Track connections with proper error handling
-wss.on('connection', (ws, req) => {
-  console.log('✅ New WebSocket connection');
-  ws.isAlive = true;
-  
-  // Add origin validation for WebSocket connections
-  const origin = req.headers.origin;
-  if (origin && !allowedOrigins.includes(origin)) {
-    console.log('❌ WebSocket connection rejected due to CORS:', origin);
-    ws.close(1008, 'Not allowed by CORS');
-    return;
-  }
-
-  ws.on('pong', () => {
-    ws.isAlive = true;
+  // --- Rate limiting ---
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 600,
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => (req.headers['upgrade'] || '').toLowerCase() === 'websocket',
   });
+  if (process.env.NODE_ENV === 'production') app.use(limiter);
 
-  ws.on('close', (code, reason) => {
-    console.log(`❌ WebSocket disconnected - Code: ${code}, Reason: ${reason}`);
-  });
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  ws.on('error', (err) => {
-    console.error('WebSocket error:', err.message);
-  });
-});
+  // --- DB Connection ---
+  connectDB();
 
-// Keep-alive ping/pong with better error handling
-const keepAliveInterval = setInterval(() => {
-  wss.clients.forEach((ws) => {
-    if (!ws.isAlive) {
-      console.log('Terminating unresponsive WebSocket connection');
-      return ws.terminate();
-    }
-    ws.isAlive = false;
-    
-    // Add error handling for ping
+  // --- Seed superadmin ---
+  (async () => {
     try {
-      ws.ping(null, false, (err) => {
-        if (err) {
-          console.error('Ping error:', err.message);
-          ws.terminate();
+      const count = await Admin.countDocuments({ role: 'superadmin' });
+      if (count === 0) {
+        const bcrypt = require('bcryptjs');
+        const password_hash = await bcrypt.hash(process.env.SUPERADMIN_PASSWORD, 10);
+        await Admin.create({
+          username: process.env.SUPERADMIN_USERNAME,
+          email: process.env.SUPERADMIN_EMAIL,
+          password_hash,
+          role: 'superadmin'
+        });
+        console.log('Seeded superadmin user:', process.env.SUPERADMIN_USERNAME);
+      }
+    } catch (e) {
+      console.error('Error seeding superadmin:', e.message);
+    }
+  })();
+
+  // --- Server + WebSocket ---
+  const server = http.createServer(app);
+  const wss = new WebSocket.Server({ server, clientTracking: true });
+
+  // WebSocket connection handling
+  wss.on('connection', (ws, req) => {
+    console.log('✅ New WebSocket connection');
+    ws.isAlive = true;
+
+    const origin = req.headers.origin;
+    if (origin && !allowedOrigins.includes(origin)) {
+      console.log('❌ WebSocket connection rejected due to CORS:', origin);
+      ws.close(1008, 'Not allowed by CORS');
+      return;
+    }
+
+    ws.on('pong', () => { ws.isAlive = true; });
+
+    ws.on('close', (code, reason) => {
+      console.log(`❌ WebSocket disconnected - Code: ${code}, Reason: ${reason}`);
+    });
+
+    ws.on('error', (err) => {
+      console.error('WebSocket error:', err.message);
+    });
+  });
+
+  // Keep-alive ping/pong
+  const keepAliveInterval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (!ws.isAlive) return ws.terminate();
+      ws.isAlive = false;
+      try { ws.ping(); } catch { ws.terminate(); }
+    });
+  }, 30000);
+
+  wss.on('close', () => clearInterval(keepAliveInterval));
+
+  // --- Dashboard broadcast ---
+  function broadcastDashboardUpdate(update) {
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        try {
+          client.send(JSON.stringify({ 
+            type: 'dashboard-update', 
+            payload: update,
+            timestamp: Date.now()
+          }));
+        } catch (err) {
+          console.error('Broadcast error:', err.message);
+          client.terminate();
         }
+      }
+    });
+  }
+  app.set('broadcastDashboardUpdate', broadcastDashboardUpdate);
+
+  // --- Health check ---
+  app.get('/health', async (req, res) => {
+    try {
+      const mongoose = require('mongoose');
+      const dbState = mongoose.connection.readyState;
+      res.status(200).json({
+        status: 'OK',
+        database: dbState === 1 ? 'connected' : 'disconnected',
+        websocket: wss.clients.size
       });
     } catch (err) {
-      console.error('Ping failed:', err.message);
-      ws.terminate();
+      res.status(500).json({ status: 'DB_ERROR', message: 'Database connection failed' });
     }
   });
-}, 30000);
 
-wss.on('close', () => {
-  clearInterval(keepAliveInterval);
-  console.log('WebSocket server closed');
-});
+  // --- Routes ---
+  [
+    { path: '/api/auth', router: require('./routes/auth') },
+    { path: '/api/admin', router: require('./routes/admin') },
+    { path: '/api/blog', router: require('./routes/blog') },
+    { path: '/api/contact', router: require('./routes/contact') },
+    { path: '/api/subscribers', router: require('./routes/subscribers') },
+    { path: '/api/events', router: require('./routes/events') },
+    { path: '/api/enrollments', router: require('./routes/enrollments') },
+    { path: '/api/users', router: require('./routes/users') }
+  ].forEach(route => app.use(route.path, route.router));
 
-// --- Dashboard broadcast with connection check ---
-function broadcastDashboardUpdate(update) {
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      try {
-        client.send(JSON.stringify({ 
-          type: 'dashboard-update', 
-          payload: update,
-          timestamp: Date.now()
-        }));
-      } catch (err) {
-        console.error('Broadcast error:', err.message);
-        client.terminate();
-      }
-    }
-  });
-}
-app.set('broadcastDashboardUpdate', broadcastDashboardUpdate);
+  // --- Static files ---
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// --- Health check ---
-app.get('/health', async (req, res) => {
-  try {
-    const mongoose = require('mongoose');
-    const dbState = mongoose.connection.readyState;
-    res.status(200).json({
-      status: 'OK',
-      database: dbState === 1 ? 'connected' : 'disconnected',
-      websocket: wss.clients.size
+  // --- Error handler ---
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    if (err.message === 'Not allowed by CORS') 
+      return res.status(403).json({ message: 'CORS policy violation' });
+    res.status(500).json({
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
-  } catch (err) {
-    res.status(500).json({ status: 'DB_ERROR', message: 'Database connection failed' });
-  }
-});
-
-// --- Routes ---
-[
-  { path: '/api/auth', router: require('./routes/auth') },
-  { path: '/api/admin', router: require('./routes/admin') },
-  { path: '/api/blog', router: require('./routes/blog') },
-  { path: '/api/contact', router: require('./routes/contact') },
-  { path: '/api/subscribers', router: require('./routes/subscribers') },
-  { path: '/api/events', router: require('./routes/events') },
-  { path: '/api/enrollments', router: require('./routes/enrollments') },
-  { path: '/api/users', router: require('./routes/users') }
-].forEach(route => app.use(route.path, route.router));
-
-// --- Static files ---
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// --- Error handler ---
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  if (err.message === 'Not allowed by CORS') return res.status(403).json({ message: 'CORS policy violation' });
-  res.status(500).json({
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
-});
 
-// --- Start server ---
-const PORT = process.env.PORT || 5000;
-if (process.env.NODE_ENV !== 'test') {
+  // --- Start server ---
+  const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🔌 WebSocket running at ${process.env.NODE_ENV === 'production' ? 'wss' : 'ws'}://localhost:${PORT}`);
   });
-}
 
-module.exports = { app, server, broadcastDashboardUpdate };
+  module.exports = { app, server, broadcastDashboardUpdate };
+}

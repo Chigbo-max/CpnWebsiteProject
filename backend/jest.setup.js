@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Ensure required envs for tests have safe defaults
 process.env.NODE_ENV = 'test';
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cpn_test';
+process.env.MONGODB_URI_DEV = process.env.MONGODB_URI_DEV || 'mongodb://localhost:27017/cpn_test';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
 process.env.SUPERADMIN_USERNAME = process.env.SUPERADMIN_USERNAME || 'Uju';
 process.env.SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'password';
@@ -14,10 +14,7 @@ beforeAll(async () => {
   
   // Only connect if not already connected
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI_DEV);
   }
 });
 
