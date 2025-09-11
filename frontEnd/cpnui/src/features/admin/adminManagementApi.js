@@ -21,9 +21,9 @@ export const adminManagementApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: 'Admin', id })),
-              { type: 'Admin', id: 'LIST' },
-            ]
+            ...result.map(({ id }) => ({ type: 'Admin', id })),
+            { type: 'Admin', id: 'LIST' },
+          ]
           : [{ type: 'Admin', id: 'LIST' }],
     }),
     addAdmin: builder.mutation({
@@ -39,7 +39,10 @@ export const adminManagementApi = createApi({
         url: `/admin/admins/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'Admin', id }],
+      invalidatesTags: (result, error, id) => [
+        { type: 'Admin', id },
+        { type: 'Admin', id: 'LIST' },
+      ],
     }),
     resetAdminPassword: builder.mutation({
       query: (id) => ({

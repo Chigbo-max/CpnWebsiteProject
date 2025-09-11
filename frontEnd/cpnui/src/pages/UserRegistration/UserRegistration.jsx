@@ -170,7 +170,7 @@ const UserRegistration = () => {
       <div className="max-w-2xl w-full">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary-600 to-primary-800 px-8 py-6">
+          <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white px-8 py-6">
             <h1 className="text-3xl font-bold text-white text-center">
               Join CPN Community
             </h1>
@@ -185,7 +185,7 @@ const UserRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline w-4 h-4 mr-2 text-primary-600" />
+                  <User className="inline w-4 h-4 mr-2 text-primary-900" />
                   First Name *
                 </label>
                 <input
@@ -193,7 +193,7 @@ const UserRegistration = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                     errors.firstName ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your first name"
@@ -205,7 +205,7 @@ const UserRegistration = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline w-4 h-4 mr-2 text-primary-600" />
+                  <User className="inline w-4 h-4 mr-2 text-primary-900" />
                   Last Name *
                 </label>
                 <input
@@ -213,7 +213,7 @@ const UserRegistration = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                     errors.lastName ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your last name"
@@ -227,7 +227,7 @@ const UserRegistration = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Mail className="inline w-4 h-4 mr-2 text-primary-600" />
+                <Mail className="inline w-4 h-4 mr-2 text-primary-900" />
                 Email Address *
               </label>
               <input
@@ -235,7 +235,7 @@ const UserRegistration = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter your email address"
@@ -248,7 +248,7 @@ const UserRegistration = () => {
             {/* WhatsApp */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Phone className="inline w-4 h-4 mr-2 text-primary-600" />
+                <Phone className="inline w-4 h-4 mr-2 text-primary-900" />
                 WhatsApp Number *
               </label>
               <input
@@ -256,7 +256,7 @@ const UserRegistration = () => {
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                   errors.whatsapp ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="e.g., +234 801 234 5678"
@@ -270,14 +270,14 @@ const UserRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Globe className="inline w-4 h-4 mr-2 text-primary-600" />
+                  <Globe className="inline w-4 h-4 mr-2 text-primary-900" />
                   Nationality *
                 </label>
                 <select
                   name="nationality"
                   value={formData.nationality}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                     errors.nationality ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
@@ -301,7 +301,7 @@ const UserRegistration = () => {
                       name="otherCountry"
                       value={formData.otherCountry}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                         errors.otherCountry ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Enter your country name"
@@ -315,14 +315,14 @@ const UserRegistration = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <MapPin className="inline w-4 h-4 mr-2 text-primary-600" />
+                  <MapPin className="inline w-4 h-4 mr-2 text-primary-900" />
                   State of Residence(If you are in Nigeria) *
                 </label>
                 <select
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-all duration-200 ${
                     errors.state ? 'border-red-500' : 'border-gray-300'
                   }`}
                   disabled={!(formData.nationality && formData.nationality.toLowerCase() === 'nigeria')}
@@ -345,7 +345,7 @@ const UserRegistration = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-primary-600 to-primary-800 text-white font-bold py-4 px-6 rounded-lg hover:from-primary-600 hover:to-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-primary-900 to-primary-800 text-white font-bold py-4 px-6 rounded-lg hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>

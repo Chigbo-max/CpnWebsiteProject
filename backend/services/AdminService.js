@@ -7,7 +7,7 @@ class IAdminService {
   delete(id) { throw new Error('Not implemented'); }
   updatePassword(id, password_hash) { throw new Error('Not implemented'); }
   update(id, updateData) { throw new Error('Not implemented'); }
-  getProfile(adminId) {throw new Error('Not implemented'); }
+  getProfile(adminId) { throw new Error('Not implemented'); }
 }
 
 // AdminServiceImpl implements IAdminService
@@ -21,6 +21,11 @@ class AdminServiceImpl extends IAdminService {
   }
 
   async create({ username, email, password_hash, role }) {
+    const existing = await Admin.findOne({ username });
+    if (existing) {
+      throw new Error(`Admin with username "${username}" already exists`);
+    }
+
     const admin = new Admin({
       username,
       email,
@@ -29,6 +34,7 @@ class AdminServiceImpl extends IAdminService {
     });
     return await admin.save();
   }
+
 
   async delete(id) {
     return await Admin.findByIdAndDelete(id);
