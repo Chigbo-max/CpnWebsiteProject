@@ -48,6 +48,7 @@ function initializeServer() {
     'https://cprofessionalsnetworkdev.onrender.com',
     'https://cpn-frontend-dev.onrender.com',
     'https://cpn-front-dev.onrender.com',
+    'https://cprofessionalsnetwork.com',
   ];
 
   app.use(cors({
