@@ -26,8 +26,7 @@ const resources = [
     { title: "Latest Podcast", path: "/Resources/listen" },
     { title: "Blog Articles", path: "InsideCPN/blog" },
     { title: "Leadership Resources", path: "/Resources" },
-    { title: "Bible Study Series", path: "/events" },
-    { title: "Professional Development", path: "/Resources" }
+    { title: "Events", path: "/events" },
 ];
 
 const socialLinks = [
