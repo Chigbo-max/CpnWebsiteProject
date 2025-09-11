@@ -41,7 +41,7 @@ const AdminLogin = () => {
             value={form.username}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
           />
         </div>
         <div className="mb-6">
@@ -52,18 +52,18 @@ const AdminLogin = () => {
             value={form.password}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
           />
         </div>
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-accent-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-accent-600 transition-all duration-300 hover:bg-accent-700 hover:border-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
         <div className="mt-4 text-center">
-          <Link to="/admin/forgot-password" className="text-amber-600 hover:text-amber-800 text-sm font-medium">
+          <Link to="/admin/forgot-password" className="text-accent-600 hover:text-accent-800 text-sm font-medium">
             Forgot password?
           </Link>
         </div>

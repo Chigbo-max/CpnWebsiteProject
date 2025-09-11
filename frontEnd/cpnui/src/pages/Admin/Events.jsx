@@ -74,7 +74,7 @@ const AdminEvents = () => {
               placeholder="Search by title or description..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
             />
             <select
               value={typeFilter}
@@ -86,7 +86,7 @@ const AdminEvents = () => {
               <option value="virtual">Virtual</option>
             </select>
           </div>
-          <Link to="/admin/events/create" className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-amber-700 transition-colors">
+          <Link to="/admin/events/create" className="bg-accent-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-accent-700 transition-colors">
             <FontAwesomeIcon icon={faPlus} /> Create Event
           </Link>
         </div>
@@ -118,7 +118,7 @@ const AdminEvents = () => {
                     <td className="p-3 flex gap-2">
                       <button 
                         onClick={() => navigate(`/admin/events/edit/${ev.event_id}`)} 
-                        className="text-amber-600 hover:text-amber-800 transition-colors p-1 rounded"
+                        className="text-accent-600 hover:text-accent-800 transition-colors p-1 rounded"
                         title="Edit Event"
                       >
                         <FontAwesomeIcon icon={faEdit} />
@@ -144,7 +144,7 @@ const AdminEvents = () => {
           <div className="flex justify-center gap-2 mt-4">
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Prev</button>
             {[...Array(totalPages)].map((_, i) => (
-              <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
+              <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-accent-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
             ))}
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Next</button>
           </div>

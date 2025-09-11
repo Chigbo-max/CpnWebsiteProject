@@ -64,18 +64,45 @@ const EnrolleeManagement = () => {
   }, [startDate, endDate, refetch]);
 
   const handleBroadcast = async (e) => {
-    e.preventDefault();
-    setBroadcastStatus(null);
-    try {
-      await broadcastToEnrollments({ subject, content, startDate, endDate }).unwrap();
-      setBroadcastStatus({ type: 'success', message: `Broadcast sent to ${enrollments.length} enrollees.` });
-      setShowModal(false);
-      setSubject('');
-      setContent('');
-    } catch (error) {
-      setBroadcastStatus({ type: 'error', message: error.data?.error || 'Network error. Please try again.' });
+  e.preventDefault();
+  setBroadcastStatus(null);
+
+  try {
+    let payload;
+
+    if (filteredEnrollments.length > 0) {
+      // Explicit recipients mode (e.g., when user filtered or searched)
+      payload = {
+        subject,
+        content,
+        recipients: filteredEnrollments.map((enrollment) => ({
+          id: enrollment.enrollment_id,
+          email: enrollment.email,
+          name: enrollment.name,
+        })),
+      };
+    } else {
+      // Fallback: date range broadcast
+      payload = { subject, content, startDate, endDate };
     }
-  };
+
+    const response = await broadcastToEnrollments(payload).unwrap();
+
+    setBroadcastStatus({
+      type: 'success',
+      message: response.message || `Broadcast sent successfully.`,
+    });
+
+    setShowModal(false);
+    setSubject('');
+    setContent('');
+  } catch (error) {
+    setBroadcastStatus({
+      type: 'error',
+      message: error.data?.error || 'Network error. Please try again.',
+    });
+  }
+};
 
   const handleEditClick = (enrollment) => {
     setEditingEnrollment(enrollment);
@@ -164,7 +191,7 @@ const EnrolleeManagement = () => {
             className="border rounded px-3 py-2 w-full md:w-64" 
           />
         </div>
-        <button onClick={() => refetch()} className="bg-amber-600 text-white px-4 py-2 rounded mt-6 md:mt-0">Filter</button>
+        <button onClick={() => refetch()} className="bg-accent-600 text-white px-4 py-2 rounded mt-6 md:mt-0">Filter</button>
       </div>
       {isLoading ? (
         <SimpleSpinner message="Loading enrollees..." />
@@ -225,7 +252,7 @@ const EnrolleeManagement = () => {
           </table>
         </div>
       )}
-      <button onClick={() => setShowModal(true)} className="bg-amber-600 text-white px-6 py-2 rounded mb-4">Send Mail</button>
+      <button onClick={() => setShowModal(true)} className="bg-accent-600 text-white px-6 py-2 rounded mb-4">Send Mail</button>
       {broadcastStatus && (
         <div className={`mb-4 ${broadcastStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{broadcastStatus.message}</div>
       )}
@@ -251,7 +278,7 @@ const EnrolleeManagement = () => {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 />
               </div>
@@ -261,7 +288,7 @@ const EnrolleeManagement = () => {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 />
               </div>
@@ -270,7 +297,7 @@ const EnrolleeManagement = () => {
                 <select
                   value={editForm.course}
                   onChange={(e) => setEditForm({ ...editForm, course: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 >
                   <option value="">Select a course</option>
@@ -285,7 +312,7 @@ const EnrolleeManagement = () => {
                   type="text"
                   value={editForm.whatsapp}
                   onChange={(e) => setEditForm({ ...editForm, whatsapp: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   placeholder="Enter WhatsApp number"
                 />
               </div>
@@ -301,7 +328,7 @@ const EnrolleeManagement = () => {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUpdating ? (
                     <span className="flex items-center justify-center">
@@ -401,7 +428,7 @@ const EnrolleeManagement = () => {
                   type="text"
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 />
               </div>
@@ -427,7 +454,7 @@ const EnrolleeManagement = () => {
                 <button
                   type="submit"
                   disabled={isBroadcasting}
-                  className="px-6 py-2 rounded-lg text-white bg-amber-500 hover:bg-amber-600 transition disabled:opacity-50"
+                  className="px-6 py-2 rounded-lg text-white bg-accent-500 hover:bg-accent-600 transition disabled:opacity-50"
                 >
                   {isBroadcasting ? 'Sending...' : 'Send Broadcast'}
                 </button>
@@ -445,7 +472,7 @@ const EnrolleeManagement = () => {
                     &times;
                   </button>
                   <h2 className="text-xl font-bold mb-4">{subject}</h2>
-                  <div className="prose prose-amber max-w-none">
+                  <div className="prose prose-accent max-w-none">
                     <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{content}</ReactMarkdown>
                   </div>
                 </div>

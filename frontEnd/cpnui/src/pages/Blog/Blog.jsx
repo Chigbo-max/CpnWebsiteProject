@@ -112,7 +112,7 @@ function Blog() {
                                     <div className="p-6">
                                         <div className="flex items-center text-sm text-gray-500 mb-3">
                                             <FontAwesomeIcon icon={faCalendar} className="mr-2 text-accent-500" />
-                                            <span>{formatDate(post.created_at)}</span>
+                                            <span>{formatDate(post.createdAt)}</span>
                                             <FontAwesomeIcon icon={faUser} className="ml-4 mr-2 text-accent-500" />
                                             <span>CPN Team</span>
                                         </div>

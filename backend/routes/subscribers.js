@@ -1,36 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const redisClient = require('../config/redisClient');
 const { SubscriberServiceImpl } = require('../services/SubscriberService');
 const subscriberService = new SubscriberServiceImpl();
 const { authenticateAdmin } = require('../middleware/auth');
 
+const {
+  clearCache,
+  redisSafeGet,
+  redisSafeSetEx
+} = require('../utils/redisHelper');
+
+// Get all subscribers
 router.get('/', async (req, res) => {
   const cacheKey = 'subscribers:list';
 
-  let cached = null;
-
-  if(redisClient){
-  cached = await redisClient.get(cacheKey);
-  }
-
-  if (cached) {
-    const parsed = JSON.parse(cached);
-    return res.json(Array.isArray(parsed) ? { subscribers: parsed } : parsed);
-  }
   try {
-    const result = await subscriberService.getAll();
-
-    if(redisClient){
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+    const cached = await redisSafeGet(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      return res.json(Array.isArray(parsed) ? { subscribers: parsed } : parsed);
     }
+
+    const result = await subscriberService.getAll();
+    await redisSafeSetEx(cacheKey, 300, JSON.stringify(result));
+
     res.json({ subscribers: result });
   } catch (error) {
     console.error('Error fetching subscribers:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 
 // Unsubscribe from newsletter
 router.delete('/:email', async (req, res) => {
@@ -40,8 +39,8 @@ router.delete('/:email', async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
-    await redisClient.del('subscribers:list');
-    // Broadcast dashboard update
+
+    await clearCache('subscribers:list');
     req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'delete' });
     res.json({ message: 'Successfully unsubscribed' });
   } catch (error) {
@@ -57,14 +56,15 @@ router.post('/', async (req, res) => {
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
     }
-    // Check if already exists
+
     const existing = await subscriberService.findByEmail(email);
     if (existing.length > 0) {
       return res.status(400).json({ message: 'Email already subscribed' });
     }
+
     const result = await subscriberService.create({ name, email });
-    await redisClient.del('subscribers:list');
-    // Broadcast dashboard update
+    await clearCache('subscribers:list');
+
     req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'create' });
     res.status(201).json({ message: 'Subscriber added', subscriber: result });
   } catch (error) {
@@ -81,19 +81,20 @@ router.put('/:id', async (req, res) => {
     if (!name && !email) {
       return res.status(400).json({ message: 'Name or email required to update' });
     }
-    // If updating email, check for duplicate
+
     if (email) {
       const existing = await subscriberService.findByEmail(email);
       if (existing.some(sub => sub.id != id)) {
         return res.status(400).json({ message: 'Email already subscribed by another user' });
       }
     }
+
     const result = await subscriberService.update(id, { name, email });
     if (!result) {
       return res.status(404).json({ message: 'Subscriber not found' });
     }
-    await redisClient.del('subscribers:list');
-    // Broadcast dashboard update
+
+    await clearCache('subscribers:list');
     req.app.get('broadcastDashboardUpdate')({ entity: 'subscriber', action: 'update' });
     res.json({ message: 'Subscriber updated', subscriber: result });
   } catch (error) {
@@ -102,7 +103,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Admin: Get monthly subscriber counts for dashboard analytics
+// Admin: Get monthly subscriber counts
 router.get('/monthly-counts', authenticateAdmin, async (req, res) => {
   try {
     const result = await subscriberService.getMonthlyCounts();
@@ -113,4 +114,4 @@ router.get('/monthly-counts', authenticateAdmin, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

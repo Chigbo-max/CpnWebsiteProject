@@ -7,7 +7,7 @@ function LatestRelease() {
     return (
         <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 -mt-24 lg:-mt-32 bg-gradient-to-br from-gray-50 to-amber-50">
             <div className="flex flex-col justify-center items-center w-full gap-4 sm:gap-6 lg:gap-8">
-                
+
                 {/* Section Header */}
                 <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16">
                     <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">
@@ -28,8 +28,8 @@ function LatestRelease() {
                     <div className="flex flex-col items-center text-center w-full lg:items-start lg:text-start lg:w-96 xl:w-[400px]">
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Read</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Insights and Inspiration for Professionals</h5>
-                        <p className="text-sm sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
-                            Explore our library of thoughtfully crafted articles designed to inspire, equip, and challenge Christian professionals. From practical career guidance to faith-driven leadership insights, our reads provide actionable wisdom to help you grow in your industry while honoring God’s principles. Stay informed, inspired, and ready to make a Kingdom impact.
+                        <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
+                            Discover inspiring articles and practical guidance for Christian professionals. Explore career development, faith-driven leadership, and actionable wisdom to help you grow in your industry while honoring God's principles.
                         </p>
                         <button
                             onClick={() => navigate("/InsideCPN/blog")}
@@ -51,9 +51,8 @@ function LatestRelease() {
                     <div className="flex flex-col items-center text-center w-full lg:items-end lg:text-end lg:w-96 xl:w-[400px]">
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Podcast</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Conversations that Empower</h5>
-                        <p className="text-sm sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
-                            Tune in to our podcast series where we share empowering conversations with experienced professionals, thought leaders, and industry changemakers. Each episode provides practical advice, spiritual insights, and real-life stories to help you thrive as a professional while living out your faith. Listen, learn, and be inspired to make a meaningful impact in your workplace and community.
-                        </p>
+                        <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
+                            Listen to our podcast series for inspiring conversations with Christian professionals and thought leaders. Gain practical advice, spiritual insights, and real-life stories to help you thrive in your career and make a positive impact.                        </p>
                         <button
                             onClick={() => navigate("/Resources/listen")}
                             className="mb-6 bg-accent-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-lg border-2 border-none transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"

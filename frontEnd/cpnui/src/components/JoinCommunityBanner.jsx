@@ -24,7 +24,7 @@ const JoinCommunityBanner = () => {
           <ArrowRight className="w-5 h-5" />
         </Link>
         <div className="mt-6 text-gray-300 text-sm">
-          Free to join • Active community • Weekly prayers • Monthly mentorship
+          Free to join • Active community • Weekly prayers • Mentorship sessions
         </div>
       </div>
     </section>

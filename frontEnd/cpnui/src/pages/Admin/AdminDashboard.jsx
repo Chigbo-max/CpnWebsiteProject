@@ -166,7 +166,7 @@ function AdminDashboard() {
         wsRef.current = ws;
 
         ws.onopen = () => {
-          console.log('✅ WebSocket connected successfully');
+          console.log('WebSocket connected successfully');
           reconnectAttemptsRef.current = 0;
         };
 
@@ -356,7 +356,7 @@ function AdminDashboard() {
 function SummaryCard({ icon, value, label }) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-      <div className="text-5xl text-amber-600 mb-4">{icon}</div>
+      <div className="text-5xl text-accent-600 mb-4">{icon}</div>
       <div className="text-4xl font-bold text-gray-900">{value}</div>
       <div className="text-lg text-gray-600 mt-2">{label}</div>
     </div>

@@ -142,138 +142,141 @@ const EventDetail = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-6 sm:p-8 lg:p-10">
-            {isPast ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FontAwesomeIcon icon={faCalendarAlt} className="text-2xl text-gray-600" />
+        {/* Registration Section */}
+        {event.title === "Doing Leadership Differently(DLD)" ? null : (
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="p-6 sm:p-8 lg:p-10">
+              {isPast ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="text-2xl text-gray-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Closed</h3>
+                  <p className="text-gray-600">This event has already taken place.</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Closed</h3>
-                <p className="text-gray-600">This event has already taken place.</p>
-              </div>
-            ) : registered ? (
-              <AnimatePresence>
-                <motion.div 
-                  className="text-center py-12"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
+              ) : registered ? (
+                <AnimatePresence>
                   <motion.div 
-                    className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    className="text-center py-12"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                   >
-                    <motion.div
+                    <motion.div 
+                      className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                     >
-                      <FontAwesomeIcon icon={faCheckCircle} className="text-4xl text-green-600" />
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+                      >
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-4xl text-green-600" />
+                      </motion.div>
                     </motion.div>
+                    <motion.h3 
+                      className="text-2xl font-bold text-gray-900 mb-2"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6, duration: 0.5 }}
+                    >
+                      Registration Successful!
+                    </motion.h3>
+                    <motion.p 
+                      className="text-gray-600 mb-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8, duration: 0.5 }}
+                    >
+                      Thank you for registering for this event.
+                    </motion.p>
+                    <motion.p 
+                      className="text-sm text-gray-500"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.0, duration: 0.5 }}
+                    >
+                      Check your email for event details and your registration code.
+                    </motion.p>
                   </motion.div>
-                  <motion.h3 
-                    className="text-2xl font-bold text-gray-900 mb-2"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
-                  >
-                    Registration Successful!
-                  </motion.h3>
-                  <motion.p 
-                    className="text-gray-600 mb-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8, duration: 0.5 }}
-                  >
-                    Thank you for registering for this event.
-                  </motion.p>
-                  <motion.p 
-                    className="text-sm text-gray-500"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.0, duration: 0.5 }}
-                  >
-                    Check your email for event details and your registration code.
-                  </motion.p>
-                </motion.div>
-              </AnimatePresence>
-            ) : (
-              <div>
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Register for This Event</h3>
-                  <p className="text-gray-600">Complete the form below to secure your spot.</p>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
-                        value={form.name} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                      <input 
-                        type="email" 
-                        name="email" 
-                        value={form.email} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Whatsapp number *</label>
-                      <input 
-                        type="tel" 
-                        name="phone" 
-                        value={form.phone} 
-                        onChange={handleChange} 
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
-                        placeholder="Enter your Whatsapp number"
-                      />
-                    </div>
+                </AnimatePresence>
+              ) : (
+                <div>
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Register for This Event</h3>
+                    <p className="text-gray-600">Complete the form below to secure your spot.</p>
                   </div>
                   
-                  <div className="pt-6">
-                    <button 
-                      type="submit" 
-                      className="w-full bg-amber-600 text-white font-bold py-4 px-8 rounded-lg hover:bg-amber-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
-                      disabled={regLoading}
-                    >
-                      {regLoading ? (
-                        <span className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Registering...
-                        </span>
-                      ) : (
-                        'Register for Event'
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
+                  <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                        <input 
+                          type="text" 
+                          name="name" 
+                          value={form.name} 
+                          onChange={handleChange} 
+                          required 
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                        <input 
+                          type="email" 
+                          name="email" 
+                          value={form.email} 
+                          onChange={handleChange} 
+                          required 
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
+                          placeholder="Enter your email"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Whatsapp number *</label>
+                        <input 
+                          type="tel" 
+                          name="phone" 
+                          value={form.phone} 
+                          onChange={handleChange} 
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors" 
+                          placeholder="Enter your Whatsapp number"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="pt-6">
+                      <button 
+                        type="submit" 
+                        className="w-full bg-amber-600 text-white font-bold py-4 px-8 rounded-lg hover:bg-amber-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+                        disabled={regLoading}
+                      >
+                        {regLoading ? (
+                          <span className="flex items-center justify-center">
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Registering...
+                          </span>
+                        ) : (
+                          'Register for Event'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default EventDetail; 
+export default EventDetail;

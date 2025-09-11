@@ -150,7 +150,7 @@ const EventEdit = () => {
           <input type="file" accept="image/*" onChange={handleChange} className="w-full" />
           {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 w-40 h-40 object-cover rounded-lg border" />}
         </div>
-        <button type="submit" disabled={loading} className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50">
+        <button type="submit" disabled={loading} className="w-full bg-accent-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-accent-600 transition-all duration-300 hover:bg-accent-700 hover:border-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50">
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
       </form>

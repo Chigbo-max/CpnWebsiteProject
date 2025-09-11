@@ -105,12 +105,12 @@ function initializeServer() {
 
   // WebSocket connection handling
   wss.on('connection', (ws, req) => {
-    console.log('✅ New WebSocket connection');
+    console.log('New WebSocket connection');
     ws.isAlive = true;
 
     const origin = req.headers.origin;
     if (origin && !allowedOrigins.includes(origin)) {
-      console.log('❌ WebSocket connection rejected due to CORS:', origin);
+      console.log('WebSocket connection rejected due to CORS:', origin);
       ws.close(1008, 'Not allowed by CORS');
       return;
     }
@@ -118,7 +118,7 @@ function initializeServer() {
     ws.on('pong', () => { ws.isAlive = true; });
 
     ws.on('close', (code, reason) => {
-      console.log(`❌ WebSocket disconnected - Code: ${code}, Reason: ${reason}`);
+      console.log(`WebSocket disconnected - Code: ${code}, Reason: ${reason}`);
     });
 
     ws.on('error', (err) => {
@@ -200,8 +200,8 @@ function initializeServer() {
   // --- Start server ---
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🔌 WebSocket running at ${process.env.NODE_ENV === 'production' ? 'wss' : 'ws'}://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`WebSocket running at ${process.env.NODE_ENV === 'production' ? 'wss' : 'ws'}://localhost:${PORT}`);
   });
 
   module.exports = { app, server, broadcastDashboardUpdate };

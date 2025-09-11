@@ -7,10 +7,14 @@ const authenticateAdmin = (req, res, next) => {
       return res.status(401).json({ message: 'Access denied. No token provided.' });
     }
     
-   
-    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = decoded; // decoded should include id, username, role
+    
+    req.admin = {
+      id: decoded.id,
+      username: decoded.username, 
+      role: decoded.role
+    };
+    
     next();
   } catch (error) {
     console.error('Auth error:', error.message);
@@ -18,4 +22,4 @@ const authenticateAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { authenticateAdmin }; 
+module.exports = { authenticateAdmin };

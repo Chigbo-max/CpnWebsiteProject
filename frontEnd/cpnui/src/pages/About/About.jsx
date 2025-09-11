@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Target, Eye, Handshake, Leaf, Users, HandHeart, Scale, User as UserTie, CheckCircle, Church } from 'lucide-react';
+import { Target, Eye, Handshake, Leaf, Users, HandHeart, Scale, User as UserTie, CheckCircle, Church } from 'lucide-react';
 import { faInstagram, faSpotify, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import icon from "../../assets/clubhouse.svg";
 import bgImage from "../../assets/cpnevent1.jpg";
@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ceo from "../../assets/Hadassah.jpg";
 import commanager from "../../assets/Uju.jpg";
+import chigbo from "../../assets/chigbo.jpg"
 import JoinCommunityBanner from "../../components/JoinCommunityBanner";
 
 
@@ -16,8 +17,10 @@ const instagramLink = import.meta.env.VITE_INSTAGRAM_LINK;
 const clubhouseLink = import.meta.env.VITE_CLUBHOUSE_LINK;
 
 const team = [
-  { name: 'Hadassah Okpala', role: 'Convener', img: ceo },
-  { name: 'Uju Anachuna', role: 'Community Manager', img: commanager },
+  { name: 'Hadassah', role: 'Convener', img: ceo },
+  { name: 'Uju', role: 'Community Manager', img: commanager },
+  { name: 'Chigbo', role: 'Software Engineer', img: chigbo },
+
 ];
 
 const values = [
@@ -25,7 +28,7 @@ const values = [
   { icon: <Users className="text-3xl mb-2 text-amber-600" />, label: 'Authentic relationship' },
   { icon: <HandHeart className="text-3xl mb-2 text-amber-600" />, label: 'Collaboration and co-creation' },
   { icon: <Scale className="text-3xl mb-2 text-amber-600" />, label: 'Humility and integrity' },
-  { icon: <UserTie className="text-3xl mb-2 text-amber-600" />, label: 'Skilful and diligent work' },
+  { icon: <UserTie className="text-3xl mb-2 text-amber-600" />, label: 'Excellent and diligent work' },
 ];
 
 function About() {
@@ -112,19 +115,30 @@ function About() {
       </section>
 
       {/* Values - Responsive layout with icons, icon stands alone */}
-      <section className="w-full bg-white py-12 px-4 sm:px-6">
-        <h3 className="text-3xl font-extrabold text-primary-900 mb-8 text-center">Our Values</h3>
-        <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-7xl mx-auto flex-wrap">
-          {values.map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center justify-center w-full max-w-xs min-h-[180px] text-center flex-shrink-0 mx-auto">
-              <div className="flex items-center justify-center w-20 h-20 rounded-full bg-accent-600 mb-4 shadow-lg">
-                {React.cloneElement(val.icon, { className: 'w-10 h-10 text-white' })}
-              </div>
-              <span className="text-lg font-semibold text-white mt-2 bg-primary-900 px-2 py-2 rounded-lg">{val.label}</span>
-            </div>
-          ))}
+<section className="w-full bg-white py-12 px-4 sm:px-6">
+  <h3 className="text-3xl font-extrabold text-primary-900 mb-8 text-center">
+    Our Values
+  </h3>
+  <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-7xl mx-auto flex-wrap">
+    {values.map((val, idx) => (
+      <motion.div
+        key={idx}
+        className="flex flex-col items-center justify-center w-full max-w-xs min-h-[180px] text-center flex-shrink-0 mx-auto"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: idx * 0.2, duration: 0.6, type: 'spring' }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-accent-600 mb-4 shadow-lg">
+          {React.cloneElement(val.icon, { className: 'w-10 h-10 text-white' })}
         </div>
-      </section>
+        <span className="text-lg font-semibold text-white mt-2 bg-primary-900 px-2 py-2 rounded-lg">
+          {val.label}
+        </span>
+      </motion.div>
+    ))}
+  </div>
+</section>
 
       {/* Commitments + Statement of Faith - joined, dark background */}
       <section className="w-full bg-gradient-to-br from-primary-800 to-primary-900 py-16 px-4 sm:px-6">
@@ -136,14 +150,14 @@ function About() {
               <li>Remain apolitical – we honor and submit to local authorities as those put in place by God.</li>
               <li>Treat others with respect and dignity – we foster authentic relationships and respect all members.</li>
               <li>Promote safe spaces for sharing, learning, and growth in faith and work.</li>
-              <li>Promote the common good of the Christian faith and act upon Christian values in business.</li>
+              <li>Promote the common good of the Christian faith and act upon Christian values in the workplace</li>
             </ol>
           </div>
           <div>
             <h3 className="text-3xl font-extrabold text-white mb-6 flex items-center gap-3"><Church className="w-8 h-8 text-accent-600" /> Statement of Faith</h3>
             <blockquote className="bg-primary-800 p-6 rounded-lg text-gray-100 italic text-lg font-small">
-              I believe in God, the Father almighty, Creator of heaven and earth. And in Jesus Christ, his only Son, our Lord. He was conceived by the power of the Holy Spirit, born of the virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried, He descended into hell, on the third day He rose again from the dead, He ascended into heaven, and is seated at the right hand of God, the Father almighty, from there He will come again to judge the living and the dead. I believe in the Holy Spirit, the holy church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.
-            </blockquote>
+              So here’s what I want you to do, God helping you: Take your everyday, ordinary life—your sleeping, eating, going-to-work, and walking-around life—and place it before God as an offering. Embracing what God does for you is the best thing you can do for him.
+              Don’t become so well-adjusted to your culture that you fit into it without even thinking. Instead, fix your attention on God.... -ROM 12: 1-2a MSG            </blockquote>
           </div>
         </div>
       </section>
@@ -173,7 +187,7 @@ function About() {
           <Link to="/register" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><FontAwesomeIcon icon={faWhatsapp} className="w-10 h-10 text-gray-900" /></Link>
         </div>
       </section>
-      
+
       <JoinCommunityBanner />
     </div>
   );

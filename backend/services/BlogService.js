@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const BlogPost = require('../models/BlogPost');
 
 // IBlogService interface
@@ -19,30 +20,34 @@ class BlogServiceImpl extends IBlogService {
   }
 
   // Generate a unique slug from title
-  async generateUniqueSlug(title, existingSlug = null) {
-    let baseSlug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim('-');
-    let slug = baseSlug;
-    let counter = 1;
+async generateUniqueSlug(title, existingId = null) {
+  let baseSlug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim('-');
+  let slug = baseSlug;
+  let counter = 1;
+  
+  const checkSlug = async (testSlug) => {
+    let query = { slug: testSlug };
     
-    const checkSlug = async (testSlug) => {
-      const query = existingSlug 
-        ? { slug: testSlug, _id: { $ne: existingSlug } }
-        : { slug: testSlug };
-      const existingPost = await BlogPost.findOne(query);
-      return !!existingPost;
-    };
-    
-    while (await checkSlug(slug)) {
-      slug = `${baseSlug}-${counter}`;
-      counter++;
+    // Only add _id exclusion if existingId is a valid ObjectId
+    if (existingId && mongoose.Types.ObjectId.isValid(existingId)) {
+      query._id = { $ne: existingId };
     }
-    return slug;
+    
+    const existingPost = await BlogPost.findOne(query);
+    return !!existingPost;
+  };
+  
+  while (await checkSlug(slug)) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
   }
+  return slug;
+}
 
   static renderBlogTemplate({ title, author, date, excerpt, content, featuredImage, tags }) {
     return `
@@ -97,6 +102,9 @@ class BlogServiceImpl extends IBlogService {
   }
 
   async getById(id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid blog post ID');
+  }
     return await BlogPost.findById(id);
   }
 
@@ -104,11 +112,38 @@ class BlogServiceImpl extends IBlogService {
     return await BlogPost.findOne({ slug, status: 'published' });
   }
 
-  async create({ title, content, excerpt, tags, status, slug, authorId, featured_image }) {
-    try {
-      // Generate unique slug if not provided or if it might conflict
-      const uniqueSlug = slug ? await this.generateUniqueSlug(title, slug) : await this.generateUniqueSlug(title);
-      
+  async create(data) {
+  try {
+
+    const { title, content, excerpt, tags, status, slug, featured_image, authorId, authorName } = data;
+
+    
+    if (!authorId || !mongoose.Types.ObjectId.isValid(authorId)) {
+      throw new Error('Invalid or missing userId from token');
+    }
+
+    const uniqueSlug = slug 
+      ? await this.generateUniqueSlug(title, slug) 
+      : await this.generateUniqueSlug(title);
+    
+    const blogPost = new BlogPost({
+      title: data.title,
+      content: data.content,
+      excerpt: data.excerpt,
+      tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
+      status: data.status,
+      slug: uniqueSlug,
+      author_id: authorId,
+      author_name: authorName || 'Author',
+      featured_image: featured_image || null
+    });
+
+    
+    return await blogPost.save();
+  } catch (error) {
+    console.error('Error in BlogService.create:', error);
+    if (error.code === 11000 && error.keyPattern?.slug) {
+      const uniqueSlug = await this.generateUniqueSlug(title, null);
       const blogPost = new BlogPost({
         title,
         content,
@@ -117,42 +152,29 @@ class BlogServiceImpl extends IBlogService {
         status,
         slug: uniqueSlug,
         author_id: authorId,
+        author_name: authorName || 'Author',
         featured_image: featured_image || null
       });
-      
       return await blogPost.save();
-    } catch (error) {
-      if (error.code === 11000 && error.keyPattern?.slug) {
-        // Handle duplicate slug error
-        const uniqueSlug = await this.generateUniqueSlug(title);
-        const blogPost = new BlogPost({
-          title,
-          content,
-          excerpt,
-          tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-          status,
-          slug: uniqueSlug,
-          author_id: authorId,
-          featured_image: featured_image || null
-        });
-        return await blogPost.save();
-      }
-      throw error;
     }
+    throw error;
   }
+}
 
   async update(id, { title, content, excerpt, tags, slug, status }) {
+
     try {
-      // Get current post to check existing slug
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid blog post ID');
+  }
       const currentPost = await this.getById(id);
+
       if (!currentPost) {
         throw new Error('Blog post not found');
       }
       
-      // Generate unique slug if slug is being changed
-      const uniqueSlug = slug && slug !== currentPost.slug 
-        ? await this.generateUniqueSlug(title, currentPost.slug)
-        : slug || currentPost.slug;
+      const uniqueSlug = await this.generateUniqueSlug(title, id);
       
       const updateData = {
         title,
@@ -166,7 +188,6 @@ class BlogServiceImpl extends IBlogService {
       return await BlogPost.findByIdAndUpdate(id, updateData, { new: true });
     } catch (error) {
       if (error.code === 11000 && error.keyPattern?.slug) {
-        // Handle duplicate slug error
         const uniqueSlug = await this.generateUniqueSlug(title);
         const updateData = {
           title,
@@ -183,8 +204,11 @@ class BlogServiceImpl extends IBlogService {
   }
 
   async delete(id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid blog post ID');
+  }
     return await BlogPost.findByIdAndDelete(id);
   }
 }
 
-module.exports = { IBlogService, BlogServiceImpl }; 
+module.exports = { IBlogService, BlogServiceImpl };
