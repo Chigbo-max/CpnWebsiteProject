@@ -59,7 +59,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
           <img
             src={admin?.profilePic || admin?.profile_pic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=128'}
             alt="Profile"
-            className="w-20 h-20 rounded-full object-cover border-4 border-amber-500 mb-3 shadow-lg"
+            className="w-20 h-20 rounded-full object-cover border-4 border-accent-500 mb-3 shadow-lg"
           />
           <h2 className="text-base font-semibold leading-tight truncate max-w-[90%] text-center">{admin?.username || 'Admin'}</h2>
           <p className="text-xs text-gray-400 truncate max-w-[90%] text-center">{admin?.email}</p>
@@ -71,7 +71,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
               <button
                 key={link.id}
                 onClick={() => { setActiveSection(link.id); setSidebarOpen(false); }}
-                className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-amber-600 text-white' : 'hover:bg-gray-800 hover:text-amber-400'}`}
+                className={`w-full flex items-center px-6 py-3 text-left text-sm font-medium transition-colors duration-150 ${activeSection === link.id ? 'bg-accent-600 text-white' : 'hover:bg-gray-800 hover:text-accent-400'}`}
               >
                 <FontAwesomeIcon icon={link.icon} className="mr-3 text-base" />
                 {link.label}
@@ -101,7 +101,7 @@ const AdminLayout = ({ admin, onLogout, activeSection, setActiveSection, onShowC
               <img
                 src={admin?.profilePic || admin?.profile_pic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(admin?.username || 'Admin') + '&background=111827&color=fff&size=64'}
                 alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border-2 border-amber-500"
+                className="w-10 h-10 rounded-full object-cover border-2 border-accent-500"
               />
               <span className="font-semibold text-gray-900 hidden sm:block">{admin?.username || 'Admin'}</span>
               <FontAwesomeIcon icon={faTimes} className="text-gray-500" />

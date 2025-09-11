@@ -98,16 +98,27 @@ router.delete('/admin/enrollments/:enrollment_id', authenticateAdmin, async (req
 // Admin: Broadcast email to filtered enrollees
 router.post('/admin/enrollments/broadcast', authenticateAdmin, async (req, res) => {
   try {
-    const { subject, content, startDate, endDate } = req.body;
+    const { subject, content, startDate, endDate, recipients } = req.body;
+
     if (!subject || !content) {
       return res.status(400).json({ error: 'Subject and content are required.' });
     }
-    const count = await enrollmentService.broadcast({ subject, content, startDate, endDate });
+
+    let count;
+    if (Array.isArray(recipients) && recipients.length > 0) {
+      count = await enrollmentService.broadcastToRecipients({ subject, content, recipients });
+    } else {
+      count = await enrollmentService.broadcast({ subject, content, startDate, endDate });
+    }
+
     res.json({ message: `Broadcast sent to ${count} enrollees.` });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 // Admin: Get monthly enrollment counts for dashboard analytics
 router.get('/monthly-counts', authenticateAdmin, async (req, res) => {

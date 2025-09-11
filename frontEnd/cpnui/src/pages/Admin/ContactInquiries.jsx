@@ -129,7 +129,7 @@ const ContactInquiries = () => {
             placeholder="Search by name, email, or message..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
           />
           <select
             value={statusFilter}
@@ -168,7 +168,7 @@ const ContactInquiries = () => {
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{inq.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-blue-700">{inq.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-700">{inq.message.slice(0, 40)}{inq.message.length > 40 ? '...' : ''}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">{inq.created_at ? new Date(inq.created_at).toLocaleDateString() : '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">{inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded text-xs font-bold ${inq.status === 'responded' ? 'bg-green-100 text-green-700' : inq.status === 'read' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{inq.status || 'unread'}</span>
                   </td>
@@ -212,7 +212,7 @@ const ContactInquiries = () => {
         <div className="flex justify-center gap-2 mt-4">
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Prev</button>
           {[...Array(totalPages)].map((_, i) => (
-            <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
+            <button key={i} onClick={() => setPage(i + 1)} className={`px-3 py-1 rounded font-bold ${page === i + 1 ? 'bg-accent-600 text-white' : 'bg-gray-200 text-gray-700'}`}>{i + 1}</button>
           ))}
           <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded bg-gray-200 text-gray-700 font-bold disabled:opacity-50">Next</button>
         </div>
@@ -230,7 +230,7 @@ const ContactInquiries = () => {
             </button>
             <h2 className="text-xl font-bold mb-2">{selected.name}</h2>
             <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Email:</span> {selected.email}</p>
-            <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Date:</span> {selected.created_at ? new Date(selected.created_at).toLocaleString() : '-'}</p>
+            <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Date:</span> {selected.createdAt ? new Date(selected.createdAt).toLocaleString() : '-'}</p>
             <div className="mt-4">
               <p className="text-gray-900 whitespace-pre-line">{selected.message}</p>
             </div>
@@ -252,7 +252,7 @@ const ContactInquiries = () => {
                 </button>
               )}
               <button
-                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 text-xs font-semibold"
+                className="px-4 py-2 rounded bg-accent-500 text-white hover:bg-accent-600 text-xs font-semibold"
                 onClick={() => { setRespondModalOpen(true); setResponseContent(''); }}
               >
                 Respond
@@ -293,7 +293,7 @@ const ContactInquiries = () => {
               </button>
               <button
                 type="button"
-                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 font-semibold"
+                className="px-4 py-2 rounded bg-accent-500 text-white hover:bg-accent-600 font-semibold"
                 onClick={handleSendResponse}
                 disabled={responseSending}
               >
@@ -308,7 +308,7 @@ const ContactInquiries = () => {
               </button>
             </div>
             {previewResponse && (
-              <div className="prose prose-amber max-w-none mt-4 p-4 border rounded bg-gray-50">
+              <div className="prose prose-accent max-w-none mt-4 p-4 border rounded bg-gray-50">
                 <ReactMarkdown components={{ span: ({...props}) => <span {...props} /> }}>{responseContent}</ReactMarkdown>
               </div>
             )}

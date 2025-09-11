@@ -50,7 +50,7 @@ const BlogList = ({ onRefresh }) => {
       const startOfDay = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
       const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
       filtered = filtered.filter(post => {
-        const postDate = new Date(post.created_at);
+        const postDate = new Date(post.createdAt);
         return postDate >= startOfDay && postDate < endOfDay;
       });
     }
@@ -93,7 +93,7 @@ const BlogList = ({ onRefresh }) => {
     e.preventDefault();
     setEditLoading(true);
     try {
-      await updateBlog({ id: editPost.id, ...editPost }).unwrap();
+      await updateBlog({ id: editPost.id || editPost._id, ...editPost }).unwrap();
       toast.success('Blog post updated');
       setEditPost(null);
       refetch();
@@ -234,7 +234,7 @@ const BlogList = ({ onRefresh }) => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded text-xs font-bold ${post.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{post.status}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">{post.created_at ? new Date(post.created_at).toLocaleDateString() : '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                     <button
                       className="px-3 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-semibold"
@@ -274,7 +274,7 @@ const BlogList = ({ onRefresh }) => {
             </button>
             <h2 className="text-xl font-bold mb-2">{viewPost.title}</h2>
             <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Status:</span> {viewPost.status}</p>
-            <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Date:</span> {viewPost.created_at ? new Date(viewPost.created_at).toLocaleString() : '-'}</p>
+            <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Date:</span> {viewPost.createdAt ? new Date(viewPost.createdAt).toLocaleString() : '-'}</p>
             <div className="mt-4">
               <p className="text-gray-900 whitespace-pre-line">{viewPost.content}</p>
             </div>

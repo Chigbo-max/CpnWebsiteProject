@@ -20,8 +20,12 @@ const blogPostSchema = new mongoose.Schema({
   }],
   author_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Admin',
     required: true
+  },
+  author_name: {
+    type: String,
+    required: true,
+    trim: true
   },
   featured_image: {
     type: String,
@@ -50,5 +54,6 @@ const blogPostSchema = new mongoose.Schema({
 // Index for better query performance
 blogPostSchema.index({ status: 1 });
 blogPostSchema.index({ createdAt: -1 });
+blogPostSchema.index({ author_id: 1 });
 
 module.exports = mongoose.model('BlogPost', blogPostSchema);

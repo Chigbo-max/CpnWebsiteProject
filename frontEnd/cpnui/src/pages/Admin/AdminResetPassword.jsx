@@ -66,7 +66,7 @@ const AdminResetPassword = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
                 minLength={12}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                 disabled={!token}
                 autoComplete="new-password"
               />
@@ -83,7 +83,7 @@ const AdminResetPassword = () => {
                 onChange={e => setConfirm(e.target.value)}
                 required
                 minLength={12}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                 disabled={!token}
                 autoComplete="new-password"
               />
@@ -91,7 +91,7 @@ const AdminResetPassword = () => {
             <button
               type="submit"
               disabled={isLoading || !token}
-              className="w-full bg-amber-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-amber-600 transition-all duration-300 hover:bg-amber-700 hover:border-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-accent-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-accent-600 transition-all duration-300 hover:bg-accent-700 hover:border-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Resetting...' : 'Reset Password'}
             </button>

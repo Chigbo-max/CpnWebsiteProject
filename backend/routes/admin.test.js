@@ -2,6 +2,9 @@ const request = require('supertest');
 const server = require('../server');
 const app = server.app;
 
+
+
+
 jest.mock('../config/redisClient', () => ({
   get: jest.fn().mockResolvedValue(null),
   setEx: jest.fn().mockResolvedValue(undefined),
@@ -52,7 +55,14 @@ jest.mock('nodemailer', () => ({
     sendMail: jest.fn().mockResolvedValue(undefined)
   })
 }));
-jest.mock('multer', () => () => ({ single: () => (req, res, next) => next() }));
+jest.mock('multer', () => {
+  const multerMock = jest.fn(() => ({
+    single: () => (req, res, next) => next(),
+  }));
+  multerMock.memoryStorage = jest.fn(() => ({}));
+  return multerMock;
+});
+
 jest.mock('../middleware/auth', () => ({
   authenticateAdmin: (req, res, next) => {
     req.admin = { id: 1, role: 'superadmin' };

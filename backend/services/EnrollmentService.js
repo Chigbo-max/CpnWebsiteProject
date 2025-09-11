@@ -42,8 +42,10 @@ class EnrollmentService {
 
     // Send confirmation email
     const content = `
-      Thank you for enrolling in <b>${course}</b>!<br>
-      Your enrollment ID: <b>${enrollment_id}</b><br>
+      Thank you for enrolling in <b>${course}</b>!<br><br>
+      Your enrollment ID: <b>${enrollment_id}</b><br><br>
+      We will send you an email with other enrollment details before the course starts.<br><br>
+      <a href="${process.env.VITE_WHATSAPP_LINK}">Feel free join our whatsapp community.</a><br><br>
       Date: <b>${enrolled_at.toLocaleString()}</b>
     `;
     await this.mailer.sendMail({
@@ -104,6 +106,23 @@ class EnrollmentService {
     await Promise.all(emailPromises);
     return enrollees.length;
   }
+
+  async broadcastToRecipients({ subject, content, recipients }) {
+  const emailPromises = recipients.map(r =>
+    this.mailer.sendMail({
+      from: process.env.EMAIL_USER,
+      to: r.email,
+      subject,
+      html: NewsletterServiceImpl.renderNewsletterTemplate({
+        name: r.name,
+        content
+      })
+    })
+  );
+
+  await Promise.all(emailPromises);
+  return recipients.length;
+}
 
   // Get enrollments per month for a given period (default 60 months = 5 years)
   async getMonthlyCounts(months = 60) {

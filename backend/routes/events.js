@@ -4,10 +4,14 @@ const { EventServiceImpl } = require('../services/EventService');
 const { CloudinaryServiceImpl } = require('../services/CloudinaryService');
 const nodemailer = require('nodemailer');
 const { authenticateAdmin } = require('../middleware/auth');
-const redisClient = require('../config/redisClient');
 const multer = require('multer');
 const upload = multer();
 
+const {
+  clearCache,
+  redisSafeGet,
+  redisSafeSetEx
+} = require('../utils/redisHelper');
 
 const eventService = new EventServiceImpl();
 const cloudinaryService = new CloudinaryServiceImpl();
@@ -15,25 +19,15 @@ const cloudinaryService = new CloudinaryServiceImpl();
 // GET /api/events
 router.get('/', async (req, res) => {
   try {
-    const cacheKey = 'events:list';
-
-    let cached = null;
-
-    if(redisClient){ 
-      cached = await redisClient.get(cacheKey);
-    }
-    
-  
+    const cached = await redisSafeGet('events:list');
     if (cached) {
       const parsed = JSON.parse(cached);
       return res.json(Array.isArray(parsed) ? { events: parsed } : parsed);
     }
+
     const events = await eventService.getEvents();
-    console.log("Fetched events:", events);
-    
-    if(redisClient){
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(events));
-    }
+
+    await redisSafeSetEx('events:list', 300, JSON.stringify(events));
     res.json({ events });
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -45,13 +39,14 @@ router.get('/', async (req, res) => {
 router.get('/:event_id', async (req, res) => {
   try {
     const cacheKey = `events:${req.params.event_id}`;
-    const cached = await redisClient.get(cacheKey);
+    const cached = await redisSafeGet(cacheKey);
+
     if (cached) return res.json(JSON.parse(cached));
 
     const event = await eventService.getEventById(req.params.event_id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(event));
+    await redisSafeSetEx(cacheKey, 300, JSON.stringify(event));
     res.json(event);
   } catch (error) {
     console.error('Error fetching event:', error);
@@ -64,14 +59,13 @@ router.put('/:event_id', authenticateAdmin, async (req, res) => {
   try {
     const event_id = req.params.event_id;
     const updates = req.body;
-    
+
     // Handle image upload if provided
     let image_url = updates.image_url;
     if (updates.image && updates.image.startsWith('data:image')) {
       image_url = await cloudinaryService.uploadImage(updates.image, 'event-images');
     }
-    
-    // Prepare update data
+
     const updateData = {
       title: updates.title,
       description: updates.description,
@@ -83,16 +77,13 @@ router.put('/:event_id', authenticateAdmin, async (req, res) => {
       location_map_url: updates.location_map_url || null,
       virtual_link: updates.virtual_link || null
     };
-    
+
     const updatedEvent = await eventService.updateEvent(event_id, updateData);
     if (!updatedEvent) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    
-    // Clear cache
-    await redisClient.del(`events:${event_id}`);
-    await redisClient.del('events:list');
-    
+
+    await clearCache([`events:${event_id}`, 'events:list']);
     res.json(updatedEvent);
   } catch (error) {
     console.error('Error updating event:', error);
@@ -105,15 +96,12 @@ router.delete('/:event_id', authenticateAdmin, async (req, res) => {
   try {
     const event_id = req.params.event_id;
     const deleted = await eventService.deleteEvent(event_id);
-    
+
     if (!deleted) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    
-    // Clear cache
-    await redisClient.del(`events:${event_id}`);
-    await redisClient.del('events:list');
-    
+
+    await clearCache([`events:${event_id}`, 'events:list']);
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {
     console.error('Error deleting event:', error);
@@ -131,7 +119,9 @@ router.post('/:event_id/register', async (req, res) => {
     }
     const { name, email, phone } = req.body;
     if (!name || !email) return res.status(400).json({ message: 'Name and email required' });
+
     const reg = await eventService.registerForEvent(req.params.event_id, { name, email, phone });
+
     // Send confirmation email
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -140,12 +130,14 @@ router.post('/:event_id/register', async (req, res) => {
         pass: process.env.EMAIL_PASS
       }
     });
+
     let locationInfo = '';
     if (event.event_type === 'physical') {
       locationInfo = `<b>Address:</b> ${event.location_address}<br/><a href="${event.location_map_url}">View on Google Maps</a>`;
     } else {
-      locationInfo = `<b>Virtual Meeting Link:</b> <a href="${event.virtual_link}">${event.virtual_link}</a>`;
+      locationInfo = `<b>Meeting Link:</b> <a href="${event.virtual_link}">${event.virtual_link}</a>`;
     }
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -160,8 +152,8 @@ router.post('/:event_id/register', async (req, res) => {
         `
       })
     });
-    // Invalidate registrations cache for this event
-    await redisClient.del(`event_registrations:${req.params.event_id}`);
+
+    await clearCache(`event_registrations:${req.params.event_id}`);
     res.status(201).json({ ...reg, event });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -172,11 +164,11 @@ router.post('/:event_id/register', async (req, res) => {
 router.get('/:event_id/registrations', authenticateAdmin, async (req, res) => {
   try {
     const cacheKey = `event_registrations:${req.params.event_id}`;
-    const cached = await redisClient.get(cacheKey);
+    const cached = await redisSafeGet(cacheKey);
     if (cached) return res.json(JSON.parse(cached));
 
     const regs = await eventService.getRegistrationsForEvent(req.params.event_id);
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(regs));
+    await redisSafeSetEx(cacheKey, 300, JSON.stringify(regs));
     res.json(regs);
   } catch (error) {
     console.error('Error fetching registrations:', error);
@@ -188,11 +180,11 @@ router.get('/:event_id/registrations', authenticateAdmin, async (req, res) => {
 router.get('/:event_id/registrations/csv', authenticateAdmin, async (req, res) => {
   try {
     const cacheKey = `event_registrations_csv:${req.params.event_id}`;
-    const cached = await redisClient.get(cacheKey);
+    const cached = await redisSafeGet(cacheKey);
     if (cached) return res.json(JSON.parse(cached));
 
     const csvData = await eventService.getRegistrationsCSV(req.params.event_id);
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(csvData));
+    await redisSafeSetEx(cacheKey, 300, JSON.stringify(csvData));
 
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename=registrations_${req.params.event_id}.csv`);

@@ -69,6 +69,7 @@ const BlogCreate = ({ token, onSuccess }) => {
       formData.append('tags', tags);
       formData.append('status', status);
       formData.append('slug', slug);
+    
       if (image) {
         formData.append('image', image);
       }
@@ -91,6 +92,9 @@ const BlogCreate = ({ token, onSuccess }) => {
       } else if (err?.data?.error === 'DATABASE_ERROR') {
         toast.error('Database error occurred. Please check your input and try again.');
         setError('Please check your input and try again.');
+      } else if (err?.data?.message?.includes('Authentication error')) {
+        toast.error('Authentication error. Please log in again.');
+        setError('Your session may have expired. Please log in again.');
       } else {
         toast.error(err?.data?.message || 'Failed to create blog post');
         setError(err?.data?.message || 'An error occurred while creating the blog post.');
@@ -151,7 +155,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             type="text"
             value={title}
             onChange={handleTitleChange}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
             required
           />
         </div>
@@ -176,7 +180,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             }}
             rows={3}
             maxLength={EXCERPT_MAX_LENGTH}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400 resize-y"
             placeholder="Short summary for preview..."
             required
           />
@@ -190,7 +194,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-50 file:text-accent-700 hover:file:bg-accent-100"
           />
           {imagePreview && (
             <img src={imagePreview} alt="Preview" className="mt-2 h-32 rounded-lg object-cover border" />
@@ -202,7 +206,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             type="text"
             value={slug}
             onChange={handleSlugChange}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
             placeholder="e.g. my-first-blog-post"
             required
           />
@@ -213,7 +217,7 @@ const BlogCreate = ({ token, onSuccess }) => {
             type="text"
             value={tags}
             onChange={e => setTags(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
             placeholder="e.g. faith, career, leadership"
           />
         </div>
@@ -226,7 +230,7 @@ const BlogCreate = ({ token, onSuccess }) => {
               value="draft"
               checked={status === 'draft'}
               onChange={() => setStatus('draft')}
-              className="form-radio text-amber-500"
+              className="form-radio text-accent-500"
             />
             <span className="ml-2 text-gray-700">Draft</span>
           </label>
@@ -237,7 +241,7 @@ const BlogCreate = ({ token, onSuccess }) => {
               value="published"
               checked={status === 'published'}
               onChange={() => setStatus('published')}
-              className="form-radio text-amber-500"
+              className="form-radio text-accent-500"
             />
             <span className="ml-2 text-gray-700">Publish</span>
           </label>
@@ -246,14 +250,21 @@ const BlogCreate = ({ token, onSuccess }) => {
           <button
             type="button"
             className="px-6 py-2 rounded-lg border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 transition"
-            onClick={e => handleSubmit(e)}
+            onClick={() => {
+              setStatus('draft');
+              handleSubmit({ preventDefault: () => {} });
+            }}
             disabled={submitting}
           >
             {submitting ? 'Saving...' : 'Save as Draft'}
           </button>
           <button
-            type="submit"
-            className={`px-6 py-2 rounded-lg text-white bg-amber-500 hover:bg-amber-600 transition ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+            type="button"
+            className={`px-6 py-2 rounded-lg text-white bg-accent-500 hover:bg-accent-600 transition ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+            onClick={() => {
+              setStatus('published');
+              handleSubmit({ preventDefault: () => {} });
+            }}
             disabled={submitting}
           >
             {submitting ? 'Publishing...' : 'Publish'}
@@ -277,7 +288,7 @@ const BlogCreate = ({ token, onSuccess }) => {
       {showClearModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 relative animate-fadeIn">
-            <h2 className="text-xl font-bold mb-4 text-amber-600">Clear All Fields?</h2>
+            <h2 className="text-xl font-bold mb-4 text-accent-600">Clear All Fields?</h2>
             <p className="mb-6 text-gray-700">Are you sure you want to clear all fields? This action cannot be undone.</p>
             <div className="flex justify-end gap-4">
               <button
@@ -287,7 +298,7 @@ const BlogCreate = ({ token, onSuccess }) => {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 font-semibold"
+                className="px-4 py-2 rounded bg-accent-500 text-white hover:bg-accent-600 font-semibold"
                 onClick={() => {
                   setTitle('');
                   setMarkdownValue('');
@@ -296,6 +307,8 @@ const BlogCreate = ({ token, onSuccess }) => {
                   setImage(null);
                   setImagePreview(null);
                   setTags('');
+                  setSlug('');
+                  setSlugEdited(false);
                   setShowClearModal(false);
                 }}
               >
@@ -314,4 +327,4 @@ BlogCreate.propTypes = {
   onSuccess: PropTypes.func
 };
 
-export default BlogCreate; 
+export default BlogCreate;

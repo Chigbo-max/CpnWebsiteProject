@@ -179,7 +179,7 @@ const UserManagement = ({ token }) => {
         <button
           onClick={exportToPDF}
           disabled={exporting || users.length === 0}
-          className="inline-flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-accent-600 text-white px-4 py-2 rounded-lg hover:bg-accent-700 transition-colors disabled:opacity-50"
         >
           {exporting ? (
             <>
@@ -199,8 +199,8 @@ const UserManagement = ({ token }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-lg shadow border">
           <div className="flex items-center">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <FaUsers className="text-amber-600" />
+            <div className="p-2 bg-accent-100 rounded-lg">
+              <FaUsers className="text-accent-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
@@ -256,7 +256,7 @@ const UserManagement = ({ token }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name, email, or phone..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -267,7 +267,7 @@ const UserManagement = ({ token }) => {
             <select
               value={filterState}
               onChange={(e) => setFilterState(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
             >
               <option value="">All States</option>
               {nigerianStates.map(state => (
@@ -283,7 +283,7 @@ const UserManagement = ({ token }) => {
             <select
               value={filterNationality}
               onChange={(e) => setFilterNationality(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
             >
               <option value="">All Nationalities</option>
               {nationalities.map(nationality => (

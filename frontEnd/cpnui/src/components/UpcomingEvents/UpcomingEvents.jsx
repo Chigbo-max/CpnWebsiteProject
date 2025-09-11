@@ -1,10 +1,11 @@
 import { useGetEventsQuery } from '../../features/event/eventApi';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faUsers, faBookOpen, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faMapMarkerAlt, faVideo } from '@fortawesome/free-solid-svg-icons';
 
 function UpcomingEvents() {
-    const { data: events = [], isLoading, isError} = useGetEventsQuery();
+    const { data: events = [], isLoading, isError } = useGetEventsQuery();
+
     let upcomingEvents = [];
     if (events.length > 0) {
         const now = new Date();
@@ -70,48 +71,8 @@ function UpcomingEvents() {
 
     if (upcomingEvents.length === 0) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
-                    <div className="h-48 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                        <FontAwesomeIcon icon={faCalendarAlt} className="text-6xl text-white" />
-                    </div>
-                    <div className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Leadership Summit 2024</h3>
-                        <p className="text-gray-600 mb-4">A comprehensive leadership development event featuring industry experts and biblical insights.</p>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">March 15-16, 2024</span>
-                            <Link to="/events" className="text-amber-600 font-semibold hover:text-amber-700">Learn More</Link>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
-                    <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                        <FontAwesomeIcon icon={faUsers} className="text-6xl text-white" />
-                    </div>
-                    <div className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Professional Networking</h3>
-                        <p className="text-gray-600 mb-4">Connect with fellow professionals and expand your network in a faith-based environment.</p>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">Monthly</span>
-                            <Link to="/events" className="text-amber-600 font-semibold hover:text-amber-700">Learn More</Link>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
-                    <div className="h-48 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                        <FontAwesomeIcon icon={faBookOpen} className="text-6xl text-white" />
-                    </div>
-                    <div className="p-6" style={{backgroundColor: '#111826ff'}}>
-                        <h3 className="text-xl font-bold text-white mb-2">Bible Study Series</h3>
-                        <p className="text-gray-300 mb-4">Deep dive into biblical principles for professional excellence and workplace ministry.</p>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-400">Weekly</span>
-                            <Link to="/events" className="text-amber-400 font-semibold hover:text-amber-300">Learn More</Link>
-                        </div>
-                    </div>
-                </div>
+            <div className="text-center py-8">
+                <p className="text-gray-500">No upcoming events found.</p>
             </div>
         );
     }
@@ -119,7 +80,10 @@ function UpcomingEvents() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {upcomingEvents.map((event, index) => (
-                <div key={event.event_id} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                <div 
+                    key={event.event_id} 
+                    className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300"
+                >
                     <div className={`h-48 bg-gradient-to-br ${getEventGradient(index)} flex items-center justify-center`}>
                         <FontAwesomeIcon icon={getEventIcon(event.event_type)} className="text-6xl text-white" />
                     </div>
@@ -128,7 +92,10 @@ function UpcomingEvents() {
                         <p className="text-gray-600 mb-4 line-clamp-3">{event.description}</p>
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-500">{formatEventDate(event.start_time)}</span>
-                            <Link to={`/events/${event.event_id}`} className="text-amber-600 font-semibold hover:text-amber-700">
+                            <Link 
+                                to={`/events/${event.event_id}`} 
+                                className="text-amber-600 font-semibold hover:text-amber-700"
+                            >
                                 Learn More
                             </Link>
                         </div>
@@ -139,4 +106,4 @@ function UpcomingEvents() {
     );
 }
 
-export default UpcomingEvents; 
+export default UpcomingEvents;

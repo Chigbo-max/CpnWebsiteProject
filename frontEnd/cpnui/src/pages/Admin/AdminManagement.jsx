@@ -41,13 +41,14 @@ const AdminManagement = ({ currentAdmin }) => {
       admin.username?.toLowerCase().includes(searchLower) ||
       admin.email?.toLowerCase().includes(searchLower) ||
       admin.role?.toLowerCase().includes(searchLower) ||
-      admin.id?.toString().includes(searchLower)
+      admin._id?.toString().includes(searchLower)
     );
   });
 
   const [addAdmin, { isLoading: isAdding }] = useAddAdminMutation();
   const [deleteAdmin] = useDeleteAdminMutation();
   const [resetPassword] = useResetAdminPasswordMutation();
+
 
   if (!currentAdmin || currentAdmin.role !== 'superadmin') {
     return (
@@ -64,7 +65,7 @@ const AdminManagement = ({ currentAdmin }) => {
     setConfirmModal({ 
       open: true, 
       type: 'delete', 
-      admin: admins.find(admin => admin.id === id) 
+      admin: admins.find(admin => admin._id === id) 
     });
   };
 
@@ -72,7 +73,7 @@ const AdminManagement = ({ currentAdmin }) => {
     setConfirmModal({ 
       open: true, 
       type: 'reset', 
-      admin: admins.find(admin => admin.id === id) 
+      admin: admins.find(admin => admin._id === id) 
     });
   };
 
@@ -81,10 +82,10 @@ const AdminManagement = ({ currentAdmin }) => {
     
     try {
       if (confirmModal.type === 'delete') {
-        await deleteAdmin(confirmModal.admin.id).unwrap();
+        await deleteAdmin(confirmModal.admin._id).unwrap();
         toast.success('Admin deleted successfully');
       } else if (confirmModal.type === 'reset') {
-        await resetPassword(confirmModal.admin.id).unwrap();
+        await resetPassword(confirmModal.admin._id).unwrap();
         toast.success('Password reset email sent');
       }
     } catch (err) {
@@ -115,7 +116,7 @@ const AdminManagement = ({ currentAdmin }) => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Admin Management</h2>
         <button
-          className="px-4 py-2 rounded bg-amber-500 text-white font-semibold hover:bg-amber-600"
+          className="px-4 py-2 rounded bg-accent-500 text-white font-semibold hover:bg-accent-600"
           onClick={() => setModalOpen(true)}
         >
           Add Admin
@@ -129,7 +130,7 @@ const AdminManagement = ({ currentAdmin }) => {
           placeholder="Search by name, email, role, or ID..." 
           value={searchTerm} 
           onChange={e => setSearchTerm(e.target.value)} 
-          className="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent" 
+          className="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent" 
         />
       </div>
 
@@ -157,25 +158,25 @@ const AdminManagement = ({ currentAdmin }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredAdmins.map(admin => (
-                <tr key={admin.id}>
+                <tr key={admin._id}>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{admin.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-blue-700">{admin.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-700">{admin.role}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-700">
-                    {admin.created_at ? new Date(admin.created_at).toLocaleDateString() : '-'}
+                    {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                    {admin.id !== currentAdmin.id && (
+                    {admin._id !==currentAdmin._id && (
                       <>
                         <button
                           className="px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 text-xs font-semibold"
-                          onClick={() => handleDelete(admin.id)}
+                          onClick={() => handleDelete(admin._id)}
                         >
                           Delete
                         </button>
                         <button
                           className="px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-semibold"
-                          onClick={() => handleResetPassword(admin.id)}
+                          onClick={() => handleResetPassword(admin._id)}
                         >
                           Reset Password
                         </button>
@@ -208,7 +209,7 @@ const AdminManagement = ({ currentAdmin }) => {
                   type="text"
                   value={form.username}
                   onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 />
               </div>
@@ -218,7 +219,7 @@ const AdminManagement = ({ currentAdmin }) => {
                   type="email"
                   value={form.email}
                   onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                 />
               </div>
@@ -228,7 +229,7 @@ const AdminManagement = ({ currentAdmin }) => {
                   type="password"
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                   required
                   minLength={8}
                 />
@@ -238,7 +239,7 @@ const AdminManagement = ({ currentAdmin }) => {
                 <select
                   value={form.role}
                   onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400"
                 >
                   <option value="admin">Admin</option>
                   <option value="superadmin">Super Admin</option>
@@ -247,7 +248,7 @@ const AdminManagement = ({ currentAdmin }) => {
               <div className="flex gap-4 mt-4">
                 <button
                   type="submit"
-                  className={`px-6 py-2 rounded-lg text-white bg-amber-500 hover:bg-amber-600 transition ${isAdding ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  className={`px-6 py-2 rounded-lg text-white bg-accent-500 hover:bg-accent-600 transition ${isAdding ? 'opacity-60 cursor-not-allowed' : ''}`}
                   disabled={isAdding}
                 >
                   {isAdding ? 'Adding...' : 'Add Admin'}
@@ -296,7 +297,7 @@ const AdminManagement = ({ currentAdmin }) => {
                 className={`px-4 py-2 rounded text-white font-semibold ${
                   confirmModal.type === 'delete' 
                     ? 'bg-red-500 hover:bg-red-600' 
-                    : 'bg-amber-500 hover:bg-amber-600'
+                    : 'bg-accent-500 hover:bg-accent-600'
                 }`}
                 onClick={confirmAction}
               >
@@ -312,7 +313,7 @@ const AdminManagement = ({ currentAdmin }) => {
 
 AdminManagement.propTypes = {
   currentAdmin: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     role: PropTypes.string.isRequired,
   }).isRequired,
 };

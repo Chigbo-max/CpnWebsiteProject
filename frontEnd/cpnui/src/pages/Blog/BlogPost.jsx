@@ -13,7 +13,9 @@ import { useGetBlogBySlugQuery } from '../../features/blog/blogApi';
 function BlogPost() {
     const { slug } = useParams();
     const [showShareOptions, setShowShareOptions] = useState(false);
-    const { data: post, isLoading, isError, error } = useGetBlogBySlugQuery(slug);
+    const { data, isLoading, isError, error } = useGetBlogBySlugQuery(slug);
+    const post = data?._doc ?? data;
+    console.log('post', post);
     const serverDown = isError && (error?.message === 'Failed to fetch' || error?.message === 'NetworkError when attempting to fetch resource.');
 
     const shareUrl = window.location.href;
@@ -126,7 +128,7 @@ function BlogPost() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <FontAwesomeIcon icon={faCalendarAlt} className="text-sm" />
-                                <span>{new Date(post.created_at).toLocaleDateString('en-US', {
+                                <span>{new Date(post.createdAt).toLocaleDateString('en-US', {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric'
@@ -158,7 +160,8 @@ function BlogPost() {
                         {/* Tags */}
                         {post.tags && (
                             <div className="mb-6 flex flex-wrap gap-2">
-                                {post.tags.split(',').map((tag, index) => (
+                                {(Array.isArray(post.tags) ? post.tags : post.tags.split(','))
+                                .map((tag, index) => (
                                     <span 
                                         key={index}
                                         className="px-3 py-1 bg-amber-100 text-accent-800 rounded-full text-sm font-medium"

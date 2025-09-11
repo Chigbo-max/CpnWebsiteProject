@@ -139,7 +139,7 @@ function Events() {
                             src={ev.image_url} 
                             alt={ev.title} 
                             className="w-full h-full object-cover"
-                            onError={e => { e.target.onerror = null; e.target.src = '/vite.svg'; }}
+                            onError={e => { e.target.onerror = null; e.target.src = '/cpnBanner.png'; }}
                           />
                         </div>
                       ) : (

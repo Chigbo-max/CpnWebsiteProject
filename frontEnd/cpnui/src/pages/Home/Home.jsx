@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Calendar, ChevronLeft, ChevronRight} from 'lucide-react';
-import { faBookOpen} from "@fortawesome/free-solid-svg-icons";
+import { Users, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify as faSpotifyBrand, faWhatsapp as faWhatsappBrand } from "@fortawesome/free-brands-svg-icons";
 import Cpn1 from "../../assets/cpnevent1.jpg";
@@ -48,7 +48,7 @@ const slides = [
     buttonType: "link"
   },
   {
-    image: Bookshelf, 
+    image: Bookshelf,
     title: "Courses",
     subtitle: "Grow Professionally & Spiritually",
     text: "Explore our range of courses designed to help you do work, leadership, and business differently—anchored in Kingdom values and practical excellence.",
@@ -82,13 +82,13 @@ function Home() {
   }, [])
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? slides.length - 1 : prevIndex - 1
     );
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       (prevIndex + 1) % slides.length
     );
   };
@@ -116,7 +116,7 @@ function Home() {
             <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-60 z-10" />
           </motion.div>
         </AnimatePresence>
-        
+
         <div className="relative z-20 flex flex-col justify-center items-center w-full px-6 pt-40 pb-24 mx-auto">
           <motion.div
             key={slides[currentIndex].subtitle}
@@ -128,7 +128,7 @@ function Home() {
           >
             {slides[currentIndex].subtitle}
           </motion.div>
-          
+
           <motion.h1
             key={slides[currentIndex].title}
             initial={{ opacity: 0, y: 20 }}
@@ -141,7 +141,7 @@ function Home() {
               <div key={index} className="whitespace-nowrap">{line}</div>
             ))}
           </motion.h1>
-          
+
           <motion.p
             key={slides[currentIndex].text}
             initial={{ opacity: 0, y: 20 }}
@@ -152,7 +152,7 @@ function Home() {
           >
             {slides[currentIndex].text}
           </motion.p>
-          
+
           <motion.div
             key={slides[currentIndex].buttonText}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -181,7 +181,7 @@ function Home() {
             )}
           </motion.div>
         </div>
-        
+
         {/* Navigation Arrows */}
         <button
           onClick={goToPrevious}
@@ -190,7 +190,7 @@ function Home() {
         >
           <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
-        
+
         <button
           onClick={goToNext}
           className="absolute right-4 sm:right-8 top-1/2 transform -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"
@@ -198,16 +198,15 @@ function Home() {
         >
           <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
-        
+
         {/* Slide Indicators */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 flex space-x-3">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex ? 'bg-accent-500 scale-125' : 'bg-white bg-opacity-50'
-              }`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-accent-500 scale-125' : 'bg-white bg-opacity-50'
+                }`}
             />
           ))}
         </div>
@@ -215,7 +214,7 @@ function Home() {
 
       {/* Main Content Sections */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-accent-50">
-                <Features />
+        <Features />
 
         {/* Community Section */}
         <section className="mb-24 max-w-7xl mx-auto">
@@ -225,7 +224,7 @@ function Home() {
               Join thousands of professionals who are transforming their workplaces with Kingdom values and biblical principles.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
@@ -242,7 +241,7 @@ function Home() {
                 Join Now <FontAwesomeIcon icon={faWhatsappBrand} className="text-lg" />
               </Link>
             </div>
-            
+
             <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
                 <FontAwesomeIcon icon={faBookOpen} className="text-2xl text-accent-600" />
@@ -255,14 +254,14 @@ function Home() {
                 Every Wednesday 5AM
               </span>
             </div>
-            
+
             <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
               <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6">
                 <Calendar className="w-8 h-8 text-accent-600" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Monthly Mentorship</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Mentorship Sessions</h3>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Participate in our monthly mentorship sessions with the convener. Get guidance, support, and insights.
+                Participate in our mentorship sessions with the convener. Get guidance, support, and insights.
               </p>
               <Link
                 to="/events"
@@ -284,7 +283,7 @@ function Home() {
               Access high-quality, biblically-aligned resources designed to help you excel in your professional journey.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-3xl font-bold text-white mb-6">Latest Podcasts and Blogs</h3>
@@ -307,7 +306,7 @@ function Home() {
                 </Link>
               </div>
             </div>
-            
+
             <div className="rounded-2xl p-8 text-white border border-gray-700">
               <h4 className="text-2xl font-bold mb-6 text-white">Available Resources</h4>
               <div className="space-y-4">
@@ -340,11 +339,12 @@ function Home() {
       {/* Main Content Sections Continued */}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-gray-50 to-accent-50">
         {/* Events Section */}
+        {/* Events Section */}
         <section className="mb-24 max-w-7xl mx-auto">
           <div className="w-full text-center mb-8 px-4 sm:px-6 lg:px-8">
             <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-600 uppercase tracking-wider mb-2">EVENTS</p>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
-                Connect at <span className="text-accent-600">Our Events</span>
+              Connect at <span className="text-accent-600">Our Events</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mt-4">
               Join us for transformative events designed to equip and inspire Kingdom professionals.
@@ -352,9 +352,9 @@ function Home() {
           </div>
           {/* Show up to 3 real upcoming events */}
           {eventsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 animate-pulse">
+                <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 animate-pulse w-full max-w-sm">
                   <div className="h-48 bg-gray-200"></div>
                   <div className="p-6">
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
@@ -373,9 +373,9 @@ function Home() {
               <p className="text-gray-500">No upcoming events at the moment.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {upcomingEvents.map((event, idx) => (
-                <div key={event.event_id} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                <div key={event.event_id} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 w-full max-w-sm">
                   {event.image_url ? (
                     <div className="h-48 w-full overflow-hidden bg-gray-200 flex items-center justify-center">
                       <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
@@ -414,24 +414,24 @@ function Home() {
             <p className="text-gray-600">Stay inspired with our weekly episodes on Spotify</p>
           </div>
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <iframe 
-              className="w-full h-96 border-0" 
+            <iframe
+              className="w-full h-96 border-0"
               src={podcastSource}
-              allowFullScreen="" 
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+              allowFullScreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
             />
           </div>
         </section>
       </div>
 
-      <LatestRelease/>
-      
+      <LatestRelease />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-accent-50">
-        <Courses/>
-        <FreeContent/>
+        <Courses />
+        <FreeContent />
       </div>
-      
+
       <JoinCommunityBanner />
     </div>
   )
