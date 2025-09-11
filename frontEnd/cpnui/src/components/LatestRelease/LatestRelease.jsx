@@ -29,7 +29,7 @@ function LatestRelease() {
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Read</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Insights and Inspiration for Professionals</h5>
                         <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
-                            Discover inspiring articles and practical guidance for Christian professionals. Explore career development, faith-driven leadership, and actionable wisdom to help you grow in your industry while honoring God's principles.
+                            Discover inspiring articles and practical guidance for Christian professionals. Explore career development, faith-driven leadership, and actionable wisdom to help you grow in your industry while honoring God&apos;s principles.
                         </p>
                         <button
                             onClick={() => navigate("/InsideCPN/blog")}
