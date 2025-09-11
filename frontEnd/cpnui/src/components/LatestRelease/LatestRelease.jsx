@@ -28,7 +28,7 @@ function LatestRelease() {
                     <div className="flex flex-col items-center text-center w-full lg:items-start lg:text-start lg:w-96 xl:w-[400px]">
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Read</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Insights and Inspiration for Professionals</h5>
-                        <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
+                        <p className="text-xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
                             Discover inspiring articles and practical guidance for Christian professionals. Explore career development, faith-driven leadership, and actionable wisdom to help you grow in your industry while honoring God&apos;s principles.
                         </p>
                         <button
@@ -51,7 +51,7 @@ function LatestRelease() {
                     <div className="flex flex-col items-center text-center w-full lg:items-end lg:text-end lg:w-96 xl:w-[400px]">
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Podcast</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Conversations that Empower</h5>
-                        <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
+                        <p className="text-xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
                             Listen to our podcast series for inspiring conversations with Christian professionals and thought leaders. Gain practical advice, spiritual insights, and real-life stories to help you thrive in your career and make a positive impact.</p>
                         <button
                             onClick={() => navigate("/Resources/listen")}

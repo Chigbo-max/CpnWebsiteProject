@@ -15,7 +15,7 @@ function Courses() {
                 </p>
                 <button 
                     onClick={() => navigate("/courses")}
-                    className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 hover:text-accent-500 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50"
+                    className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 hover:text-accent-500 text-white font-bold py-3 px-6 md:py-4 md:px-8 mt-5 rounded-lg border-2 border-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50"
                 >
                     LEARN MORE &rarr;
                 </button>

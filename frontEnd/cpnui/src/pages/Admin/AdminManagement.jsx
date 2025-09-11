@@ -89,7 +89,7 @@ const AdminManagement = ({ currentAdmin }) => {
         toast.success('Password reset email sent');
       }
     } catch (err) {
-      toast.error(err.data?.message || 'An error occurred');
+      toast.error(err.data?.error || 'An error occurred');
     } finally {
       setConfirmModal({ open: false, type: '', admin: null });
     }
@@ -107,7 +107,7 @@ const AdminManagement = ({ currentAdmin }) => {
       setModalOpen(false);
       setForm({ username: '', email: '', password: '', role: 'admin' });
     } catch (err) {
-      toast.error(err.data?.message || 'Failed to add admin');
+      toast.error(err.data?.error || 'Failed to add admin');
     }
   };
 
@@ -138,7 +138,7 @@ const AdminManagement = ({ currentAdmin }) => {
         <SimpleSpinner message="Loading admins..." />
       ) : isError ? (
         <div className="text-center py-8 text-red-500">
-          {error.data?.message || 'Failed to load admins'}
+          {error.data?.error || 'Failed to load admins'}
         </div>
       ) : admins.length === 0 ? (
         <div className="text-center py-8 text-gray-500">No admins found.</div>
@@ -204,7 +204,7 @@ const AdminManagement = ({ currentAdmin }) => {
             <h2 className="text-xl font-bold mb-4">Add New Admin</h2>
             <form className="space-y-4" onSubmit={handleAdd}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
                 <input
                   type="text"
                   value={form.username}
