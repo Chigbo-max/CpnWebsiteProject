@@ -150,14 +150,14 @@ function About() {
               <li>Remain apolitical – we honor and submit to local authorities as those put in place by God.</li>
               <li>Treat others with respect and dignity – we foster authentic relationships and respect all members.</li>
               <li>Promote safe spaces for sharing, learning, and growth in faith and work.</li>
-              <li>Promote the common good of the Christian faith and act upon Christian values in the workplace</li>
+              <li>Promote the common good of the Christian faith and act upon Christian values in the workplace</li>
             </ol>
           </div>
           <div>
             <h3 className="text-3xl font-extrabold text-white mb-6 flex items-center gap-3"><Church className="w-8 h-8 text-accent-600" /> Statement of Faith</h3>
             <blockquote className="bg-primary-800 p-6 rounded-lg text-gray-100 italic text-lg font-small">
               So here’s what I want you to do, God helping you: Take your everyday, ordinary life—your sleeping, eating, going-to-work, and walking-around life—and place it before God as an offering. Embracing what God does for you is the best thing you can do for him.
-              Don’t become so well-adjusted to your culture that you fit into it without even thinking. Instead, fix your attention on God.... -ROM 12: 1-2a MSG            </blockquote>
+              Don’t become so well-adjusted to your culture that you fit into it without even thinking. Instead, fix your attentio  on God.... -ROM 12: 1-2a MSG </blockquote>
           </div>
         </div>
       </section>

@@ -52,7 +52,7 @@ function LatestRelease() {
                         <h4 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4">Latest Podcast</h4>
                         <h5 className="text-lg sm:text-xl lg:text-2xl font-semibold text-accent-400 mb-4">Conversations that Empower</h5>
                         <p className="text-2xl sm:text-base lg:text-lg text-gray-300 mb-6 leading-relaxed">
-                            Listen to our podcast series for inspiring conversations with Christian professionals and thought leaders. Gain practical advice, spiritual insights, and real-life stories to help you thrive in your career and make a positive impact.                        </p>
+                            Listen to our podcast series for inspiring conversations with Christian professionals and thought leaders. Gain practical advice, spiritual insights, and real-life stories to help you thrive in your career and make a positive impact.</p>
                         <button
                             onClick={() => navigate("/Resources/listen")}
                             className="mb-6 bg-accent-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-lg border-2 border-none transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent-500 focus:ring-opacity-50"

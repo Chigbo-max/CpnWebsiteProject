@@ -166,7 +166,7 @@ const AdminManagement = ({ currentAdmin }) => {
                     {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                    {admin._id !== currentAdmin._id && (
+                    {admin._id !==currentAdmin._id && (
                       <>
                         <button
                           className="px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 text-xs font-semibold"
@@ -313,7 +313,7 @@ const AdminManagement = ({ currentAdmin }) => {
 
 AdminManagement.propTypes = {
   currentAdmin: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     role: PropTypes.string.isRequired,
   }).isRequired,
 };
