@@ -79,7 +79,7 @@ function BlogPost() {
                         <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
                         <p className="mb-8">{error?.data?.message || error?.message}</p>
                         <Link 
-                            to="/blog"
+                            to="InsideCPN/blog"
                             className="inline-flex items-center text-accent-500 hover:text-accent-400 font-semibold"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
