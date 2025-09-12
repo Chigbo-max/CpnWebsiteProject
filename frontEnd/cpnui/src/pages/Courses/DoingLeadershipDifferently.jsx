@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import Cpn2 from '../../assets/dld.jpeg';
+import Cpn2 from '../../assets/DLDiff.jpg';
 import JoinCommunityBanner from '../../components/JoinCommunityBanner';
 
 const faqs = [

@@ -74,7 +74,7 @@ function BlogPost() {
     if (isError) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mt-8">
                     <div className="text-center text-red-400">
                         <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
                         <p className="mb-8">{error?.data?.message || error?.message}</p>
@@ -138,7 +138,7 @@ function BlogPost() {
                     </div>
 
                     {/* Featured Image */}
-                    {post.featured_image && (
+                    {/* {post.featured_image && (
                         <div className="w-full h-64 md:h-80 overflow-hidden">
                             <img 
                                 src={post.featured_image} 
@@ -146,7 +146,7 @@ function BlogPost() {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                    )}
+                    )} */}
 
                     {/* Content */}
                     <div className="p-8">
