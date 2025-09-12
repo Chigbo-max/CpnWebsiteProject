@@ -43,35 +43,24 @@ if (process.env.NODE_ENV === 'test') {
 function initializeServer() {
   // --- CORS ---
   const allowedOrigins = [
-  'https://www.cprofessionalsnetwork.com',
-  'https://cpn-front-dev.onrender.com',
-  'https://cprofessionalsnetworkdev.onrender.com',
-  'http://localhost:5173',
-  'http://localhost:5174',
-];
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://cprofessionalsnetworkdev.onrender.com',
+    'https://cpn-front-dev.onrender.com',
+    'https://www.cprofessionalsnetwork.com',
+  ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow Postman / curl / server-side requests
-    if (!origin) return callback(null, true);
-    
-    // exact match
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    
-    console.warn('Blocked CORS origin:', origin);
-    // instead of throwing an error, just deny
-    return callback(null, false);
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept','Origin']
-}));
-
-// handle preflight OPTIONS
-app.options('*', cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.log('CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
+    allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept','Origin']
+  }));
 
   // --- Rate limiting ---
   const limiter = rateLimit({
