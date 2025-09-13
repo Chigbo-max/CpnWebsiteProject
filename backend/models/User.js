@@ -34,6 +34,34 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: ''
   },
+
+  dateOfBirth: {
+    day: {
+      type: Number,
+      min: 1,
+      max: 31,
+      required: true
+    },
+    month: {
+      type: Number,
+      min: 1,
+      max: 12,
+      required: true
+    }
+  },
+  industry: {
+    type: String,
+    required: false,
+    trim: true,
+    default: ''
+  },
+  occupation: {
+    type: String,
+    required: false,
+    trim: true,
+    default: ''
+  },
+
   registeredAt: {
     type: Date,
     default: Date.now
