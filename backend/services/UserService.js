@@ -4,23 +4,26 @@ class IUserService {
   register(data) { throw new Error('Not implemented'); }
   list() { throw new Error('Not implemented'); }
   stats() { throw new Error('Not implemented'); }
+  update(id, data) { throw new Error('Not implemented'); }
 }
 
 class UserServiceImpl extends IUserService {
-  async register({ email, firstName, lastName, whatsapp, nationality, state, otherCountry }) {
+  async register({ email, firstName, lastName, whatsapp, nationality, state, otherCountry, dateOfBirth, industry, occupation }) {
     if (!email || !firstName || !lastName || !whatsapp || !nationality) {
-      const err = new Error('All fields are required');
+      const err = new Error('All required fields must be provided');
       err.code = 'VALIDATION_ERROR';
       throw err;
     }
 
     const isNigeria = typeof nationality === 'string' && nationality.trim().toLowerCase() === 'nigeria';
     const isOther = typeof nationality === 'string' && nationality.trim().toLowerCase() === 'other';
+
     if (isNigeria && !state) {
       const err = new Error('State of residence is required for Nigeria');
       err.code = 'VALIDATION_ERROR';
       throw err;
     }
+
     if (isOther) {
       if (!otherCountry || !otherCountry.trim()) {
         const err = new Error('Please specify your country');
@@ -37,8 +40,24 @@ class UserServiceImpl extends IUserService {
       throw err;
     }
 
-    const user = new User({ email, firstName, lastName, whatsapp, nationality, state: isNigeria ? state : '' });
+    const userPayload = {
+      email,
+      firstName,
+      lastName,
+      whatsapp,
+      nationality,
+      state: isNigeria ? state : '',
+      dateOfBirth: dateOfBirth || null,
+      industry: industry || '',
+      occupation: occupation || ''
+    };
+
+    const user = new User(userPayload);
     return await user.save();
+  }
+
+   async delete(id) {
+    return await User.findByIdAndDelete(id);
   }
 
   async list() {
@@ -70,10 +89,62 @@ class UserServiceImpl extends IUserService {
       { $limit: 10 }
     ]);
 
-    return { totalUsers, todayUsers, thisWeekUsers, usersByState, usersByNationality };
+    const usersByIndustry = await User.aggregate([
+      { $match: { isActive: true } },
+      { $group: { _id: '$industry', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+
+    const usersByOccupation = await User.aggregate([
+      { $match: { isActive: true } },
+      { $group: { _id: '$occupation', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+
+    return {
+      totalUsers,
+      todayUsers,
+      thisWeekUsers,
+      usersByState,
+      usersByNationality,
+      usersByIndustry,
+      usersByOccupation
+    };
+  }
+
+  async update(id, data) {
+    const allowedFields = [
+      'firstName',
+      'lastName',
+      'whatsapp',
+      'state',
+      'dateOfBirth',
+      'industry',
+      'occupation'
+    ];
+
+    const updateData = {};
+    for (const field of allowedFields) {
+      if (data[field] !== undefined) {
+        updateData[field] = data[field];
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    });
+
+    if (!updatedUser) {
+      const err = new Error('User not found');
+      err.code = 'NOT_FOUND';
+      throw err;
+    }
+
+    return updatedUser;
   }
 }
 
 module.exports = { IUserService, UserServiceImpl };
-
-

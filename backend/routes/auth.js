@@ -4,11 +4,20 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const { AuthServiceImpl } = require('../services/AuthService');
 const authService = new AuthServiceImpl(bcrypt, jwt);
-const nodemailer = require('nodemailer');
-const mailer = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-});
+const { createMailer } = require('../config/mailer');
+
+let mailer;
+
+(async()=>{
+  try{
+    mailer = await createMailer();
+  }catch(err){
+    console.error('Failed to create mailer:', err);
+  }
+
+})();
+
+
 const { NewsletterServiceImpl } = require('../services/NewsletterService');
 const { v4: uuidv4 } = require('uuid');
 const { authenticateAdmin } = require('../middleware/auth');
@@ -61,7 +70,7 @@ router.post('/forgot-password', async (req, res) => {
           subject: 'CPN Password Reset Request',
           html: NewsletterServiceImpl.renderNewsletterTemplate({
             name: admin.username,
-            content: `<p>Hello <b>${admin.username.split(' ')[0]}</b>,<br>If you requested a password reset, click <a href="${resetLink}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
+            content: `<p><br>If you requested a password reset, click <a href="${resetLink}">here</a>.<br>If you did not request this, please contact support immediately.</p>`
           })
         });
         status = 'success';
@@ -120,6 +129,9 @@ router.post('/reset-password', async (req, res) => {
     await authService.logResetAttempt({ token, ip, status, reason, type: 'reset' });
   }
 });
+
+
+
 
 // Change password (authenticated)
 router.post('/change-password', authenticateAdmin, async (req, res) => {

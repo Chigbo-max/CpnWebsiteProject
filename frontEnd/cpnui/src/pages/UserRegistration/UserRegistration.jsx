@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { User, Mail, Phone, Globe, MapPin, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, Globe, MapPin, Briefcase, Building, Calendar, Loader2 } from 'lucide-react';
 
 const UserRegistration = () => {
   const [formData, setFormData] = useState({
@@ -10,12 +10,15 @@ const UserRegistration = () => {
     whatsapp: '',
     nationality: '',
     state: '',
-    otherCountry: ''
+    otherCountry: '',
+    dateOfBirth: { day: '', month: '' },
+    industry: '',
+    occupation: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const nigerianStates = [
+   const nigerianStates = [
     'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
     'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe',
     'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara',
@@ -66,45 +69,39 @@ const UserRegistration = () => {
     { name: 'Finland', flag: '🇫🇮' },
     { name: 'Other', flag: '🌍' }
   ];
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
 
+  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (!formData.email) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+
+    if (!formData.whatsapp.trim()) newErrors.whatsapp = 'WhatsApp number is required';
+    else if (!/^\+?[1-9]\d{0,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
+      newErrors.whatsapp = 'Please enter a valid WhatsApp number (e.g., +234 801 234 5678)';
     }
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
+    if (!formData.nationality) newErrors.nationality = 'Country is required';
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-
-    if (!formData.whatsapp.trim()) {
-      newErrors.whatsapp = 'WhatsApp number is required';
-    } else if (!/^\+?[1-9]\d{0,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
-      newErrors.whatsapp = 'Please enter a valid WhatsApp number("e.g., +234 801 234 5678")';
-    }
-
-    if (!formData.nationality) {
-      newErrors.nationality = 'Country is required';
-    }
-
-    if (formData.nationality && formData.nationality.toLowerCase() === 'nigeria' && !formData.state) {
+    if (formData.nationality?.toLowerCase() === 'nigeria' && !formData.state) {
       newErrors.state = 'State of residence is required for Nigeria';
     }
 
-    if (formData.nationality && formData.nationality.toLowerCase() === 'other') {
-      if (!formData.otherCountry.trim()) {
-        newErrors.otherCountry = 'Please specify your country';
-      }
+    if (formData.nationality?.toLowerCase() === 'other' && !formData.otherCountry.trim()) {
+      newErrors.otherCountry = 'Please specify your country';
     }
+
+    if (!formData.dateOfBirth.day || !formData.dateOfBirth.month) {
+      newErrors.dateOfBirth = 'Please select your day and month of birth';
+    }
+
+    if (!formData.industry.trim()) newErrors.industry = 'Industry is required';
+    if (!formData.occupation.trim()) newErrors.occupation = 'Occupation is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -112,23 +109,27 @@ const UserRegistration = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
+    if (name === 'day' || name === 'month') {
+      setFormData((prev) => ({
         ...prev,
-        [name]: ''
+        dateOfBirth: {
+          ...prev.dateOfBirth,
+          [name]: value
+        }
       }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
+    if (errors[name] || (name === 'day' || name === 'month') && errors.dateOfBirth) {
+      setErrors((prev) => ({ ...prev, [name]: '', dateOfBirth: '' }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error('Please fill in all required fields correctly');
       return;
@@ -139,9 +140,7 @@ const UserRegistration = () => {
     try {
       const response = await fetch(`${apiBaseUrl}/users/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -149,11 +148,7 @@ const UserRegistration = () => {
 
       if (response.ok) {
         toast.success('Registration successful! Redirecting to WhatsApp...');
-        
-        // Redirect to WhatsApp after a short delay
-        setTimeout(() => {
-          window.open(data.whatsappLink, '_blank');
-        }, 2000);
+        setTimeout(() => window.open(data.whatsappLink, '_blank'), 2000);
       } else {
         toast.error(data.message || 'Registration failed');
       }
@@ -171,9 +166,7 @@ const UserRegistration = () => {
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white px-8 py-6">
-            <h1 className="text-3xl font-bold text-white text-center">
-              Join CPN Community
-            </h1>
+            <h1 className="text-3xl font-bold text-center">Join CPN Community</h1>
             <p className="text-primary-100 text-center mt-2">
               Fill in your details to join our WhatsApp community
             </p>
@@ -340,7 +333,94 @@ const UserRegistration = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Date of Birth */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="inline w-4 h-4 mr-2 text-primary-900" />
+                Date of Birth *
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  name="day"
+                  value={formData.dateOfBirth.day}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent ${
+                    errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Day</option>
+                  {[...Array(31)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  name="month"
+                  value={formData.dateOfBirth.month}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent ${
+                    errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Month</option>
+                  {[
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                  ].map((month, i) => (
+                    <option key={month} value={i + 1}>{month}</option>
+                  ))}
+                </select>
+              </div>
+              {errors.dateOfBirth && (
+                <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>
+              )}
+            </div>
+
+            {/* Industry */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Building className="inline w-4 h-4 mr-2 text-primary-900" />
+                Industry *
+              </label>
+              <input
+                type="text"
+                name="industry"
+                value={formData.industry}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent ${
+                  errors.industry ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="e.g., Technology, Healthcare, Finance"
+              />
+              {errors.industry && (
+                <p className="text-red-500 text-sm mt-1">{errors.industry}</p>
+              )}
+            </div>
+
+            {/* Occupation */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Briefcase className="inline w-4 h-4 mr-2 text-primary-900" />
+                Occupation *
+              </label>
+              <input
+                type="text"
+                name="occupation"
+                value={formData.occupation}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent ${
+                  errors.occupation ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="e.g., Software Engineer, Nurse, Teacher"
+              />
+              {errors.occupation && (
+                <p className="text-red-500 text-sm mt-1">{errors.occupation}</p>
+              )}
+            </div>
+
+              {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"

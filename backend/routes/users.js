@@ -1,31 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateAdmin } = require('../middleware/auth');
-const { IUserService, UserServiceImpl } = require('../services/UserService');
+const { UserServiceImpl } = require('../services/UserService');
 const puppeteer = require('puppeteer');
+const User = require('../models/User');
 
-/** @type {IUserService} */
 const userService = new UserServiceImpl();
 
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const { email, firstName, lastName, whatsapp, nationality, state, otherCountry } = req.body;
-    const user = await userService.register({ email, firstName, lastName, whatsapp, nationality, state, otherCountry });
-
-    const whatsappLink = process.env.VITE_WHATSAPP_LINK;
-
+    const user = await userService.register(req.body);
     res.status(201).json({
       message: 'User registered successfully',
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
-      },
-      whatsappLink
+      user,
+      whatsappLink: process.env.VITE_WHATSAPP_LINK
     });
-
   } catch (error) {
     console.error('User registration error:', error);
     if (error.code === 'VALIDATION_ERROR') {
@@ -38,15 +28,37 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.delete('/admin/users/:id', authenticateAdmin, async (req, res, next) => {
+  try {
+    const deletedUser = await userService.delete(req.params.id);
+    if (!deletedUser) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ message: 'User deleted' });
+  } catch (error) { next(error); }
+});
+
+// ✅ Admin update user (PATCH)
+router.patch('/admin/users/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const updatedUser = await userService.update(req.params.id, req.body);
+    res.json({
+      message: 'User updated successfully',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Update user error:', error);
+    if (error.code === 'NOT_FOUND') {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Get all users (admin only)
 router.get('/admin/users', authenticateAdmin, async (req, res) => {
   try {
     const users = await userService.list();
-
-    res.json({
-      users,
-      total: users.length
-    });
+    res.json({ users, total: users.length });
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -60,15 +72,12 @@ router.get('/admin/users/export', authenticateAdmin, async (req, res) => {
       .sort({ registeredAt: -1 })
       .select('-__v');
 
-    // Generate PDF using Puppeteer
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-
     const page = await browser.newPage();
 
-    // Create HTML content for PDF
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -99,6 +108,9 @@ router.get('/admin/users/export', authenticateAdmin, async (req, res) => {
               <th>WhatsApp</th>
               <th>Nationality</th>
               <th>State</th>
+              <th>DOB</th>
+              <th>Industry</th>
+              <th>Occupation</th>
               <th>Registration Date</th>
             </tr>
           </thead>
@@ -111,6 +123,9 @@ router.get('/admin/users/export', authenticateAdmin, async (req, res) => {
                 <td>${user.whatsapp}</td>
                 <td>${user.nationality}</td>
                 <td>${user.state}</td>
+                <td>${user.dateOfBirth ? `${user.dateOfBirth.day}/${user.dateOfBirth.month}` : ''}</td>
+                <td>${user.industry || ''}</td>
+                <td>${user.occupation || ''}</td>
                 <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
               </tr>
             `).join('')}
@@ -127,20 +142,13 @@ router.get('/admin/users/export', authenticateAdmin, async (req, res) => {
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
-      }
+      margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' }
     });
 
     await browser.close();
-
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="cpn-users-${new Date().toISOString().split('T')[0]}.pdf"`);
     res.send(pdfBuffer);
-
   } catch (error) {
     console.error('Export users error:', error);
     res.status(500).json({ message: 'Internal server error' });

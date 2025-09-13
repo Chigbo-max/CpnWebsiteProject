@@ -1,384 +1,319 @@
-import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
-import { FaDownload, FaUsers, FaFilter, FaSearch } from 'react-icons/fa';
-import SimpleSpinner from '../../components/SimpleSpinner';
-import PropTypes from 'prop-types';
+import { useState } from "react";
+import {
+  useGetUsersQuery,
+  useGetUserStatsQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useExportUsersPdfQuery,
+} from "../../features/admin/userManagementApi";
+import { toast } from "sonner";
+import { Loader2, Pencil, Trash2, FileDown } from "lucide-react";
 
-const UserManagement = ({ token }) => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [exporting, setExporting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterState, setFilterState] = useState('');
-  const [filterNationality, setFilterNationality] = useState('');
-  const [stats, setStats] = useState({});
+const UserManagement = () => {
+  const { data, isLoading, error } = useGetUsersQuery();
+  const { data: stats } = useGetUserStatsQuery();
+  const [updateUser] = useUpdateUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
+  const { refetch: exportUsersPdf } = useExportUsersPdfQuery(undefined, {
+    skip: true,
+  });
 
-  const nigerianStates = [
-    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
-    'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe',
-    'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara',
-    'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau',
-    'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
-  ];
+  const [editingUser, setEditingUser] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [deleteTarget, setDeleteTarget] = useState(null); // store user id for delete modal
 
-  const nationalities = [
-    'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'Morocco',
-    'Tunisia', 'Algeria', 'Libya', 'Sudan', 'Ethiopia', 'Uganda',
-    'Tanzania', 'Rwanda', 'Botswana', 'Namibia', 'Zimbabwe', 'Zambia',
-    'Malawi', 'Mozambique', 'Angola', 'Cameroon', 'Senegal', 'Mali', 'United States of America',
-    'Burkina Faso', 'Niger', 'Chad', 'Central African Republic', 'Democratic Republic of Congo',
-    'United Kingdom', 'Republic of Congo', 'Gabon', 'Equatorial Guinea', 'São Tomé and Príncipe',
-    'Cape Verde', 'Guinea-Bissau', 'Guinea', 'Sierra Leone', 'Liberia', 'Côte d\'Ivoire',
-    'Togo', 'Benin', 'Mauritania', 'Somalia', 'Djibouti', 'Eritrea', 'Burundi',
-    'Comoros', 'Madagascar', 'Mauritius', 'Seychelles', 'Other'
-  ];
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setFormData({
+      ...user,
+      dateOfBirth: user.dateOfBirth || { day: "", month: "" },
+    });
+  };
 
-  const apiBaseUrl = import.meta.env.VITE_BASE_API_URL || '';
+  const handleSave = async () => {
+    if (!formData.dateOfBirth?.day || !formData.dateOfBirth?.month) {
+      toast.error("Day and month of birth are required");
+      return;
+    }
 
-  const fetchStats = useCallback(async () => {
     try {
-      const response = await fetch(`${apiBaseUrl}/users/admin/users/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Stats fetch failed:', response.status, errorText);
-        return;
-      }
-
-      const data = await response.json();
-      setStats(data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      // Don't show toast for stats - it's secondary data
-    }
-  }, [token, apiBaseUrl]);
-
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${apiBaseUrl}/users/admin/users`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Users fetch failed:', response.status, errorText);
-        
-        if (response.status === 401) {
-          toast.error('Session expired. Please login again.');
-        } else if (response.status === 403) {
-          toast.error('Access denied. You need admin privileges.');
-        } else if (response.status === 404) {
-          toast.error('Users endpoint not found. Check server configuration.');
-        } else {
-          toast.error(`Failed to fetch users: ${response.status}`);
-        }
-        return;
-      }
-
-      const data = await response.json();
-      setUsers(data.users || []);
-      
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        toast.error('Network error. Check if server is running.');
-      } else {
-        toast.error('Error fetching users');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [token, apiBaseUrl]);
-
-  useEffect(() => {
-    fetchUsers();
-    fetchStats();
-  }, [fetchUsers, fetchStats]);
-
-  const filterUsers = useCallback(() => {
-    let filtered = users;
-
-    if (searchTerm) {
-      filtered = filtered.filter(user =>
-        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.whatsapp?.includes(searchTerm)
-      );
-    }
-
-    if (filterState) {
-      filtered = filtered.filter(user => user.state === filterState);
-    }
-
-    if (filterNationality) {
-      filtered = filtered.filter(user => user.nationality === filterNationality);
-    }
-
-    setFilteredUsers(filtered);
-  }, [users, searchTerm, filterState, filterNationality]);
-
-  useEffect(() => {
-    filterUsers();
-  }, [filterUsers]);
-
-  const exportToPDF = async () => {
-    setExporting(true);
-    try {
-      const response = await fetch(`${apiBaseUrl}/users/admin/users/export`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Export failed:', response.status, errorText);
-        toast.error('Failed to export users');
-        return;
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `cpn-users-${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      toast.success('Users exported successfully');
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error('Error exporting users');
-    } finally {
-      setExporting(false);
+      await updateUser({ id: editingUser._id, ...formData }).unwrap();
+      toast.success("User updated successfully");
+      setEditingUser(null);
+    } catch {
+      toast.error("Failed to update user");
     }
   };
 
-  if (loading) {
-    return <SimpleSpinner message="Loading users..." />;
+  const confirmDelete = async () => {
+    try {
+      await deleteUser(deleteTarget).unwrap();
+      toast.success("User deleted successfully");
+      setDeleteTarget(null);
+    } catch {
+      toast.error("Failed to delete user");
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportUsersPdf().unwrap();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "users.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Export successful");
+    } catch {
+      toast.error("Failed to export PDF");
+    }
+  };
+
+  const formatDate = (dob) => {
+    if (!dob) return "-";
+    if (dob.day && dob.month) {
+      const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+      return `${dob.day} ${monthNames[dob.month - 1]}`;
+    }
+    return "-";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-500 p-4">Failed to load users</div>;
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-          <p className="text-gray-600">Manage registered community members</p>
+    <div className="p-6 space-y-6">
+      {/* Stats Section */}
+      {stats && (
+        <div className="grid grid-cols-3 gap-6">
+          <div className="bg-white p-4 shadow rounded-lg">
+            <h3 className="text-gray-500">Total Users</h3>
+            <p className="text-2xl font-bold">{stats.totalUsers}</p>
+          </div>
+          <div className="bg-white p-4 shadow rounded-lg">
+            <h3 className="text-gray-500">Active Users</h3>
+            <p className="text-2xl font-bold">{stats.activeUsers}</p>
+          </div>
+          <div className="bg-white p-4 shadow rounded-lg">
+            <h3 className="text-gray-500">Inactive Users</h3>
+            <p className="text-2xl font-bold">{stats.inactiveUsers}</p>
+          </div>
         </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Users</h2>
         <button
-          onClick={exportToPDF}
-          disabled={exporting || users.length === 0}
-          className="inline-flex items-center gap-2 bg-accent-600 text-white px-4 py-2 rounded-lg hover:bg-accent-700 transition-colors disabled:opacity-50"
+          onClick={handleExport}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
         >
-          {exporting ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Exporting...
-            </>
-          ) : (
-            <>
-              <FaDownload />
-              Export PDF
-            </>
-          )}
+          <FileDown size={18} />
+          Export PDF
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-accent-100 rounded-lg">
-              <FaUsers className="text-accent-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalUsers || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FaUsers className="text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Today</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.todayUsers || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FaUsers className="text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">This Week</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.thisWeekUsers || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <FaUsers className="text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Filtered</p>
-              <p className="text-2xl font-bold text-gray-900">{filteredUsers.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow border">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FaSearch className="inline mr-2" />
-              Search
-            </label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name, email, or phone..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FaFilter className="inline mr-2" />
-              State
-            </label>
-            <select
-              value={filterState}
-              onChange={(e) => setFilterState(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-            >
-              <option value="">All States</option>
-              {nigerianStates.map(state => (
-                <option key={state} value={state}>{state}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FaFilter className="inline mr-2" />
-              Nationality
-            </label>
-            <select
-              value={filterNationality}
-              onChange={(e) => setFilterNationality(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-            >
-              <option value="">All Nationalities</option>
-              {nationalities.map(nationality => (
-                <option key={nationality} value={nationality}>{nationality}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilterState('');
-                setFilterNationality('');
-              }}
-              className="w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  WhatsApp
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nationality
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  State
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Registered
-                </th>
+      {/* User Table */}
+      <div className="overflow-x-auto bg-white shadow rounded-lg">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100 text-left text-sm">
+              <th className="p-3">Name</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">WhatsApp</th>
+              <th className="p-3">Nationality</th>
+              <th className="p-3">State</th>
+              <th className="p-3">DOB</th>
+              <th className="p-3">Industry</th>
+              <th className="p-3">Occupation</th>
+              <th className="p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.users?.map((user) => (
+              <tr key={user._id} className="border-t text-sm">
+                <td className="p-3">
+                  {user.firstName} {user.lastName}
+                </td>
+                <td className="p-3">{user.email}</td>
+                <td className="p-3">{user.whatsapp}</td>
+                <td className="p-3">{user.nationality}</td>
+                <td className="p-3">{user.state}</td>
+                <td className="p-3">{formatDate(user.dateOfBirth)}</td>
+                <td className="p-3">{user.industry || "-"}</td>
+                <td className="p-3">{user.occupation || "-"}</td>
+                <td className="p-3 flex gap-2">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(user._id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {user.firstName} {user.lastName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.whatsapp}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.nationality}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.state || 'N/A'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {new Date(user.registeredAt).toLocaleDateString()}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredUsers.length === 0 && users.length > 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No users found matching your criteria.
-          </div>
-        )}
-        {users.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No users found.
-          </div>
-        )}
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold mb-4">Edit User</h2>
+            <div className="space-y-3">
+              {[
+                "firstName",
+                "lastName",
+                "email",
+                "whatsapp",
+                "nationality",
+                "state",
+                "industry",
+                "occupation",
+              ].map((field) => (
+                <div key={field}>
+                  <label className="block text-sm text-gray-600 capitalize">
+                    {field}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData[field] || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [field]: e.target.value })
+                    }
+                    className="w-full border p-2 rounded"
+                  />
+                </div>
+              ))}
+
+              {/* DOB (Day + Month) */}
+              <div>
+                <label className="block text-sm text-gray-600">
+                  Date of Birth
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={formData.dateOfBirth?.day || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        dateOfBirth: {
+                          ...formData.dateOfBirth,
+                          day: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-1/2 border p-2 rounded"
+                  >
+                    <option value="">Day</option>
+                    {[...Array(31)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.dateOfBirth?.month || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        dateOfBirth: {
+                          ...formData.dateOfBirth,
+                          month: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-1/2 border p-2 rounded"
+                  >
+                    <option value="">Month</option>
+                    {[
+                      "January",
+                      "February",
+                      "March",
+                      "April",
+                      "May",
+                      "June",
+                      "July",
+                      "August",
+                      "September",
+                      "October",
+                      "November",
+                      "December",
+                    ].map((month, i) => (
+                      <option key={month} value={i + 1}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setEditingUser(null)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete this user? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserManagement;
-
-UserManagement.propTypes = {
-  token: PropTypes.string.isRequired,
-};
